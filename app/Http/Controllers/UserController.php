@@ -24,7 +24,7 @@ class UserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'password_confirmation ' => $request->password_confirmation,
-                'phone_number' => $request->phoneNumber,
+                'phone_number' => $request->phone_number,
                 'user_logo' => $userAvatar,
             ]);
 
