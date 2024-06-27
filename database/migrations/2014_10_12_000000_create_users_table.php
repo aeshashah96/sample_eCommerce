@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->unsignedBigInteger('phoneNumber');
-            $table->string('user_logo')->default(null);
+            $table->string('user_logo')->nullable();
             $table->boolean('isActive')->default(false);
             $table->rememberToken();
             $table->timestamps();
