@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->unsignedBigInteger('phoneNumber');
-            $table->string('admin_logo')->default(null);
+            $table->string('admin_logo')->nullable()->default(null);
             $table->rememberToken();
             $table->timestamps();
         });

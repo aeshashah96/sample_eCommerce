@@ -1,8 +1,13 @@
 <?php
 
+<<<<<<< HEAD
 use App\Http\Controllers\UserController;
+=======
+use App\Http\Controllers\AdminAuthController;
+>>>>>>> ef0afce (api for admin login is complited route for this is api/authenticate_admin)
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use phpseclib3\File\ASN1\Maps\AdministrationDomainName;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,3 +42,9 @@ Route::post('/userLogin',[UserController::class,'userLogin']);
 Route::group(['middleware'=>'auth:api'],function(){
     Route::get('/userLogout',[UserController::class,'userLogout']);
 });
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+
+Route::post('/authenticate_admin',[AdminAuthController::class,'admin_auth']);
