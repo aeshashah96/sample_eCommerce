@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AdminValidationRequest;
 use App\Models\Admin;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -46,12 +47,20 @@ class AdminAuthController extends Controller
         }
     }
 
-    // public function admin_logout(){
-    //     auth('adminApi')->logout();
-    //     return response()->json([
-    //         'code'=>200,
-    //         'message'=>'logout successful'
-    //     ],200);
-    // }
+    public function admin_logout(Request $request){
+        try{
+            $request->user()->tokens()->delete();
+            return response()->json([
+                'code'=>200,
+                'message'=>'logout successful'
+            ],200);
+        }catch(Exception $e){
+            return response()->json([
+                'code'=>400,
+                'error'=>$e
+            ],400);
+        }
+        
+    }
 
 }

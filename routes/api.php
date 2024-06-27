@@ -53,6 +53,6 @@ Route::group(['middleware'=>'auth:api'],function(){
 
 Route::post('/authenticate_admin',[AdminAuthController::class,'admin_auth']);
 
-// Route::get('/admin_logout',[AdminAuthController::class,'admin_logout'])->middleware('auth:adminApi');
+Route::get('/admin_logout',[AdminAuthController::class,'admin_logout'])->middleware('auth:adminApi');
 
 
