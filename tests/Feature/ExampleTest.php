@@ -12,7 +12,7 @@ class ExampleTest extends TestCase
      */
     public function test_the_application_returns_a_successful_response(): void
     {
-        $response = $this->post('/api/authenticate_admin');
+        $response = $this->get('/api/user');
 
         $response->assertStatus(200);
     }

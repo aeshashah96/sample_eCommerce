@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AdminValidationRequest;
 use App\Models\Admin;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AdminAuthController extends Controller
@@ -16,6 +17,7 @@ class AdminAuthController extends Controller
         if($user){
             $userValidation = Hash::check($request->password,$user->password);
             if($userValidation){
+                auth('adminApi')->setUser($user);
                 $token = $user->createToken('Tokenname')->accessToken;
                 return response()->json([
                     'code'=>'200',
@@ -34,6 +36,7 @@ class AdminAuthController extends Controller
                 'Message'=>'Your email is not in database please register first'
             ],200);
         }
+            
         }
         catch(Exception $e){
             return response()->json([
@@ -42,4 +45,13 @@ class AdminAuthController extends Controller
             ],500);
         }
     }
+
+    // public function admin_logout(){
+    //     auth('adminApi')->logout();
+    //     return response()->json([
+    //         'code'=>200,
+    //         'message'=>'logout successful'
+    //     ],200);
+    // }
+
 }
