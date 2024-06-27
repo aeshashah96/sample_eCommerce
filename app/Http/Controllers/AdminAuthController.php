@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AdminValidationRequest;
 use App\Models\Admin;
-use Illuminate\Http\Request;
+use Exception;
 use Illuminate\Support\Facades\Hash;
 
 class AdminAuthController extends Controller
 {
     public function admin_auth(AdminValidationRequest $request){
-        $user =  Admin::where('email',$request->email)->first();
+
+        try{
+            $user =  Admin::where('email',$request->email)->first();
         if($user){
             $userValidation = Hash::check($request->password,$user->password);
             if($userValidation){
@@ -31,6 +33,13 @@ class AdminAuthController extends Controller
                 'code'=>'200',
                 'Message'=>'Your email is not in database please register first'
             ],200);
+        }
+        }
+        catch(Exception $e){
+            return response()->json([
+                'code'=>500,
+                'error'=>$e
+            ],500);
         }
     }
 }
