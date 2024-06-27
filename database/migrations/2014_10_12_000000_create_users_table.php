@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('email');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->unsignedBigInteger('phoneNumber');
+            $table->unsignedBigInteger('phone_number');
             $table->string('user_logo')->nullable();
             $table->boolean('isActive')->default(false);
             $table->rememberToken();
