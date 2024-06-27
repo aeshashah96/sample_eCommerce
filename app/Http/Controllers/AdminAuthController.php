@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AdminValidationRequest;
 use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class AdminAuthController extends Controller
 {
-    public function admin_auth(Request $request){
+    public function admin_auth(AdminValidationRequest $request){
         $user =  Admin::where('email',$request->email)->first();
         if($user){
             $userValidation = Hash::check($request->password,$user->password);
