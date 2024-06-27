@@ -19,7 +19,21 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// User Register && Login Route 
+// Error Message....
+Route::get('/userLogin',function(){
+    return response()->json([
+        'status' => 404,
+        'msg'=>'Please Login First To Access'
+    ]);
+})->name('userLogin');
+
+
+// User Register && Login Route && LogOut 
+
 Route::post('/userRegister',[UserController::class,'userRegister']);
 Route::post('/userLogin',[UserController::class,'userLogin']);
+// Route::get('/userLogout',[UserController::class,'userLogout']);
 
+Route::group(['middleware'=>'auth:api'],function(){
+    Route::get('/userLogout',[UserController::class,'userLogout']);
+});
