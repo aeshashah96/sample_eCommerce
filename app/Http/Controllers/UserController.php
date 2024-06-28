@@ -55,6 +55,8 @@ class UserController extends Controller
 
         if (Auth::attempt($userCredential)) {
             $user = $request->user();
+            $user->isActive = true;
+            $user->save();
             $token = $user->createToken('Has API Token')->accessToken;
             return response()->json([
                 'status' => 200,
@@ -73,6 +75,8 @@ class UserController extends Controller
     // User Logout
     public function userLogout(Request $request)
     {   
+        $request->user()->isActive = false;
+        $request->user()->save();
         $request->user()->tokens()->delete();
         return response()->json(
             [
