@@ -34,10 +34,13 @@ Route::get('/error',function(){
 Route::post('/userRegister',[UserController::class,'userRegister']);
 Route::post('/userLogin',[UserController::class,'userLogin']);
 
+// User Logout && My Profile
 Route::group(['middleware'=>'auth:api'],function(){
     Route::get('/userLogout',[UserController::class,'userLogout']);
-});
+    Route::get('/my-profile',[UserController::class,'userProfile']);
+    Route::post('/update-profile',[UserController::class,'updateProfile']);
 
+});
 
 Route::post('/authenticateadmin',[AdminAuthController::class,'admin_auth']);
 
