@@ -1,10 +1,7 @@
 <?php
 
-<<<<<<< HEAD
 use App\Http\Controllers\UserController;
-=======
 use App\Http\Controllers\AdminAuthController;
->>>>>>> ef0afce (api for admin login is complited route for this is api/authenticate_admin)
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,7 +16,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-<<<<<<< HEAD
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -43,9 +39,7 @@ Route::group(['middleware'=>'auth:api'],function(){
     Route::get('/userLogout',[UserController::class,'userLogout']);
 });
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-=======
 // Route::middleware('auth:adminApi')->get('/user', function (Request $request) {
->>>>>>> 7f0b85a (solve auth guard errors)
 //     return $request->user();
 // });
 
