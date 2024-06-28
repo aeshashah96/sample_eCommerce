@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\CategoriesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -50,3 +51,6 @@ Route::post('/authenticate_admin',[AdminAuthController::class,'admin_auth']);
 Route::get('/admin_logout',[AdminAuthController::class,'admin_logout'])->middleware('auth:adminApi');
 
 
+//sunil 28/7
+Route::apiResource('/category',CategoriesController::class);
+Route::post('/category-search',[CategoriesController::class,'SearchCategory']);
