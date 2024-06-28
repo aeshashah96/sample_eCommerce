@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -37,3 +38,15 @@ Route::post('/userLogin',[UserController::class,'userLogin']);
 Route::group(['middleware'=>'auth:api'],function(){
     Route::get('/userLogout',[UserController::class,'userLogout']);
 });
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+// Route::middleware('auth:adminApi')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+
+
+Route::post('/authenticate_admin',[AdminAuthController::class,'admin_auth']);
+
+Route::get('/admin_logout',[AdminAuthController::class,'admin_logout'])->middleware('auth:adminApi');
+
+
