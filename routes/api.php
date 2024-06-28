@@ -47,6 +47,18 @@ Route::group(['middleware'=>'auth:api'],function(){
 
 Route::post('/authenticate_admin',[AdminAuthController::class,'admin_auth']);
 
-Route::get('/admin_logout',[AdminAuthController::class,'admin_logout'])->middleware('auth:adminApi');
+// harshvardhan 28 jun handle logout route errors
+Route::get('/error',function(){
+    return response()->json([
+        'status' => 404,
+        'msg'=>'Mismatch Token ..'
+    ]);
+})->name('login');
+
+
+// harshvardhan 28 jun logout route
+Route::middleware(['auth:adminApi'])->group(function(){
+    Route::get('/admin_logout',[AdminAuthController::class,'admin_logout']);
+});
 
 
