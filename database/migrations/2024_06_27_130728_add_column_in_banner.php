@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user__addresses', function (Blueprint $table) {
-            $table->id();
-            $table->text('billing_address');
-            $table->text('shipping_address');
-            $table->unsignedBigInteger('user_id');
-            $table->timestamps();
+        Schema::table('banners', function (Blueprint $table) {
+            $table->string('banner_title');
+            $table->unsignedBigInteger('sub_category_id');
         });
     }
 
@@ -25,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user__addresses');
+        Schema::table('banners', function (Blueprint $table) {
+            //
+        });
     }
 };
