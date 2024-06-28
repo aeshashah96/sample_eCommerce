@@ -75,15 +75,23 @@ class UserController extends Controller
     // User Logout
     public function userLogout(Request $request)
     {   
-        $request->user()->isActive = false;
-        $request->user()->save();
-        $request->user()->tokens()->delete();
-        return response()->json(
-            [
-                'status' => 200,
-                'msg' => 'Log Out SuccessFully',
-            ],
-            200,
-        );
+        try{
+            $request->user()->isActive = false;
+            $request->user()->save();
+            $request->user()->tokens()->delete();
+            return response()->json(
+                [
+                    'status' => 200,
+                    'msg' => 'Log Out SuccessFully',
+                ],
+                200,
+            );
+        }
+        catch(Exception $th){
+            return response()->json([
+                'status' => 'warning',
+                'msg' => $th,
+            ]);
+        }
     }
 }
