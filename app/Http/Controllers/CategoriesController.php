@@ -146,11 +146,11 @@ class CategoriesController extends Controller
         try {
             $categoryimage = time() . '.' . $request->file('category_image')->getClientOriginalExtension();
             $request->category_image->move(public_path('images/category'), $categoryimage);
-            $imagename = url("/images/category/$categoryimage");
+            // $imagename = url("/images/category/$categoryimage");
             $category = Categories::create([
                 "name" => $request->name,
                 "description" => $request->description,
-                "category_image" => $imagename
+                "category_image" => $categoryimage
             ]);
             return response()->json([
                 'success' => true,
@@ -169,8 +169,13 @@ class CategoriesController extends Controller
     {
         try {
             $category = Categories::all();
+            foreach($category as $cat){
+                $cat['image'] = url("/images/category/ ".$cat->image);
+            }
             $subcategory = Categories::select('id','name')->with('subCategory')->get();
-            
+            foreach($subcategory as $sub){
+                $sub['image'] = url("/images/category/ ".$sub->image);
+            }
                 return response()->json([
                     'success'=>true,
                     'category'=>$category,
