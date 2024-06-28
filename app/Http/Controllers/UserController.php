@@ -113,7 +113,7 @@ class UserController extends Controller
 
     // My Profile
     public function userProfile(Request $request)
-    {
+    {   
         try {
             $user = $request->user();
             if ($user) {
@@ -126,7 +126,8 @@ class UserController extends Controller
             } else {
                 return response()->json([
                     'success' => false,
-                ]);
+                    'status'=>404,
+                ],404);
             }
         } catch (\Throwable $th) {
             return response()->json([
@@ -135,5 +136,40 @@ class UserController extends Controller
                 'message' => $th,
             ]);
         }
+    }
+
+    // Update User Profile
+    public function updateProfile(Request $request)
+    {   
+        try {
+            $user = $request->user();
+            if ($request->hasFile('user_logo')) {
+                $img_path = public_path("/images/users/$user->user_logo");
+                unlink($img_path);
+                $userFile = $request->file('user_logo');
+                $userLogo = time().".".$userFile->getClientOriginalExtension();
+                $destinationPath = public_path('images/users/');
+                $userFile->move($destinationPath, $userLogo);
+                $user->update([
+                    'user_logo' => $userLogo,
+                ]);
+            }
+            $user->update($request->input());
+            return response()->json([
+                'status' => 200,
+                'success' => true,
+                'message' => 'User Updated SuccessFully',
+                'user' => $user,
+                'image_url' => url("/images/users/$user->user_logo"),
+            ],200);
+        } 
+        catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'status' => 'warning',
+                'message' => $th,
+            ]);
+        }
+       
     }
 }

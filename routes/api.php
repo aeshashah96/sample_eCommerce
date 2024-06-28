@@ -24,8 +24,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Mismatch Message....
 Route::get('/error',function(){
     return response()->json([
+        'success'=>false,
         'status' => 404,
-        'msg'=>'Mismatch Token ..'
+        'message'=>'Mismatch Token ..'
     ]);
 })->name('login');
 
@@ -39,7 +40,6 @@ Route::group(['middleware'=>'auth:api'],function(){
     Route::get('/userLogout',[UserController::class,'userLogout']);
     Route::get('/my-profile',[UserController::class,'userProfile']);
     Route::post('/update-profile',[UserController::class,'updateProfile']);
-
 });
 
 Route::post('/authenticateadmin',[AdminAuthController::class,'admin_auth']);
