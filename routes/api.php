@@ -45,7 +45,7 @@ Route::group(['middleware'=>'auth:api'],function(){
 
 
 
-Route::post('/authenticate_admin',[AdminAuthController::class,'admin_auth']);
+Route::post('/authenticateadmin',[AdminAuthController::class,'admin_auth']);
 
 // harshvardhan 28 jun handle logout route errors
 Route::get('/error',function(){
@@ -58,7 +58,10 @@ Route::get('/error',function(){
 
 // harshvardhan 28 jun logout route
 Route::middleware(['auth:adminApi'])->group(function(){
-    Route::get('/admin_logout',[AdminAuthController::class,'admin_logout']);
+    Route::get('/adminlogout',[AdminAuthController::class,'admin_logout']);
+    Route::get('/adminprofile',[AdminAuthController::class,'fetch_admin_data']);
+    Route::post('/editadminprofile',[AdminAuthController::class,'edit_admin_data']);
+    Route::post('/changeadminpassword',[AdminAuthController::class,'change_admin_password']);
 });
 
 
