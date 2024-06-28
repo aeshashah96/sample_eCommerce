@@ -21,29 +21,22 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Error Message....
-Route::get('/userLogin',function(){
+// Mismatch Message....
+Route::get('/error',function(){
     return response()->json([
         'status' => 404,
-        'msg'=>'Please Login First To Access'
+        'msg'=>'Mismatch Token ..'
     ]);
-})->name('userLogin');
+})->name('login');
 
 
 // User Register && Login Route && LogOut 
-
 Route::post('/userRegister',[UserController::class,'userRegister']);
 Route::post('/userLogin',[UserController::class,'userLogin']);
-// Route::get('/userLogout',[UserController::class,'userLogout']);
 
 Route::group(['middleware'=>'auth:api'],function(){
     Route::get('/userLogout',[UserController::class,'userLogout']);
 });
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-// Route::middleware('auth:adminApi')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
 
 
 Route::post('/authenticateadmin',[AdminAuthController::class,'admin_auth']);
@@ -65,5 +58,8 @@ Route::middleware(['auth:adminApi'])->group(function(){
     Route::post('/changeadminpassword',[AdminAuthController::class,'change_admin_password']);
     Route::resource('/banner',BannerCrudController::class);
 });
+// AdminLogin  && AdminLogout
+Route::post('/authenticate_admin',[AdminAuthController::class,'admin_auth']);
+Route::get('/admin_logout',[AdminAuthController::class,'admin_logout'])->middleware('auth:adminApi');
 
 
