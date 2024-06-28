@@ -3,6 +3,7 @@
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\SubCategoriesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -54,3 +55,6 @@ Route::get('/admin_logout',[AdminAuthController::class,'admin_logout'])->middlew
 //sunil 28/7
 Route::apiResource('/category',CategoriesController::class);
 Route::post('/category-search',[CategoriesController::class,'SearchCategory']);
+
+Route::apiResource('/sub-category',SubCategoriesController::class);
+Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCategory']);
