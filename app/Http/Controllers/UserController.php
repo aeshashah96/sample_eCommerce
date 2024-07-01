@@ -280,7 +280,7 @@ class UserController extends Controller
         }
     }
 
-    // User Reset Password
+    // User Reset Password Link
     public function resetPassword(Request $request)
     {
         try {
