@@ -82,7 +82,10 @@ Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCat
 
 
 // 1st July Banner Get Api For front end side Nikunj 
-Route::get('/home-banner',[BannersController::class,'Banner']);
+
+
+Route::get('/home-banner',[BannersController::class,'homeBanner']);
+
 
 // 28/06 Category Show Get Api  Nikunj
 Route::get('/list-category',[CategoriesController::class,'listCategory']);
