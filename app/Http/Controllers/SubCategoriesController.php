@@ -112,4 +112,29 @@ class SubCategoriesController extends Controller
             return response()->json(['success' => false, 'code' => 200, 'message' => 'Error Found'], 200);
         }
     }
+    public function showSubCategory(){
+        try {
+            $subcategory = SubCategories::all();
+            if ($subcategory){
+                return response()->json([
+                    'success' => true,
+                    'sub_category' => $subcategory,
+                    'message'=>'sub category show successfully'
+                ],200);
+            }
+            else{
+                return response()->json([
+                    'succsess' => false,
+                    'message' => 'sub category is not Found',
+                ],200);
+            }
+            
+        } catch (Exception $e) {
+            return response()->json([
+                'succsess' => false,
+                'message' => 'sub category is not get',
+                'error' => $e
+            ],200);
+        }
+    }
 }
