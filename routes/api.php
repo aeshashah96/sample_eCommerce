@@ -34,12 +34,13 @@ Route::get('/error',function(){
     ]);
 })->name('login');
 
+// <---------------------------- User Module : Nehal Solanki------------------------------------------->
 
 // User Register && Login Route && LogOut 
 Route::post('/userRegister',[UserController::class,'userRegister']);
 Route::post('/userLogin',[UserController::class,'userLogin']);
 
-// User Logout && My Profile
+// User Logout && My Profile && Forgot-Password && Reset Password 
 Route::group(['middleware'=>'auth:api'],function(){
     Route::get('/userLogout',[UserController::class,'userLogout']);
     Route::get('/my-profile',[UserController::class,'userProfile']);
@@ -48,6 +49,11 @@ Route::group(['middleware'=>'auth:api'],function(){
 });
 
 Route::post('/admin-login',[AdminAuthController::class,'admin_login']);
+Route::post('/forgot-password',[UserController::class,'forgotPassword']);
+Route::get('/reset-password',[UserController::class,'resetPassword'])->name('password.reset');
+// <------------------------------ User Module Completed ------------------------------------------------->$_COOKIE
+
+Route::post('/authenticateadmin',[AdminAuthController::class,'admin_auth']);
 
 // harshvardhan 28 jun handle logout route errors
 // Route::get('/error',function(){
