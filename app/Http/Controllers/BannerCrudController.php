@@ -144,4 +144,30 @@ class BannerCrudController extends Controller
        }
         
     }
+    // function for get banner frontend side 
+    public function showBanner()
+    {
+        try {
+            $banner = Banners::all();
+            foreach($banner as $ele){
+                $ele['image'] =  url("/images/banners/ ".$ele->image);
+            }
+            $subcategory = Banners::with('subcategory')->get();
+            foreach($subcategory as $subcat){
+                $subcat['image'] = url("/images/banners/ ".$subcat->image);
+            }
+            return response()->json([
+                'success' => true,
+                'banner' => $banner,
+                'subcatrgory' => $subcategory,
+                'message' => 'Banner get Successfully',
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'succsess' => false,
+                'message' => 'Banner is not get',
+                'error' => $e
+            ]);
+        }
+    }
 }

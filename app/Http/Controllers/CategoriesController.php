@@ -143,46 +143,30 @@ class CategoriesController extends Controller
             return response()->json(['success' => true, 'code' => 200, 'message' => 'Error Found'], 200);
         }
     }
-        
-    public function createCategoreis(Request $request)
-    {
-        try {
-            $categoryimage = time() . '.' . $request->file('category_image')->getClientOriginalExtension();
-            $request->category_image->move(public_path('images/category'), $categoryimage);
-            $imagename = url("/images/category/$categoryimage");
-            $category = Categories::create([
-                "name" => $request->name,
-                "description" => $request->description,
-                "category_image" => $imagename
-            ]);
-            return response()->json([
-                'success' => true,
-                'category' => $category
-            ], 200);
-        } catch (Exception $e) {
-            return response()->json([
-                'succsess' => false,
-                'message' => 'Category is not get',
-                'error' => $e
-            ]);
-        }
-    }
 
+    // get category list for front end side 
     public function showCategory()
     {
         try {
             $category = Categories::all();
-            if($category){
+            foreach($category as $cat){
+                $cat['image'] = url("/images/category/ ".$cat->image);
+            }
+            $subcategory = Categories::select('id','name')->with('subCategory')->get();
+            foreach($subcategory as $sub){
+                $sub['image'] = url("/images/category/ ".$sub->image);
+            }
                 return response()->json([
                     'success'=>true,
                     'category'=>$category,
-                    'message'=>'Category show successfully'
+                    'sub_category'=>$subcategory,
+                    'message'=>'Category show successfully '
                 ],200);
-            }
+            
         } catch (Exception $e) {
             return response()->json([
                 'succsess' => false,
-                'message' => 'Category is not get',
+                'message' => 'Category is not Found',
                 'error' => $e
             ]);
         }
