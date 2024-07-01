@@ -74,14 +74,13 @@
         </div>
         <div class="content">
             <h1>Welcome to Multi Shop!</h1>
-            <p>Hi {{ $user->first_name }}</p>   
+            <p>Hello <b>{{$user->first_name}}  {{$user->last_name}}</b></p>   
             <p>Thank you for joining our community! We are excited to have you on board. At Multi Shop, we strive to
                 provide the best shopping experience for our customers.</p>
             <p>As a token of our appreciation, here is a special welcome discount code just for you:</p>
             <p style="font-size: 18px; font-weight: bold;">WELCOME10</p>
             <p>Use this code at checkout to get 10% off your first purchase. Hurry up, the offer is valid for a limited
                 time only!</p>
-            {{-- <a href="{{ url('/') }}" class="button">Start Shopping</a> --}}
         </div>
         <div class="footer">
             <p>© {{ date('Y') }} MultiShop. All rights reserved.</p>
