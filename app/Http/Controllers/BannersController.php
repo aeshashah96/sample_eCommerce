@@ -168,10 +168,8 @@ class BannersController extends Controller
             ], 200);
         } catch (Exception $e) {
             return response()->json([
-                'succsess' => false,
-                'status'=>200,
-                'message' => 'Banner is not get',
-                'error' => $e
+                'code'=>$e->getCode(),
+                'message'=>$e->getMessage()
             ],200);
         }
     }
