@@ -70,8 +70,6 @@ Route::middleware(['auth:adminApi'])->group(function(){
     Route::apiResource('newsletter',NewsLetterController::class);
 });
 // AdminLogin  && AdminLogout
-Route::post('/authenticate_admin',[AdminAuthController::class,'admin_auth']);
-Route::get('/admin_logout',[AdminAuthController::class,'admin_logout'])->middleware('auth:adminApi');
 
 
 //sunil 28/7
