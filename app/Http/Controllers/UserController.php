@@ -10,7 +10,9 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
+use Throwable;
 
 class UserController extends Controller
 {
@@ -19,7 +21,6 @@ class UserController extends Controller
     {
         try {
             $userAvatar = 'userLogo.png';
-
             $user = User::create([
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
@@ -46,8 +47,7 @@ class UserController extends Controller
                     'message' => 'User Not Register',
                 ]);
             }
-        } 
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'status' => 'warning',
                 'message' => $e,
@@ -79,8 +79,7 @@ class UserController extends Controller
                     'message' => 'Invalid Credentials',
                 ]);
             }
-        } 
-        catch (\Throwable $th) {
+        } catch (\Throwable $th) {
             return response()->json([
                 'success' => false,
                 'status' => 'warning',
@@ -134,11 +133,11 @@ class UserController extends Controller
                     404,
                 );
             }
-        } catch (\Throwable $th) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'status' => 'warning',
-                'message' => $th,
+                'message' => $e,
             ]);
         }
     }
@@ -150,7 +149,9 @@ class UserController extends Controller
             $user = $request->user();
             if ($request->hasFile('user_logo')) {
                 $img_path = public_path("/images/users/$user->user_logo");
-                unlink($img_path);
+                if ($user->user_logo != 'userLogo.png') {
+                    unlink($img_path);
+                }
                 $userFile = $request->file('user_logo');
                 $userLogo = time() . '.' . $userFile->getClientOriginalExtension();
                 $destinationPath = public_path('images/users/');
@@ -170,11 +171,12 @@ class UserController extends Controller
                 ],
                 200,
             );
-        } catch (\Throwable $th) {
+        } 
+        catch (Throwable $e) {
             return response()->json([
                 'success' => false,
                 'status' => 'warning',
-                'message' => $th,
+                'message' => $e,
             ]);
         }
     }
@@ -183,11 +185,17 @@ class UserController extends Controller
     public function changePassword(Request $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'current_password' => 'required',
-                'new_password' => 'required|min:4',
-                'confirm_password' => 'required|same:new_password',
-            ]);
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'current_password' => 'required',
+                    'new_password' => 'required|min:4',
+                    'confirm_password' => 'required|same:new_password',
+                ],
+                messages: [
+                    'confirm_password' => 'Password and Confirm Password do not Match',
+                ],
+            );
 
             if ($validator->fails()) {
                 return response()->json(
@@ -223,6 +231,91 @@ class UserController extends Controller
                     200,
                 );
             }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'status' => 'warning',
+                'message' => $th,
+            ]);
+        }
+    }
+
+    // User Forgot Password
+    public function forgotPassword(Request $request)
+    {
+        try {
+            $email = $request->only('email');
+            $validator = Validator::make($email, [
+                'email' => 'required|email',
+            ]);
+            if ($validator->fails()) {
+                return response()->json($validator->errors());
+            }
+
+            $status = Password::sendResetLink($email);
+
+            return $status === Password::RESET_LINK_SENT
+                ? response()->json(
+                    [
+                        'success' => true,
+                        'status' => 200,
+                        'message' => __($status),
+                    ],
+                    200,
+                )
+                : response()->json(
+                    [
+                        'success' => false,
+                        'status' => 400,
+                        'message' => __($status),
+                    ],
+                    400,
+                );
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'status' => 'warning',
+                'message' => $th,
+            ]);
+        }
+    }
+
+    // User Reset Password Link
+    public function resetPassword(Request $request)
+    {
+        try {
+            $input = $request->only('email', 'token', 'password', 'password_confirmation');
+            $validator = Validator::make($input, [
+                'token' => 'required',
+                'email' => 'required|email',
+                'password' => 'required|confirmed|min:3',
+            ]);
+            if ($validator->fails()) {
+                return response()->json($validator->errors());
+            }
+
+            $status = Password::reset($input, function ($user, $password) {
+                $user->password = Hash::make($password);
+                $user->save();
+            });
+
+            return $status === Password::PASSWORD_RESET
+                ? response()->json(
+                    [
+                        'success' => true,
+                        'status' => 200,
+                        'message' => __($status),
+                    ],
+                    200,
+                )
+                : response()->json(
+                    [
+                        'success' => false,
+                        'status' => 404,
+                        'message' => __($status),
+                    ],
+                    404,
+                );
         } catch (\Throwable $th) {
             return response()->json([
                 'success' => false,
