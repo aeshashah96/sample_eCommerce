@@ -15,7 +15,7 @@ class NewsLetterController extends Controller
     public function index()
     {   
         try{
-            $data = NewsLetter::get();
+            $data = NewsLetter::paginate(10);
             return response()->json([
                 'code'=>200,
                 'data'=>$data
