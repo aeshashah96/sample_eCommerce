@@ -5,6 +5,8 @@ use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\SubCategoriesController;
 use App\Http\Controllers\BannerCrudController;
+use App\Http\Controllers\BannersController;
+use App\Http\Controllers\CategoriesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -74,3 +76,14 @@ Route::post('/category-search',[CategoriesController::class,'SearchCategory']);
 
 Route::apiResource('/sub-category',SubCategoriesController::class);
 Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCategory']);
+// 28/06 Banner Show Get Api  Nikunj
+
+Route::get('/banner',[BannersController::class,'showBanner']);
+
+Route::post('/createbanner',[BannersController::class,'bannerCreate']);
+
+// 28/06 Category Show Get Api  Nikunj
+Route::post('/createcategory',[CategoriesController::class,'createCategoreis']);
+Route::get('/category',[CategoriesController::class,'showCategory']);
+
+

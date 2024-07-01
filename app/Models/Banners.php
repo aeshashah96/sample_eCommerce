@@ -17,6 +17,9 @@ class Banners extends Model
     ]; 
     public function getSubCategory()
     {
+    protected $fillable = ['image','description','banner_title','sub_category_id'];
+
+    public function subcategory(){
         return $this->belongsTo(SubCategories::class,'sub_category_id','id');
     }
 }
