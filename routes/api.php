@@ -78,32 +78,14 @@ Route::post('/category-search',[CategoriesController::class,'SearchCategory']);
 
 Route::apiResource('/sub-category',SubCategoriesController::class);
 Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCategory']);
-// 28/06 Banner Show Get Api  Nikunj
-
-
-// 1st July Banner Get Api For front end side Nikunj 
-
-
-Route::get('/home-banner',[BannersController::class,'homeBanner']);
 
 
 // 28/06 Category Show Get Api  Nikunj
 Route::get('/list-category',[CategoriesController::class,'listCategory']);
-Route::get('/banner',[BannersController::class,'showBanner']);
 // 1st July Banner Get Api For front end side Nikunj 
-Route::get('/show-banner',[BannersController::class,'showBanner']);
-Route::post('/createbanner',[BannersController::class,'bannerCreate']);
-
-Route::get('/banner',[BannersController::class,'showBanner']);
-Route::post('/createbanner',[BannersController::class,'bannerCreate']);
 
 // 1st July Banner Get Api For front end side Nikunj 
-Route::get('/show-banner',[BannersController::class,'showBanner']);
-
-
-// 28/06 Category Show Get Api  Nikunj
-Route::post('/create-category',[CategoriesController::class,'createCategoreis']);
-Route::get('/show-category',[CategoriesController::class,'showCategory']);
+Route::get('/home-banner',[BannersController::class,'homeBanner']);
 
 // 28/06 Sub Category Show Get Api Nikunj
 Route::get('/list-subcategory',[SubCategoriesController::class,'listSubCategory']);
@@ -111,3 +93,7 @@ Route::get('/list-subcategory',[SubCategoriesController::class,'listSubCategory'
 // 01/07 Add ContactUs Post Api Nikunj 
 
 Route::post('/add-contact',[ContactsController::class,'addContactUs']);
+
+// 01/07 Add NewsLetter Post Api Front Side Nikunj 
+
+Route::post('/add-news-letter',[NewsLetterController::class,'addNewsLetter']);

@@ -15,6 +15,8 @@ class ContactsController extends Controller
             'subject'=>$request->subject,
             'message'=>$request->message,
         ]);
+
+        // dd($contact);
         if($contact){
             SendEmailContactUsUser::dispatch($contact);
             return response()->json([

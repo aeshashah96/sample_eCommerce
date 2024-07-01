@@ -25,7 +25,6 @@ class NewsLatterRequest extends FormRequest
     {
             return [
                 'email'=>'required|email|unique:news_letters,email',
-                'is_subscribe'=>'required|boolean'
             ];
     }
 
