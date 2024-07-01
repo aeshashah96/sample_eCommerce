@@ -169,13 +169,15 @@ class CategoriesController extends Controller
     {
         try {
             $category = Categories::all();
-            if($category){
+            $subcategory = Categories::select('id','name')->with('subCategory')->get();
+            
                 return response()->json([
                     'success'=>true,
                     'category'=>$category,
-                    'message'=>'Category show successfully'
+                    'sub_category'=>$subcategory,
+                    'message'=>'Category show successfully '
                 ],200);
-            }
+            
         } catch (Exception $e) {
             return response()->json([
                 'succsess' => false,

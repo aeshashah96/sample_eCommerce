@@ -6,7 +6,6 @@ use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\SubCategoriesController;
 use App\Http\Controllers\BannerCrudController;
 use App\Http\Controllers\BannersController;
-use App\Http\Controllers\CategoriesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -79,11 +78,11 @@ Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCat
 // 28/06 Banner Show Get Api  Nikunj
 
 Route::get('/banner',[BannersController::class,'showBanner']);
-
 Route::post('/createbanner',[BannersController::class,'bannerCreate']);
 
 // 28/06 Category Show Get Api  Nikunj
-Route::post('/createcategory',[CategoriesController::class,'createCategoreis']);
-Route::get('/category',[CategoriesController::class,'showCategory']);
+Route::post('/create-category',[CategoriesController::class,'createCategoreis']);
+Route::get('/show-category',[CategoriesController::class,'showCategory']);
 
-
+// 28/06 Sub Category Show Get Api Nikunj
+Route::get('/show-subcategory',[SubCategoriesController::class,'showSubCategory']);
