@@ -92,6 +92,12 @@ class BannersController extends Controller
     {   
         try{
             $item = Banners::find($id);
+            if(!$item){
+                return response()->json([
+                    'code'=>401,
+                    'message'=>'record not found'
+                 ],401);  
+            }
             if($request->has('image')){
                 if($item->image){
                     $name = $item->image;
@@ -106,10 +112,7 @@ class BannersController extends Controller
                  $item->image = $banner_name;
                  $item->banner_url =url("/upload/banners/$banner_name");
              }
-               $item->description=$request->description;
-               $item->banner_title=$request->banner_title;
-               $item->sub_category_id=$request->sub_category_id;
-               $item->save();
+               $item->update($request->input());
                return response()->json([
                 'code'=>200,
                 'message'=>'banner updated successfully'
