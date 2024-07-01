@@ -51,7 +51,7 @@ Route::group(['middleware'=>'auth:api'],function(){
 Route::post('/admin-login',[AdminAuthController::class,'admin_login']);
 Route::post('/forgot-password',[UserController::class,'forgotPassword']);
 Route::get('/reset-password',[UserController::class,'resetPassword'])->name('password.reset');
-// <------------------------------ User Module Completed ------------------------------------------------->$_COOKIE
+// <------------------------------ User Module Completed ------------------------------------------------->
 
 Route::post('/authenticateadmin',[AdminAuthController::class,'admin_auth']);
 
