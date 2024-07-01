@@ -10,8 +10,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -20,7 +19,7 @@ class UserController extends Controller
     {
         try {
             $userAvatar = 'userLogo.png';
-   
+
             $user = User::create([
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
@@ -32,7 +31,7 @@ class UserController extends Controller
             ]);
 
             if ($user) {
-                // SendEmailUser::dispatch($user);
+                SendEmailUser::dispatch($user);
                 return response()->json([
                     'success' => true,
                     'status' => 200,
@@ -87,7 +86,7 @@ class UserController extends Controller
         try {
             $request->user()->isActive = false;
             $request->user()->save();
-            $request->user()->tokens()->delete();
+            $request->user()->token()->delete();
             return response()->json(
                 [
                     'success' => true,
@@ -107,7 +106,7 @@ class UserController extends Controller
 
     // My Profile
     public function userProfile(Request $request)
-    {   
+    {
         try {
             $user = $request->user();
             if ($user) {
@@ -118,10 +117,13 @@ class UserController extends Controller
                     'image_url' => url("/images/users/$user->user_logo"),
                 ]);
             } else {
-                return response()->json([
-                    'success' => false,
-                    'status'=>404,
-                ],404);
+                return response()->json(
+                    [
+                        'success' => false,
+                        'status' => 404,
+                    ],
+                    404,
+                );
             }
         } catch (\Throwable $th) {
             return response()->json([
@@ -134,14 +136,14 @@ class UserController extends Controller
 
     // Update User Profile
     public function updateProfile(Request $request)
-    {   
+    {
         try {
             $user = $request->user();
             if ($request->hasFile('user_logo')) {
                 $img_path = public_path("/images/users/$user->user_logo");
                 unlink($img_path);
                 $userFile = $request->file('user_logo');
-                $userLogo = time().".".$userFile->getClientOriginalExtension();
+                $userLogo = time() . '.' . $userFile->getClientOriginalExtension();
                 $destinationPath = public_path('images/users/');
                 $userFile->move($destinationPath, $userLogo);
                 $user->update([
@@ -149,13 +151,16 @@ class UserController extends Controller
                 ]);
             }
             $user->update($request->input());
-            return response()->json([
-                'status' => 200,
-                'success' => true,
-                'message' => 'User Updated SuccessFully',
-                'user' => $user,
-                'image_url' => url("/images/users/$user->user_logo"),
-            ],200);
+            return response()->json(
+                [
+                    'status' => 200,
+                    'success' => true,
+                    'message' => 'User Updated SuccessFully',
+                    'user' => $user,
+                    'image_url' => url("/images/users/$user->user_logo"),
+                ],
+                200,
+            );
         } 
         catch (\Throwable $th) {
             return response()->json([
@@ -164,6 +169,52 @@ class UserController extends Controller
                 'message' => $th,
             ]);
         }
-       
+    }
+
+    // User Change Password
+    public function changePassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required',
+            'new_password' => 'required|min:4',
+            'confirm_password' => 'required|same:new_password',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'message' => 'validations fails',
+                    'errors' => $validator->errors(),
+                ],
+                422,
+            );
+        }
+
+        $user = $request->user();
+        if (Hash::check($request->current_password, $user->password)) {
+            $user->update([
+                'password' => Hash::make($request->new_password),
+            ]);
+
+            return response()->json(
+                [
+                    'success'=>true,
+                    'status' => 200,
+                    'message' => 'Password Successfully Updated',
+                    'errors' => $validator->errors(),
+                ],
+                200,
+            );
+        }
+        else{
+            return response()->json(
+                [
+                    'success'=>false,
+                    'status' => 200,
+                    'message' => 'Invalid Password',
+                ],
+                200,
+            );
+        }
     }
 }
