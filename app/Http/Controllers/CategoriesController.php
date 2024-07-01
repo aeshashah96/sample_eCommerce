@@ -143,13 +143,6 @@ class CategoriesController extends Controller
             return response()->json(['success' => true, 'code' => 200, 'message' => 'Error Found'], 200);
         }
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 55e2d06 (minor file changes)
-=======
         
     public function createCategoreis(Request $request)
     {
@@ -174,31 +167,22 @@ class CategoriesController extends Controller
             ]);
         }
     }
->>>>>>> 49c54a0 (minor file changes)
-<<<<<<< HEAD
->>>>>>> 33a0fd7 (minor file changes)
-=======
-=======
->>>>>>> 8876e7c (Banners Update)
-=======
->>>>>>> 15efae8 (minor file changes)
->>>>>>> 55e2d06 (minor file changes)
 
     // get category list for front end side 
-    public function showCategory()
->>>>>>> 4ec28da (Banners Update)
+    public function listCategory()
     {
         try {
-            $category = Categories::all();
+            $category = Categories::orderBy('id','DESC')->all();
             foreach($category as $cat){
-                $cat['image'] = url("/images/category/ ".$cat->image);
+                $cat['category_image'] = url("/images/category/ ".$cat->category_image);
             }
             $subcategory = Categories::select('id','name')->with('subCategory')->get();
             foreach($subcategory as $sub){
-                $sub['image'] = url("/images/category/ ".$sub->image);
+                $sub['category_image'] = url("/images/category/ ".$sub->category_image);
             }
                 return response()->json([
                     'success'=>true,
+                    'status'=>200,
                     'category'=>$category,
                     'sub_category'=>$subcategory,
                     'message'=>'Category show successfully '
@@ -207,6 +191,7 @@ class CategoriesController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'succsess' => false,
+                'status'=>200,
                 'message' => 'Category is not Found',
                 'error' => $e
             ]);

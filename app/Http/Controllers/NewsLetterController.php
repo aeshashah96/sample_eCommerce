@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\NewsLatterRequest;
+use App\Jobs\SendEmailNewsPaper;
 use App\Models\NewsLetter;
 use Exception;
 use Illuminate\Http\Request;
@@ -103,6 +104,26 @@ class NewsLetterController extends Controller
                 'code'=>404,
                 'error'=>$e
             ],404);
+        }
+    }
+
+    public function addNewsLetter(NewsLatterRequest $request){
+        $newsletter = NewsLetter::create($request->input());
+        if($newsletter){
+            SendEmailNewsPaper::dispatch($newsletter);
+            return response()->json([
+                'success'=>true,
+                'status'=>200,
+                'message'=>'News Letter Add Successwfully',
+                'newsletter'=>$newsletter 
+            ],200);
+        }
+        else{
+            return response()->json([
+                'success'=>false,
+                'status'=>200,
+                'mesasge'=>'News Letters are not added'
+            ],200);
         }
     }
 }

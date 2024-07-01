@@ -148,7 +148,7 @@ class BannersController extends Controller
     public function homeBanner()
     {
         try {
-            $banner = Banners::all();
+            $banner = Banners::orderBy('id','DESC')->get();
             foreach($banner as $ele){
                 $ele['image'] =  url("/images/banners/ ".$ele->image);
             }
@@ -158,6 +158,7 @@ class BannersController extends Controller
             }
             return response()->json([
                 'success' => true,
+                'status'=>200,
                 'banner' => $banner,
                 'subcatrgory' => $subcategory,
                 'message' => 'Banner get Successfully',
@@ -165,9 +166,10 @@ class BannersController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'succsess' => false,
+                'status'=>200,
                 'message' => 'Banner is not get',
                 'error' => $e
-            ]);
+            ],200);
         }
     }
 }
