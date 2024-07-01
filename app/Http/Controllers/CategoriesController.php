@@ -144,6 +144,7 @@ class CategoriesController extends Controller
         }
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         
     public function createCategoreis(Request $request)
@@ -173,16 +174,28 @@ class CategoriesController extends Controller
 
     // get category list for front end side 
     public function listCategory()
+=======
+
+    // get category list for front end side 
+    public function showCategory()
+>>>>>>> 4ec28da (Banners Update)
     {
         try {
             $category = Categories::all();
-            if($category){
+            foreach($category as $cat){
+                $cat['image'] = url("/images/category/ ".$cat->image);
+            }
+            $subcategory = Categories::select('id','name')->with('subCategory')->get();
+            foreach($subcategory as $sub){
+                $sub['image'] = url("/images/category/ ".$sub->image);
+            }
                 return response()->json([
                     'success'=>true,
                     'category'=>$category,
-                    'message'=>'Category show successfully'
+                    'sub_category'=>$subcategory,
+                    'message'=>'Category show successfully '
                 ],200);
-            }
+            
         } catch (Exception $e) {
             return response()->json([
                 'succsess' => false,

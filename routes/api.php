@@ -90,6 +90,8 @@ Route::get('/home-banner',[BannersController::class,'Banner']);
 // 28/06 Category Show Get Api  Nikunj
 Route::get('/list-category',[CategoriesController::class,'listCategory']);
 Route::get('/banner',[BannerCrudController::class,'showBanner']);
+// 1st July Banner Get Api For front end side Nikunj 
+Route::get('/show-banner',[BannerCrudController::class,'showBanner']);
 
 // 28/06 Category Show Get Api  Nikunj
 Route::get('/show-category',[CategoriesController::class,'showCategory']);
