@@ -81,8 +81,8 @@ Route::apiResource('/sub-category',SubCategoriesController::class);
 Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCategory']);
 // 28/06 Banner Show Get Api  Nikunj
 
-Route::get('/banner',[BannersController::class,'showBanner']);
-Route::post('/createbanner',[BannersController::class,'bannerCreate']);
+// 1st July Banner Get Api For front end side Nikunj 
+Route::get('/show-banner',[BannersController::class,'showBanner']);
 
 // 28/06 Category Show Get Api  Nikunj
 Route::get('/show-category',[CategoriesController::class,'showCategory']);
