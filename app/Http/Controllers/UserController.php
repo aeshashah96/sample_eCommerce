@@ -46,7 +46,8 @@ class UserController extends Controller
                     'message' => 'User Not Register',
                 ]);
             }
-        } catch (Exception $e) {
+        } 
+        catch (Exception $e) {
             return response()->json([
                 'status' => 'warning',
                 'message' => $e,
@@ -57,25 +58,33 @@ class UserController extends Controller
     // User Login
     public function userLogin(UserLogin $request)
     {
-        $userCredential = request(['email', 'password']);
-
-        if (Auth::attempt($userCredential)) {
-            $user = $request->user();
-            $user->isActive = true;
-            $user->save();
-            $token = $user->createToken('Has API Token')->accessToken;
-            return response()->json([
-                'success' => true,
-                'status' => 200,
-                'message' => 'Login In SuccessFully',
-                'token' => $token,
-                'user' => $user,
-            ]);
-        } else {
+        try {
+            $userCredential = request(['email', 'password']);
+            if (Auth::attempt($userCredential)) {
+                $user = $request->user();
+                $user->isActive = true;
+                $user->save();
+                $token = $user->createToken('Has API Token')->accessToken;
+                return response()->json([
+                    'success' => true,
+                    'status' => 200,
+                    'message' => 'Login In SuccessFully',
+                    'token' => $token,
+                    'user' => $user,
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'status' => 401,
+                    'message' => 'Invalid Credentials',
+                ]);
+            }
+        } 
+        catch (\Throwable $th) {
             return response()->json([
                 'success' => false,
-                'status' => 401,
-                'message' => 'Invalid Credentials',
+                'status' => 'warning',
+                'message' => $th,
             ]);
         }
     }
@@ -95,11 +104,11 @@ class UserController extends Controller
                 ],
                 200,
             );
-        } catch (Exception $e) {
+        } catch (\Throwable $th) {
             return response()->json([
                 'success' => false,
                 'status' => 'warning',
-                'message' => $e,
+                'message' => $th,
             ]);
         }
     }
@@ -161,8 +170,7 @@ class UserController extends Controller
                 ],
                 200,
             );
-        } 
-        catch (\Throwable $th) {
+        } catch (\Throwable $th) {
             return response()->json([
                 'success' => false,
                 'status' => 'warning',
@@ -174,47 +182,53 @@ class UserController extends Controller
     // User Change Password
     public function changePassword(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'current_password' => 'required',
-            'new_password' => 'required|min:4',
-            'confirm_password' => 'required|same:new_password',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(
-                [
-                    'message' => 'validations fails',
-                    'errors' => $validator->errors(),
-                ],
-                422,
-            );
-        }
-
-        $user = $request->user();
-        if (Hash::check($request->current_password, $user->password)) {
-            $user->update([
-                'password' => Hash::make($request->new_password),
+        try {
+            $validator = Validator::make($request->all(), [
+                'current_password' => 'required',
+                'new_password' => 'required|min:4',
+                'confirm_password' => 'required|same:new_password',
             ]);
 
-            return response()->json(
-                [
-                    'success'=>true,
-                    'status' => 200,
-                    'message' => 'Password Successfully Updated',
-                    'errors' => $validator->errors(),
-                ],
-                200,
-            );
-        }
-        else{
-            return response()->json(
-                [
-                    'success'=>false,
-                    'status' => 200,
-                    'message' => 'Invalid Password',
-                ],
-                200,
-            );
+            if ($validator->fails()) {
+                return response()->json(
+                    [
+                        'message' => 'validations fails',
+                        'errors' => $validator->errors(),
+                    ],
+                    422,
+                );
+            }
+
+            $user = $request->user();
+            if (Hash::check($request->current_password, $user->password)) {
+                $user->update([
+                    'password' => Hash::make($request->new_password),
+                ]);
+
+                return response()->json(
+                    [
+                        'success' => true,
+                        'status' => 200,
+                        'message' => 'Password Successfully Updated',
+                    ],
+                    200,
+                );
+            } else {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'status' => 200,
+                        'message' => 'Invalid Password',
+                    ],
+                    200,
+                );
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'status' => 'warning',
+                'message' => $th,
+            ]);
         }
     }
 }
