@@ -132,7 +132,7 @@ class SubCategoriesController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'succsess' => false,
-                'message' => 'sub category is not get',
+                'message' => 'sub category is not Found',
                 'error' => $e
             ],200);
         }
