@@ -8,6 +8,7 @@ use App\Http\Controllers\BannersController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\NewsLetterController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -82,7 +83,7 @@ Route::middleware(['auth:adminApi'])->group(function(){
 // AdminLogin  && AdminLogout
 
 
-//sunil 28/7
+//sunil 28/6
 Route::apiResource('/category',CategoriesController::class);
 Route::post('/category-search',[CategoriesController::class,'SearchCategory']);
 
@@ -110,3 +111,8 @@ Route::post('/add-contact',[ContactsController::class,'addContactUs']);
 // 01/07 Add NewsLetter Post Api Front Side Nikunj 
 
 Route::post('/add-news-letter',[NewsLetterController::class,'addNewsLetter']);
+Route::get('/show-subcategory',[SubCategoriesController::class,'showSubCategory']);
+
+//sunil 1/7
+
+Route::apiResource('product',ProductController::class);
