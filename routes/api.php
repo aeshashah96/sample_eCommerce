@@ -4,6 +4,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\BannerCrudController;
 use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\SubCategoriesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -76,10 +77,14 @@ Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCat
 // 28/06 Banner Show Get Api  Nikunj
 
 // 1st July Banner Get Api For front end side Nikunj 
-Route::get('/show-banner',[BannerCrudController::class,'showBanner']);
+Route::get('/home-banner',[BannerCrudController::class,'Banner']);
 
 // 28/06 Category Show Get Api  Nikunj
-Route::get('/show-category',[CategoriesController::class,'showCategory']);
+Route::get('/list-category',[CategoriesController::class,'listCategory']);
 
 // 28/06 Sub Category Show Get Api Nikunj
-Route::get('/show-subcategory',[SubCategoriesController::class,'showSubCategory']);
+Route::get('/list-subcategory',[SubCategoriesController::class,'listSubCategory']);
+
+// 01/07 Add ContactUs Post Api Nikunj 
+
+Route::post('/add-contact',[ContactsController::class,'addContactUs']);

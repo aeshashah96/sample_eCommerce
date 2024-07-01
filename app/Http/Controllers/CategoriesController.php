@@ -145,7 +145,7 @@ class CategoriesController extends Controller
     }
 
     // get category list for front end side 
-    public function showCategory()
+    public function listCategory()
     {
         try {
             $category = Categories::all();

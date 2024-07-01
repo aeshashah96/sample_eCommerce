@@ -145,7 +145,7 @@ class BannerCrudController extends Controller
         
     }
     // function for get banner frontend side 
-    public function showBanner()
+    public function homeBanner()
     {
         try {
             $banner = Banners::all();
