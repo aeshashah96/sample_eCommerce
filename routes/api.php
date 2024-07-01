@@ -7,6 +7,7 @@ use App\Http\Controllers\SubCategoriesController;
 use App\Http\Controllers\BannersController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\NewsLetterController;
+use App\Http\Controllers\SettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -74,6 +75,9 @@ Route::middleware(['auth:adminApi'])->group(function(){
 
     // harshvardhan 1 jul news letter task 
     Route::apiResource('newsletter',NewsLetterController::class);
+
+    Route::get('get-setting',[SettingController::class,'getSettingData']);
+    Route::post('update-setting',[SettingController::class,'updateSettingData']);
 });
 // AdminLogin  && AdminLogout
 
@@ -89,6 +93,9 @@ Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCat
 // 28/06 Category Show Get Api  Nikunj
 Route::get('/list-category',[CategoriesController::class,'listCategory']);
 // 1st July Banner Get Api For front end side Nikunj 
+Route::post('/createbanner',[BannersController::class,'bannerCreate']);
+
+Route::post('/createbanner',[BannersController::class,'bannerCreate']);
 
 // 1st July Banner Get Api For front end side Nikunj 
 Route::get('/home-banner',[BannersController::class,'homeBanner']);
