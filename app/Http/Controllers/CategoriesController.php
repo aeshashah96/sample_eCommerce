@@ -141,6 +141,9 @@ class CategoriesController extends Controller
             return response()->json(['success' => true, 'code' => 200, 'message' => 'Category Get Successfully', 'Categories' => $category]);
         } else {
             return response()->json(['success' => true, 'code' => 200, 'message' => 'Error Found'], 200);
+        }
+    }
+    
     public function createCategoreis(Request $request)
     {
         try {

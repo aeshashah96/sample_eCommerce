@@ -12,8 +12,8 @@ class Categories extends Model
 
     public function subCategories(){
        return $this->hasMany(SubCategories::class,'category_id','id');
-    protected $fillable = ['name','description','category_image'];
-
+    }
+    
     public function products(){
         return $this->hasMany(Product::class,'category_id','id');
     }
