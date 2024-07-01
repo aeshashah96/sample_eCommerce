@@ -43,17 +43,18 @@ Route::group(['middleware'=>'auth:api'],function(){
     Route::get('/userLogout',[UserController::class,'userLogout']);
     Route::get('/my-profile',[UserController::class,'userProfile']);
     Route::post('/update-profile',[UserController::class,'updateProfile']);
+    Route::post('/change-password',[UserController::class,'changePassword']);
 });
 
 Route::post('/authenticateadmin',[AdminAuthController::class,'admin_auth']);
 
 // harshvardhan 28 jun handle logout route errors
-Route::get('/error',function(){
-    return response()->json([
-        'status' => 404,
-        'msg'=>'Mismatch Token ..'
-    ]);
-})->name('login');
+// Route::get('/error',function(){
+//     return response()->json([
+//         'status' => 404,
+//         'msg'=>'Mismatch Token ..'
+//     ]);
+// })->name('login');
 
 
 // harshvardhan 28 jun logout route
