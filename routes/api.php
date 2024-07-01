@@ -85,6 +85,7 @@ Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCat
 Route::get('/show-banner',[BannersController::class,'showBanner']);
 
 // 28/06 Category Show Get Api  Nikunj
+Route::post('/create-category',[CategoriesController::class,'createCategoreis']);
 Route::get('/show-category',[CategoriesController::class,'showCategory']);
 
 // 28/06 Sub Category Show Get Api Nikunj
