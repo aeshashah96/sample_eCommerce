@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\BannersController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\SubCategoriesController;
-use App\Http\Controllers\BannerCrudController;
 use App\Http\Controllers\NewsLetterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -46,7 +46,7 @@ Route::group(['middleware'=>'auth:api'],function(){
     Route::post('/change-password',[UserController::class,'changePassword']);
 });
 
-Route::post('/authenticateadmin',[AdminAuthController::class,'admin_auth']);
+Route::post('/admin-login',[AdminAuthController::class,'admin_login']);
 
 // harshvardhan 28 jun handle logout route errors
 // Route::get('/error',function(){
@@ -59,12 +59,11 @@ Route::post('/authenticateadmin',[AdminAuthController::class,'admin_auth']);
 
 // harshvardhan 28 jun logout route
 Route::middleware(['auth:adminApi'])->group(function(){
-    Route::get('/adminlogout',[AdminAuthController::class,'admin_logout']);
-    Route::get('/adminprofile',[AdminAuthController::class,'fetch_admin_data']);
-    Route::post('/editadminprofile',[AdminAuthController::class,'edit_admin_data']);
-    Route::post('/changeadminpassword',[AdminAuthController::class,'change_admin_password']);
-    Route::resource('/banner',BannerCrudController::class);
-    Route::apiResource('/newsletter',NewsLetterController::class);
+    Route::get('/admin-logout',[AdminAuthController::class,'admin_logout']);
+    Route::get('/admin-profile',[AdminAuthController::class,'admin_profile']);
+    Route::post('/edit-admin-profile',[AdminAuthController::class,'edit_admin_profile']);
+    Route::post('/change-admin-password',[AdminAuthController::class,'change_admin_password']);
+    Route::resource('/banner',BannersController::class);
 
     // harshvardhan 1 jul news letter task 
     Route::apiResource('newsletter',NewsLetterController::class);
@@ -82,13 +81,10 @@ Route::apiResource('/sub-category',SubCategoriesController::class);
 Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCategory']);
 // 28/06 Banner Show Get Api  Nikunj
 
-Route::get('/banner',[BannerCrudController::class,'showBanner']);
-// 1st July Banner Get Api For front end side Nikunj 
-Route::get('/show-banner',[BannerCrudController::class,'showBanner']);
-Route::post('/createbanner',[BannerCrudController::class,'bannerCreate']);
+Route::get('/banner',[BannersController::class,'showBanner']);
+Route::post('/createbanner',[BannersController::class,'bannerCreate']);
 
 // 28/06 Category Show Get Api  Nikunj
-Route::post('/create-category',[CategoriesController::class,'createCategoreis']);
 Route::get('/show-category',[CategoriesController::class,'showCategory']);
 
 // 28/06 Sub Category Show Get Api Nikunj
