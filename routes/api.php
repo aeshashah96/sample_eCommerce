@@ -2,10 +2,9 @@
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\BannerCrudController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\SubCategoriesController;
-use App\Http\Controllers\BannerCrudController;
-use App\Http\Controllers\BannersController;
 use App\Http\Controllers\NewsLetterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -64,9 +63,7 @@ Route::middleware(['auth:adminApi'])->group(function(){
     Route::post('/editadminprofile',[AdminAuthController::class,'edit_admin_data']);
     Route::post('/changeadminpassword',[AdminAuthController::class,'change_admin_password']);
     Route::resource('/banner',BannerCrudController::class);
-
-    // harshvardhan 1 jul news letter task 
-    Route::apiResource('newsletter',NewsLetterController::class);
+    Route::apiResource('/newsletter',NewsLetterController::class);
 });
 // AdminLogin  && AdminLogout
 Route::post('/authenticate_admin',[AdminAuthController::class,'admin_auth']);
@@ -81,11 +78,9 @@ Route::apiResource('/sub-category',SubCategoriesController::class);
 Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCategory']);
 // 28/06 Banner Show Get Api  Nikunj
 
-Route::get('/banner',[BannersController::class,'showBanner']);
-Route::post('/createbanner',[BannersController::class,'bannerCreate']);
+Route::get('/banner',[BannerCrudController::class,'showBanner']);
 
 // 28/06 Category Show Get Api  Nikunj
-Route::post('/create-category',[CategoriesController::class,'createCategoreis']);
 Route::get('/show-category',[CategoriesController::class,'showCategory']);
 
 // 28/06 Sub Category Show Get Api Nikunj
