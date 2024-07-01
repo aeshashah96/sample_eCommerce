@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminAuthController extends Controller
 {
-    public function admin_auth(AdminValidationRequest $request){
+    public function admin_login(AdminValidationRequest $request){
 
         try{
             $user =  Admin::where('email',$request->email)->first();
@@ -63,7 +63,7 @@ class AdminAuthController extends Controller
         
     }
 
-    public function fetch_admin_data(Request $request){
+    public function admin_profile(Request $request){
         try{
             $user =  $request->user();
             return response()->json([
@@ -78,7 +78,7 @@ class AdminAuthController extends Controller
         }
     }
 
-    public function edit_admin_data(AdminEditProfileRequest $request){
+    public function edit_admin_profile(AdminEditProfileRequest $request){
         try{
             $item = Admin::find($request->user()->id);
         if($request->has('admin_logo')){
