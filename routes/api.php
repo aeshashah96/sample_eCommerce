@@ -3,7 +3,6 @@
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\CategoriesController;
-use App\Http\Controllers\ContactController;
 use App\Http\Controllers\SubCategoriesController;
 use App\Http\Controllers\BannersController;
 use App\Http\Controllers\ContactsController;
@@ -69,7 +68,6 @@ Route::middleware(['auth:adminApi'])->group(function(){
 
     // harshvardhan 1 jul news letter task 
     Route::apiResource('newsletter',NewsLetterController::class);
-    Route::apiResource('/contact',ContactController::class);
 });
 // AdminLogin  && AdminLogout
 Route::post('/authenticate_admin',[AdminAuthController::class,'admin_auth']);

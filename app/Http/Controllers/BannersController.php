@@ -7,7 +7,7 @@ use App\Models\Banners;
 use Exception;
 use Illuminate\Http\Request;
 
-class BannerCrudController extends Controller
+class BannersController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -145,11 +145,7 @@ class BannerCrudController extends Controller
         
     }
     // function for get banner frontend side 
-<<<<<<< HEAD
     public function homeBanner()
-=======
-    public function showBanner()
->>>>>>> 4ec28da (Banners Update)
     {
         try {
             $banner = Banners::all();
