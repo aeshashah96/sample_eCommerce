@@ -172,16 +172,17 @@ class CategoriesController extends Controller
     public function listCategory()
     {
         try {
-            $category = Categories::all();
+            $category = Categories::orderBy('id','DESC')->all();
             foreach($category as $cat){
-                $cat['image'] = url("/images/category/ ".$cat->image);
+                $cat['category_image'] = url("/images/category/ ".$cat->category_image);
             }
             $subcategory = Categories::select('id','name')->with('subCategory')->get();
             foreach($subcategory as $sub){
-                $sub['image'] = url("/images/category/ ".$sub->image);
+                $sub['category_image'] = url("/images/category/ ".$sub->category_image);
             }
                 return response()->json([
                     'success'=>true,
+                    'status'=>200,
                     'category'=>$category,
                     'sub_category'=>$subcategory,
                     'message'=>'Category show successfully '
@@ -190,6 +191,7 @@ class CategoriesController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'succsess' => false,
+                'status'=>200,
                 'message' => 'Category is not Found',
                 'error' => $e
             ]);

@@ -113,6 +113,7 @@ class NewsLetterController extends Controller
             SendEmailNewsPaper::dispatch($newsletter);
             return response()->json([
                 'success'=>true,
+                'status'=>200,
                 'message'=>'News Letter Add Successwfully',
                 'newsletter'=>$newsletter 
             ],200);
@@ -120,8 +121,9 @@ class NewsLetterController extends Controller
         else{
             return response()->json([
                 'success'=>false,
+                'status'=>200,
                 'mesasge'=>'News Letters are not added'
-            ],400);
+            ],200);
         }
     }
 }

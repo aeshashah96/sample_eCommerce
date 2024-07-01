@@ -21,6 +21,7 @@ class ContactsController extends Controller
             SendEmailContactUsUser::dispatch($contact);
             return response()->json([
                 'succsess'=>true,
+                'status'=>200,
                 'message'=>'contacts add successfully',
                 'contacts'=>$contact
             ],200);
@@ -28,8 +29,9 @@ class ContactsController extends Controller
         else{
             return response()->json([
                 'success'=>false,
+                'status'=>200,
                 'mesasge'=>'contacts are not added'
-            ],400);
+            ],200);
         }
     }
 }
