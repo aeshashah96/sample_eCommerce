@@ -15,7 +15,7 @@ class BannerCrudController extends Controller
     public function index()
     {
         try{
-            $data = Banners::with('getSubCategory')->get();   
+            $data = Banners::with('subcategory')->get();   
             return response()->json([
                 'code'=>200,
                 'data'=>$data
