@@ -19,6 +19,7 @@ class Admin extends Authenticatable
         'password',
         'phoneNumber',
         'admin_logo',
+        'admin_logo_url'
     ];
 
      /**
