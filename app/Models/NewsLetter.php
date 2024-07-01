@@ -5,8 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class NewsLatters extends Model
+class NewsLetter extends Model
 {
     use HasFactory;
-    protected $fillable = ['email'];
+
+    protected $fillable = [
+        'email',
+        'is_subscribe'
+    ]; 
 }
