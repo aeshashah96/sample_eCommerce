@@ -112,7 +112,7 @@ class SubCategoriesController extends Controller
             return response()->json(['success' => false, 'code' => 200, 'message' => 'Error Found'], 200);
         }
     }
-    public function showSubCategory(){
+    public function listSubCategory(){
         try {
             $subcategory = SubCategories::all();
             if ($subcategory){

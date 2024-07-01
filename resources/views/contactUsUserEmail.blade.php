@@ -9,7 +9,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #3ae2c6;
             color: #333;
             line-height: 1.6;
         }
@@ -46,10 +46,20 @@
             <h1>Contact Us Form Submission</h1>
         </div>
         <div class="content">
-            <p><strong>Name:</strong> </p>
-            <p><strong>Email:</strong> </p>
-            <p><strong>Message:</strong></p>
-            <p></p>
+            <h1>Thank you for reaching out!</h1>
+            <p>Dear {{ $contact->name }},</p>
+            <p>Thank you for contacting us. We have received your message and will get back to you shortly.</p>
+            <p>Message Details:</p>
+            <ul>
+                <li><strong>Name:</strong> {{ $contact->name }}</li>
+                <li><strong>Email:</strong> {{ $contact->email }}</li>
+                <li><strong>Message:</strong> {{ $contact->message }}</li>
+            </ul>
+            <p>Best regards,</p>
+            <a href="" class="text-decoration-none">
+                <span class="h1 text-uppercase text-warning bg-dark px-2">Multi</span>
+                <span class="h1 text-uppercase text-dark bg-warning px-2 ml-n1">Shop</span>
+            </a>
         </div>
         <div class="footer">
             <p>Thank you for contacting us. We will get back to you shortly.</p>
