@@ -9,9 +9,12 @@ use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\NewsLetterController;
+use App\Http\Controllers\ProductColorController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\WishlistsController;
+use App\Http\Controllers\ProductSizeController;
+use App\Models\ProductColor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -132,3 +135,6 @@ Route::group(['middleware'=>'auth:api'],function(){
     Route::delete('/delete-product/wishlist/{id}',[WishlistsController::class,'removeProductWishlist']);
 });
 // <------------------------ Wishlist Module Completed : Nehal Solanki -------------------------->
+//sunil 2/7
+Route::apiResource('product-color',ProductColorController::class);
+Route::apiResource('product-size',ProductSizeController::class);

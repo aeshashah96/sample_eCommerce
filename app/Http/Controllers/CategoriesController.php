@@ -17,12 +17,12 @@ class CategoriesController extends Controller
     public function index()
     {
         //
-        $category = Categories::orderBy('created_at', 'DESC')->with('subCategories')->paginate(10);
+        $category = Categories::orderBy('created_at', 'DESC')->with('subCategory')->paginate(10);
 
         foreach ($category as $cat) {
             $cat['category_image'] = url('/images/Categories/' . $cat['category_image']);
         }
-        return response()->json(['success' => true, 'code' => 200, 'Categories' => $category], 200);
+        return response()->json(['success' => true, 'status' => 200, 'Categories' => $category], 200);
     }
 
     /**
@@ -44,12 +44,12 @@ class CategoriesController extends Controller
             $category = Categories::create(['name' => $request->name, 'description' => $request->description, 'category_image' => $imageName, 'is_Active' => true]);
             if ($category) {
                 $image->move(public_path('/images/Categories'), $imageName);
-                return response()->json(['success' => true, 'code' => 201, 'message' => 'Category Add Successfully'], 201);
+                return response()->json(['success' => true, 'status' => 201, 'message' => 'Category Add Successfully'], 201);
             } else {
-                return response()->json(['success' => false, 'code' => 500, 'message' => 'Error Found'], 500);
+                return response()->json(['success' => false, 'status' => 500, 'message' => 'Error Found'], 500);
             }
         } catch (Exception $e) {
-            return response()->json(['code' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['success' => false,'status' => 422, 'message' => $e->getMessage()]);
         }
     }
 
@@ -60,15 +60,15 @@ class CategoriesController extends Controller
     {
         //
         try {
-            $category = Categories::with('subCategories')->where('id', $id)->first();
+            $category = Categories::with('subCategory')->where('id', $id)->first();
             if ($category) {
                 $category->category_image = url('/images/Categories/' . $category->category_image);
-                return response()->json(['success' => true, 'code' => 200, 'message' => 'Category get Successfully', 'category' => $category]);
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Category get Successfully', 'category' => $category]);
             } else {
-                return response()->json(['success' => false, 'code' => 404, 'message' => 'Category Not Found'], 404);
+                return response()->json(['success' => false, 'status' => 404, 'message' => 'Category Not Found'], 404);
             }
         } catch (Exception $e) {
-            return response()->json(['code' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['success' => false,'status' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }
 
@@ -95,21 +95,21 @@ class CategoriesController extends Controller
 
                 if ($category) {
                     $category->update(['name' => $request->name, 'description' => $request->description, 'category_image' => $imageName]);
-                    return response()->json(['success' => true, 'code' => 200, 'message' => 'Category Update Successfully']);
+                    return response()->json(['success' => true, 'status' => 200, 'message' => 'Category Update Successfully']);
                 } else {
-                    return response()->json(['success' => false, 'code' => 404, 'message' => 'Category Not Found'], 404);
+                    return response()->json(['success' => false, 'status' => 404, 'message' => 'Category Not Found'], 404);
                 }
             } else {
                 if ($category) {
                     $category->update(['name' => $request->name, 'description' => $request->description]);
-                    return response()->json(['success' => true, 'code' => 200, 'message' => 'Category Update Successfully']);
+                    return response()->json(['success' => true, 'status' => 200, 'message' => 'Category Update Successfully']);
                 } else {
-                    return response()->json(['success' => false, 'code' => 404, 'message' => 'Category Not Found'], 404);
+                    return response()->json(['success' => false, 'status' => 404, 'message' => 'Category Not Found'], 404);
                 }
             }
             $category->save();
         } catch (Exception $e) {
-            return response()->json(['code' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['success' => false,'code' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }
 
@@ -125,12 +125,12 @@ class CategoriesController extends Controller
                 unlink(public_path('/images/Categories/' . $category->category_image));
                 SubCategories::where('category_id', $id)->delete();
                 $category->delete();
-                return response()->json(['success' => true, 'code' => 200, 'message' => 'Category Delete Successfully']);
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Category Delete Successfully']);
             } else {
-                return response()->json(['success' => false, 'code' => 404, 'message' => 'Category Not Found'], 404);
+                return response()->json(['success' => false, 'status' => 404, 'message' => 'Category Not Found'], 404);
             }
         } catch (Exception $e) {
-            return response()->json(['code' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['success' => false,'status' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }
 
@@ -141,9 +141,9 @@ class CategoriesController extends Controller
             $cat['category_image'] = url('/images/Categories/' . $cat['category_image']);
         }
         if ($category) {
-            return response()->json(['success' => true, 'code' => 200, 'message' => 'Category Get Successfully', 'Categories' => $category]);
+            return response()->json(['success' => true, 'status' => 200, 'message' => 'Category Get Successfully', 'Categories' => $category]);
         } else {
-            return response()->json(['success' => false, 'code' => 404, 'message' => 'Category Not Found'], 404);
+            return response()->json(['success' => false, 'status' => 404, 'message' => 'Category Not Found'], 404);
         }
     }
 
