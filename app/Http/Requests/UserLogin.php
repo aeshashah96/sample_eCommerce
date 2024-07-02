@@ -35,8 +35,8 @@ class UserLogin extends FormRequest
         throw new HttpResponseException(
             response()->json([
                 'success' => false,
-                'message' => 'Validation errors',
-                'data' => $validator->errors(),
+                'status' => 422,
+                'message' => $validator->errors()->first(),
             ]),
         );
     }

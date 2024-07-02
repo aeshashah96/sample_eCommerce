@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductReview;
 use App\Models\Wishlists;
 use Exception;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ class WishlistsController extends Controller
     {
         try {
             $user = $request->user();
-            $flag = Wishlists::where('product_id', $id)->first();
+            $flag = Wishlists::where('product_id', $id)->where('user_id',$user->id)->first();
             if (!$flag) {
                 $wishlist = Wishlists::create([
                     'user_id' => $user->id,
@@ -59,10 +60,17 @@ class WishlistsController extends Controller
     }
 
     // Show Product In Wishlists
-    public function showProductWishlists()
-    {
+    public function showProductWishlists(Request $request)
+    {   
+        $user = $request->user();
         try {
-            $wishlist = Wishlists::with('products')->get();
+            $wishlist = Wishlists::where('user_id',$user->id)->with(['products' => function($query){
+                $query->select('id','name','price');
+            }])->get();
+            $id = $wishlist->pluck('product_id');
+            dd($id);
+            $review = ProductReview::where('product_id',$wishlist->product_id)->get();
+            dd($review);
             if ($wishlist) {
                 return response()->json(
                     [
@@ -85,8 +93,8 @@ class WishlistsController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'status' => 'warning',
-                'message' => $e,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
             ]);
         }
     }

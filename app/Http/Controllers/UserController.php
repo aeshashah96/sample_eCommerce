@@ -48,7 +48,7 @@ class UserController extends Controller
                     [
                         'success' => false,
                         'status' => 500,
-                        'message' => 'User Not Register',
+                        'message' => 'Internal Server Error',
                     ],
                     500,
                 );
@@ -82,10 +82,10 @@ class UserController extends Controller
                 return response()->json(
                     [
                         'success' => false,
-                        'status' => 401,
+                        'status' => 404,
                         'message' => 'Invalid Credentials',
                     ],
-                    401,
+                    404,
                 );
             }
         } catch (\Throwable $th) {
@@ -141,6 +141,7 @@ class UserController extends Controller
                     [
                         'success' => false,
                         'status' => 404,
+                        'message' => 'User Not Found'
                     ],
                     404,
                 );
@@ -175,8 +176,8 @@ class UserController extends Controller
             $user->update($request->input());
             return response()->json(
                 [
-                    'status' => 200,
                     'success' => true,
+                    'status' => 200,
                     'message' => 'User Updated SuccessFully',
                     'user' => $user,
                     'image_url' => url("/images/users/$user->user_logo"),
@@ -211,10 +212,9 @@ class UserController extends Controller
             if ($validator->fails()) {
                 return response()->json(
                     [
-                        'status' => 422,
                         'success' => false,
-                        'message' => 'Validations fails',
-                        'errors' => $validator->errors(),
+                        'status' => 422,
+                        'message' => $validator->errors()->first(),
                     ],
                     422,
                 );
@@ -238,10 +238,10 @@ class UserController extends Controller
                 return response()->json(
                     [
                         'success' => false,
-                        'status' => 200,
+                        'status' => 404,
                         'message' => 'Invalid Password',
                     ],
-                    200,
+                    404,
                 );
             }
         } catch (\Throwable $th) {
@@ -264,10 +264,10 @@ class UserController extends Controller
             if ($validator->fails()) {
                 return response()->json(
                     [
-                        'status' => 422,
                         'success' => false,
+                        'status' => 422,
                         'message' => 'Validations fails',
-                        'errors' => $validator->errors(),
+                        'errors' => $validator->errors()->first(),
                     ],
                     422,
                 );
@@ -314,10 +314,10 @@ class UserController extends Controller
             if ($validator->fails()) {
                 return response()->json(
                     [
-                        'status' => 422,
                         'success' => false,
+                        'status' => 422,
                         'message' => 'Validations fails',
-                        'errors' => $validator->errors(),
+                        'errors' => $validator->errors()->first(),
                     ],
                     422,
                 );
