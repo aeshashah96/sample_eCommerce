@@ -54,3 +54,4 @@ class CustomerMail extends Mailable
         return [];
     }
 }
+
