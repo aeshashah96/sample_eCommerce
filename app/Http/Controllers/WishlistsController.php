@@ -15,39 +15,54 @@ class WishlistsController extends Controller
     {
         try {
             $user = $request->user();
-            $flag = Wishlists::where('product_id', $id)->where('user_id',$user->id)->first();
-            if (!$flag) {
-                $wishlist = Wishlists::create([
-                    'user_id' => $user->id,
-                    'product_id' => $id,
-                ]);
-                if ($wishlist) {
-                    return response()->json(
-                        [
-                            'success' => true,
-                            'status' => 201,
-                            'message' => 'Product Added To Wishlist',
-                        ],
-                        201,
-                    );
+            $productId = Product::find($id);
+            if ($productId) {
+                $flag = Wishlists::where('product_id', $id)
+                    ->where('user_id', $user->id)
+                    ->first();
+                if (!$flag) {
+                    $wishlist = Wishlists::create([
+                        'user_id' => $user->id,
+                        'product_id' => $id,
+                    ]);
+                    if ($wishlist) {
+                        return response()->json(
+                            [
+                                'success' => true,
+                                'status' => 201,
+                                'message' => 'Product Added To Wishlist',
+                            ],
+                            201,
+                        );
+                    } else {
+                        return response()->json(
+                            [
+                                'success' => false,
+                                'status' => 200,
+                                'message' => 'Product Not Added To Wishlist',
+                            ],
+                            200,
+                        );
+                    }
                 } else {
                     return response()->json(
                         [
                             'success' => false,
-                            'status' => 200,
-                            'message' => 'Product Not Added To Wishlist',
+                            'status' => 500,
+                            'message' => 'Product Already Added In Wishlist',
                         ],
-                        200,
+                        500,
                     );
                 }
-            } else {
+            }
+            else{
                 return response()->json(
                     [
                         'success' => false,
-                        'status' => 500,
-                        'message' => 'Product Already Added In Wishlist',
+                        'status' => 404,
+                        'message' => 'Product Not Found',
                     ],
-                    500,
+                    404,
                 );
             }
         } catch (Exception $e) {
@@ -61,41 +76,44 @@ class WishlistsController extends Controller
 
     // Show Product In Wishlists
     public function showProductWishlists(Request $request)
-    {   
+    {
         $user = $request->user();
         try {
-            $wishlist = Wishlists::where('user_id',$user->id)->with(['products' => function($query){
-                $query->select('id','name','price');
-            }])->get();
+            $wishlist = Wishlists::where('user_id', $user->id)
+                ->with([
+                    'products' => function ($query) {
+                        $query->select('id', 'name', 'price');
+                    },
+                ])
+                ->get();
 
-            foreach($wishlist as $ele){
-                $review = ProductReview::where('product_id',$ele->product_id)->pluck('rating');
+            foreach ($wishlist as $ele) {
+                $review = ProductReview::where('product_id', $ele->product_id)->pluck('rating');
                 $ratingAverage = $review->avg();
                 $totalReview = $review->count();
-                if(is_null($ratingAverage)){ 
-                    $ratingAverage=0;
+                if (is_null($ratingAverage)) {
+                    $ratingAverage = 0;
                 }
                 $ele->avg_rating = $ratingAverage;
                 $ele->total_review = $totalReview;
             }
-            
+
             if ($wishlist) {
                 return response()->json(
                     [
                         'success' => true,
                         'status' => 200,
-                        'message'=>'Product Found',
+                        'message' => 'Product Found',
                         'wishlist' => $wishlist,
                     ],
                     200,
                 );
-            } 
-            else {
+            } else {
                 return response()->json(
                     [
                         'success' => false,
                         'status' => 500,
-                        'message'=>'Product Not Found'
+                        'message' => 'Product Not Found',
                     ],
                     500,
                 );
@@ -127,8 +145,7 @@ class WishlistsController extends Controller
                 ],
                 200,
             );
-        } 
-        else {
+        } else {
             return response()->json(
                 [
                     'success' => false,
