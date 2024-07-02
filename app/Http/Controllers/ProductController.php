@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ImageProduct;
 use App\Models\Product;
 use App\Models\ProductDescription;
+use App\Models\ProductVarient;
 use Exception;
 use Illuminate\Http\Request;
 use Symfony\Component\Console\Input\Input;
@@ -22,9 +23,9 @@ class ProductController extends Controller
         //
         try {
             $product =  Product::get();
-            return response()->json(['success' => true, 'message' => 'Product Get Successfully', 'product' => $product]);
+            return response()->json(['success' => true,'status'=>200, 'message' => 'Product Get Successfully', 'product' => $product]);
         } catch (Exception $e) {
-            return response()->json(['code' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['success' => false,'status' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }
 
@@ -55,6 +56,8 @@ class ProductController extends Controller
                 ProductDescription::create(['additional_information'=>$request->additional_information,
                 'product_id'=>$product->id,
                 'description'=>$product->description,
+
+                
             ]);
 
                 if ($request->hasFile('image')) {
@@ -69,13 +72,18 @@ class ProductController extends Controller
                         ]);
                     }
                     
-                    return response()->json(['success' => true,'code'=>201, 'message' => 'Product Add Successfully']);
+                    return response()->json(['success' => true,'status'=>201, 'message' => 'Product Add Successfully']);
                 }
+
+                // ProductVarient::create([
+                //     'product_id'=> $product->id,
+                //     'product_size_id'=>$request->
+                // ]);
             } else {
-                return response()->json(['success' => true, 'message' => 'Error']);
+                return response()->json(['success' => false,'status'=>201, 'message' => 'Error']);
             }
         } catch (Exception $e) {
-            return response()->json(['code' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['status' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }
 
@@ -92,8 +100,6 @@ class ProductController extends Controller
         }catch(Exception $e){
             return response()->json(['code' => $e->getCode(), 'message' => $e->getMessage()]);
         }
-
-
 
     }
 

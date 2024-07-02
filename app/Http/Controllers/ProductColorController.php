@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\ProductColor;
 use Exception;
 use Illuminate\Http\Request;
-use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
 
 class ProductColorController extends Controller
 {
@@ -15,7 +14,7 @@ class ProductColorController extends Controller
     public function index()
     {
         //
-        $color=ProductColor::orderBy('created_at','DESC')->get();
+        $color=ProductColor::orderBy('created_at','DESC')->paginate(10);
         if($color){
 
             return response()->json(['success'=>true,'code'=>200,'color'=>$color]);
@@ -57,6 +56,13 @@ class ProductColorController extends Controller
     public function show(string $id)
     {
         //
+        $color=ProductColor::find($id);
+        if($color){
+
+            return response()->json(['success'=>true,'code'=>200,'color'=>$color]);
+        }else{
+            return response()->json(['success'=>false,'code'=>404,'message'=>'No Color Found']);
+        }
     }
 
     /**
