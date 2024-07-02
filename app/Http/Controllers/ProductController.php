@@ -64,10 +64,11 @@ class ProductController extends Controller
                         $imageName = time() . '.' . $file->getClientOriginalExtension();
                         $file->move(public_path('/images/product'), $imageName);
                         ImageProduct::create([
-                            'product_id' => 2,
+                            'product_id' => $product->id,
                             'image' => $imageName,
                         ]);
                     }
+                    
                     return response()->json(['success' => true,'code'=>201, 'message' => 'Product Add Successfully']);
                 }
             } else {
