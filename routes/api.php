@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\SubCategoriesController;
 use App\Http\Controllers\BannersController;
 use App\Http\Controllers\ContactsController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\NewsLetterController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ProductController;
@@ -34,7 +35,7 @@ Route::get('/error',function(){
         'success'=>false,
         'status' => 401,
         'message'=>'Mismatch Token ..'
-    ]);
+    ],401);
 })->name('login');
 
 // <---------------------------- User Module : Nehal Solanki------------------------------------------->
@@ -79,6 +80,7 @@ Route::middleware(['auth:adminApi'])->group(function(){
 
     Route::get('get-setting',[SettingController::class,'getSettingData']);
     Route::post('update-setting',[SettingController::class,'updateSettingData']);
+    Route::apiResource('customer',CustomerController::class);
 });
 // AdminLogin  && AdminLogout
 
