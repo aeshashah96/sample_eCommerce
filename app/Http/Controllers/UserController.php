@@ -33,19 +33,25 @@ class UserController extends Controller
 
             if ($user) {
                 SendEmailUser::dispatch($user);
-                return response()->json([
-                    'success' => true,
-                    'status' => 200,
-                    'message' => 'User Register Successfully.',
-                    'user' => $user,
-                    'image_url' => url("/images/users/$userAvatar"),
-                ]);
+                return response()->json(
+                    [
+                        'success' => true,
+                        'status' => 201,
+                        'message' => 'User Register Successfully.',
+                        'user' => $user,
+                        'image_url' => url("/images/users/$userAvatar"),
+                    ],
+                    201,
+                );
             } else {
-                return response()->json([
-                    'success' => false,
-                    'status' => 503,
-                    'message' => 'User Not Register',
-                ]);
+                return response()->json(
+                    [
+                        'success' => false,
+                        'status' => 500,
+                        'message' => 'Internal Server Error',
+                    ],
+                    500,
+                );
             }
         } catch (Exception $e) {
             return response()->json([
@@ -72,12 +78,16 @@ class UserController extends Controller
                     'token' => $token,
                     'user' => $user,
                 ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'status' => 401,
-                    'message' => 'Invalid Credentials',
-                ]);
+            } 
+            else {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'status' => 401,
+                        'message' => 'Invalid Credentials',
+                    ],
+                    401,
+                );
             }
         } catch (\Throwable $th) {
             return response()->json([
@@ -118,17 +128,21 @@ class UserController extends Controller
         try {
             $user = $request->user();
             if ($user) {
-                return response()->json([
-                    'success' => true,
-                    'status' => 200,
-                    'user' => $user,
-                    'image_url' => url("/images/users/$user->user_logo"),
-                ]);
+                return response()->json(
+                    [
+                        'success' => true,
+                        'status' => 200,
+                        'user' => $user,
+                        'image_url' => url("/images/users/$user->user_logo"),
+                    ],
+                    200,
+                );
             } else {
                 return response()->json(
                     [
                         'success' => false,
                         'status' => 404,
+                        'message' => 'User Not Found'
                     ],
                     404,
                 );
@@ -163,16 +177,15 @@ class UserController extends Controller
             $user->update($request->input());
             return response()->json(
                 [
-                    'status' => 200,
                     'success' => true,
+                    'status' => 200,
                     'message' => 'User Updated SuccessFully',
                     'user' => $user,
                     'image_url' => url("/images/users/$user->user_logo"),
                 ],
                 200,
             );
-        } 
-        catch (Throwable $e) {
+        } catch (Throwable $e) {
             return response()->json([
                 'success' => false,
                 'status' => 'warning',
@@ -189,7 +202,7 @@ class UserController extends Controller
                 $request->all(),
                 [
                     'current_password' => 'required',
-                    'new_password' => 'required|min:4',
+                    'new_password' => 'required|min:4|regex:/^\S*$/u',
                     'confirm_password' => 'required|same:new_password',
                 ],
                 messages: [
@@ -200,8 +213,9 @@ class UserController extends Controller
             if ($validator->fails()) {
                 return response()->json(
                     [
-                        'message' => 'validations fails',
-                        'errors' => $validator->errors(),
+                        'success' => false,
+                        'status' => 422,
+                        'message' => $validator->errors()->first(),
                     ],
                     422,
                 );
@@ -225,10 +239,10 @@ class UserController extends Controller
                 return response()->json(
                     [
                         'success' => false,
-                        'status' => 200,
+                        'status' => 404,
                         'message' => 'Invalid Password',
                     ],
-                    200,
+                    404,
                 );
             }
         } catch (\Throwable $th) {
@@ -249,7 +263,15 @@ class UserController extends Controller
                 'email' => 'required|email',
             ]);
             if ($validator->fails()) {
-                return response()->json($validator->errors());
+                return response()->json(
+                    [
+                        'success' => false,
+                        'status' => 422,
+                        'message' => 'Validations fails',
+                        'errors' => $validator->errors()->first(),
+                    ],
+                    422,
+                );
             }
 
             $status = Password::sendResetLink($email);
@@ -291,7 +313,15 @@ class UserController extends Controller
                 'password' => 'required|confirmed|min:3',
             ]);
             if ($validator->fails()) {
-                return response()->json($validator->errors());
+                return response()->json(
+                    [
+                        'success' => false,
+                        'status' => 422,
+                        'message' => 'Validations fails',
+                        'errors' => $validator->errors()->first(),
+                    ],
+                    422,
+                );
             }
 
             $status = Password::reset($input, function ($user, $password) {

@@ -9,6 +9,7 @@ use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\NewsLetterController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\WishlistsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,7 +32,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/error',function(){
     return response()->json([
         'success'=>false,
-        'status' => 404,
+        'status' => 401,
         'message'=>'Mismatch Token ..'
     ]);
 })->name('login');
@@ -50,22 +51,21 @@ Route::group(['middleware'=>'auth:api'],function(){
     Route::post('/change-password',[UserController::class,'changePassword']);
 });
 
-Route::post('/admin-login',[AdminAuthController::class,'admin_login']);
 Route::post('/forgot-password',[UserController::class,'forgotPassword']);
 Route::get('/reset-password',[UserController::class,'resetPassword'])->name('password.reset');
 // <------------------------------ User Module Completed ------------------------------------------------->
 
-Route::post('/authenticateadmin',[AdminAuthController::class,'admin_auth']);
 
 // harshvardhan 28 jun handle logout route errors
 // Route::get('/error',function(){
-//     return response()->json([
-//         'status' => 404,
-//         'msg'=>'Mismatch Token ..'
-//     ]);
-// })->name('login');
-
-
+    //     return response()->json([
+        //         'status' => 404,
+        //         'msg'=>'Mismatch Token ..'
+        //     ]);
+        // })->name('login');
+        
+        
+Route::post('/admin-login',[AdminAuthController::class,'admin_login']);
 // harshvardhan 28 jun logout route
 Route::middleware(['auth:adminApi'])->group(function(){
     Route::get('/admin-logout',[AdminAuthController::class,'admin_logout']);
@@ -118,3 +118,13 @@ Route::get('/show-subcategory',[SubCategoriesController::class,'showSubCategory'
 Route::apiResource('product',ProductController::class);
 
 Route::get('/list-featured-product',[ProductController::class,'list_featured_product']);
+
+
+// <------------------------- Wishlist Module : Nehal Solanki : 2/7/2024 -------------------------> 
+/// Add Product , Show , Delete In Wishlist 
+Route::group(['middleware'=>'auth:api'],function(){
+    Route::post('/add-product/wishlist/{id}',[WishlistsController::class,'addProductWishlist']);
+    Route::get('/show-product/wishlist',[WishlistsController::class,'showProductWishlists']);
+    Route::delete('/delete-product/wishlist/{id}',[WishlistsController::class,'removeProductWishlist']);
+});
+// <------------------------ Wishlist Module Completed : Nehal Solanki -------------------------->
