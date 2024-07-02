@@ -202,7 +202,7 @@ class UserController extends Controller
                 $request->all(),
                 [
                     'current_password' => 'required',
-                    'new_password' => 'required|min:4',
+                    'new_password' => 'required|min:4|regex:/^\S*$/u',
                     'confirm_password' => 'required|same:new_password',
                 ],
                 messages: [
