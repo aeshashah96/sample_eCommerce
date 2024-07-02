@@ -31,14 +31,14 @@ class AdminEditProfileRequest extends FormRequest
         ];
     }
 
-    public function failedValidation(Validator $validator)
+    public function failedValidation(Validator $validate)
     {
         throw new HttpResponseException(
             response()->json([
-                'success' => false,
+                'code'=>401,
                 'message' => 'Validation errors',
-                'data' => $validator->errors(),
-            ]),
+                'message' => $validate->errors()->first(),
+            ],401),
         );
     }
 }

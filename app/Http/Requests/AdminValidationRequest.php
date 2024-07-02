@@ -30,10 +30,12 @@ class AdminValidationRequest extends FormRequest
     }
 
     public function failedValidation(ValidationValidator $validate){
-        throw new HttpResponseException(response()->json([
-            'success'=>false,
-            'message' => 'validation error',
-            'data' => $validate->errors()
-        ]));
+        throw new HttpResponseException(
+            response()->json([
+                'code'=>401,
+                'message' => 'Validation errors',
+                'message' => $validate->errors()->first(),
+            ],401),
+        );
     }
 }

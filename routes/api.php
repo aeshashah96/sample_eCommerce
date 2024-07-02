@@ -7,6 +7,7 @@ use App\Http\Controllers\SubCategoriesController;
 use App\Http\Controllers\BannersController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\NewsLetterController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ProductController;
@@ -81,6 +82,7 @@ Route::middleware(['auth:adminApi'])->group(function(){
     Route::get('get-setting',[SettingController::class,'getSettingData']);
     Route::post('update-setting',[SettingController::class,'updateSettingData']);
     Route::apiResource('customer',CustomerController::class);
+    Route::apiResource('language',LanguageController::class);
 });
 // AdminLogin  && AdminLogout
 

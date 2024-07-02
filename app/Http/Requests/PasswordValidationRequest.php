@@ -27,7 +27,7 @@ class PasswordValidationRequest extends FormRequest
             'new_password' =>[
                 'required',
                 'min:6',
-                'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/',
+                'regex:/^\S*$/u',
                 'confirmed'
             ],
         ];
@@ -39,7 +39,7 @@ class PasswordValidationRequest extends FormRequest
             response()->json([
                 'code'=>401,
                 'message' => 'Validation errors',
-                'data' => $validator->errors(),
+                'message' => $validator->errors()->first(),
             ],401),
         );
     }

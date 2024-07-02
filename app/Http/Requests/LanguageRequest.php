@@ -3,11 +3,10 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator as ValidationValidator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\Validator;
 
-
-class BannerValidationRequest extends FormRequest
+class LanguageRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,20 +23,20 @@ class BannerValidationRequest extends FormRequest
      */
     public function rules(): array
     {
-            return [
-                'image' => 'required | mimes:jpeg,jpg,png,gif',
-                'description'=>'required',
-                'banner_title'=>'required',
-                'sub_category_id'=>'required'
-            ];
+        return [
+            // 'language_name'=>"required|unique:languages,language_name,$this->id,id",
+            'language_name'=>"required |unique:languages",
+            'language_code'=>"required|unique:languages,language_code,$this->id,id"
+        ];
     }
 
-    public function failedValidation(ValidationValidator $validate){
+    public function failedValidation(Validator $validator)
+    {
         throw new HttpResponseException(
             response()->json([
                 'code'=>401,
                 'message' => 'Validation errors',
-                'message' => $validate->errors()->first(),
+                'message' => $validator->errors()->first(),
             ],401),
         );
     }

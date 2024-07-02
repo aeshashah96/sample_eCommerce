@@ -28,11 +28,22 @@ class NewsLatterRequest extends FormRequest
             ];
     }
 
+<<<<<<< HEAD
     public function failedValidation(ValidationValidator $validate){
         throw new HttpResponseException(response()->json([
             'success'=>false,
             'status'=>422,
             'message' => $validate->errors()->first(),
         ]));
+=======
+    public function failedValidation(ValidationValidator $validator){
+        throw new HttpResponseException(
+            response()->json([
+                'code'=>401,
+                'message' => 'Validation errors',
+                'message' => $validator->errors()->first(),
+            ],401),
+        );
+>>>>>>> b2580ed (#112: [Backend admin - api Integration] Language crud)
     }
 }

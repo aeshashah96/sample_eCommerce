@@ -31,14 +31,21 @@ class ContactUsValidationRequest extends FormRequest
         ];
     }
 
-    public function failedValidation(Validator $validator)
+    public function failedValidation(Validator $validate)
     {
         throw new HttpResponseException(
             response()->json([
+<<<<<<< HEAD
                 'success' => false,
                 'status'=>422,
                 'message' => $validator->errors()->first(),
             ]),
+=======
+                'code'=>401,
+                'message' => 'Validation errors',
+                'message' => $validate->errors()->first(),
+            ],401),
+>>>>>>> b2580ed (#112: [Backend admin - api Integration] Language crud)
         );
     }
 }
