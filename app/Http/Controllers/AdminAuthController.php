@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AdminEditProfileRequest;
 use App\Http\Requests\AdminValidationRequest;
+use App\Http\Requests\PasswordValidationRequest;
 use App\Models\Admin;
 use Exception;
 use Illuminate\Http\Request;
@@ -27,15 +28,15 @@ class AdminAuthController extends Controller
                 ],200);    
             }else{
                 return response()->json([
-                    'code'=>'200',
+                    'code'=>401,
                     'Message'=>'incorrect password'
-                ],200);    
+                ],401);    
             }
         }else{
             return response()->json([
-                'code'=>'200',
+                'code'=>401,
                 'Message'=>'incorrect email'
-            ],200);
+            ],401);
         }
             
         }
@@ -113,7 +114,8 @@ class AdminAuthController extends Controller
         }
     }
 
-    public function change_admin_password(Request $request){
+    public function change_admin_password(PasswordValidationRequest $request){
+        
         $user =  Admin::find($request->user()->id);
             if(Hash::check($request->current_password,$user->password)){
                 if($request->new_password == $request->confirm_password){

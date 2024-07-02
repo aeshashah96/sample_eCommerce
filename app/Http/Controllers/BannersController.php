@@ -14,8 +14,8 @@ class BannersController extends Controller
      */
     public function index()
     {
-        try {
-            $data = Banners::with('subcategory')->paginate(10);
+        try{
+            $data = Banners::with('subcategory')->orderBy('created_at','desc')->paginate(10);   
             return response()->json([
                 'code' => 200,
                 'data' => $data
@@ -129,6 +129,12 @@ class BannersController extends Controller
     {
         try {
             $item = Banners::find($id);
+            if(!$item){
+                return response()->json([
+                    'code'=>404,
+                    'message'=>'record not found'
+                ],404);
+            }
             unlink("upload/banners/$item->image");
             $item->delete();
             return response()->json([
