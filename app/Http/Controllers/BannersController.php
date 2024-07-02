@@ -152,7 +152,7 @@ class BannersController extends Controller
     public function homeBanner()
     {
         try {
-            $BannerWithSubcategory = Banners::select('id','image','description','banner_title','sub_category_id')->with('subcategory:id,name')->orderBy('id','DESC')->get();
+            $BannerWithSubcategory = Banners::select('id', 'image', 'description', 'banner_title', 'sub_category_id')->with('subcategory:id,name')->orderBy('id', 'DESC')->get();
             if ($BannerWithSubcategory) {
                 foreach ($BannerWithSubcategory as $subcat) {
                     $subcat['image'] = url("/upload/banners/" . $subcat->image);

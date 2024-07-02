@@ -124,8 +124,10 @@ Route::get('/show-subcategory',[SubCategoriesController::class,'showSubCategory'
 
 Route::apiResource('product',ProductController::class);
 
+// 02/07 List Product of featured Nikunj 
 Route::get('/list-featured-product',[ProductController::class,'list_featured_product']);
 
+<<<<<<< HEAD
 
 // <------------------------- Wishlist Module : Nehal Solanki : 2/7/2024 -------------------------> 
 /// Add Product , Show , Delete In Wishlist 
@@ -138,3 +140,6 @@ Route::group(['middleware'=>'auth:api'],function(){
 //sunil 2/7
 Route::apiResource('product-color',ProductColorController::class);
 Route::apiResource('product-size',ProductSizeController::class);
+=======
+Route::get('/get-product/{id}',[ProductController::class,'getProduct']);
+>>>>>>> 64542ae (#48 Minor Changes in Featured Product List)

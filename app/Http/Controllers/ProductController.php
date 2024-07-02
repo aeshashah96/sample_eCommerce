@@ -121,7 +121,7 @@ class ProductController extends Controller
 
     public function list_featured_product(){
         try{
-            $productlist = Product::select('id','name','price')->with('productReview','productImages')->where('is_featured',1)->get();
+            $productlist = Product::select('id','name','price')->with('productReview:id,product_id,user_id,rating','productImages:id,product_id,image')->where('is_featured',1)->get();
             if($productlist){
                 foreach($productlist as $image){
                     foreach($image->productImages as $img){
@@ -129,12 +129,16 @@ class ProductController extends Controller
                     }
                 }
                 $rating = 0;
+                $productreview = 0;
                 foreach($productlist as $review){
                     foreach($review->productReview as $ele){
                         $rating = $ele->where('product_id',$review->id)->pluck('rating')->avg();
+                        $productreview = $ele->where('product_id',$review->id)->pluck('rating')->count();
                     }
                    $review->avg_rating = $rating;
+                   $review->total_review = $productreview;
                    $rating=0;
+                   $productreview=0;
                 }
                 return response()->json([
                     'success'=>true,
@@ -160,5 +164,28 @@ class ProductController extends Controller
                 'message' => $e->getMessage(),
             ]);
         }
+    }
+
+    public function getProduct($id){
+        try{
+            $product = Product::find($id)->with('colors')->get();
+            if($product){
+                return response()->json([
+                    'success'=>true,
+                    'status'=>200,
+                    'message'=>'Product Get Successfully',
+                    'product'=>$product
+                ],200);
+            }
+        }
+        catch(Exception $e){
+            return response()->json([
+                'success'=>false,
+                'status'=>$e->getCode(),
+                'message'=>$e->getMessage()
+            ]);
+        }
+       
+
     }
 }
