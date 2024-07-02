@@ -175,7 +175,7 @@ class CategoriesController extends Controller
     public function listCategory()
     {
         try {
-            $category = Categories::orderBy('id','DESC')->all();
+            $category = Categories::orderBy('id','DESC')->get();
             foreach($category as $cat){
                 $cat['category_image'] = url("/images/category/ ".$cat->category_image);
             }
