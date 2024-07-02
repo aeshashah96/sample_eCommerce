@@ -33,20 +33,9 @@ class NewsLetterController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(NewsLatterRequest $request)
+    public function store(Request $request)
     {
-        try {
-            NewsLetter::create($request->input());
-            return response()->json([
-                'code' => 200,
-                'message' => 'record created sucessfully'
-            ], 200);
-        } catch (Exception $e) {
-            return response()->json([
-                'code' => 404,
-                'error' => $e
-            ], 404);
-        }
+       
     }
 
     /**
@@ -54,18 +43,7 @@ class NewsLetterController extends Controller
      */
     public function show(string $id)
     {
-        try {
-            $data = NewsLetter::find($id);
-            return response()->json([
-                'code' => 200,
-                'data' => $data
-            ], 200);
-        } catch (Exception $e) {
-            return response()->json([
-                'code' => 404,
-                'error' => $e
-            ], 404);
-        }
+        
     }
 
     /**
@@ -73,27 +51,7 @@ class NewsLetterController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        try {
-            $item = NewsLetter::find($id);
-            if(!$item){
-               return response()->json([
-                'code'=>404,
-                'message'=>'record not found'
-               ],404);
-            }else{
-                $item->update($request->input());
-                return response()->json([
-                    'code' => 200,
-                    'message' => 'record updated successfully'
-                ], 200);
-            }
-            
-        } catch (Exception $e) {
-            return response()->json([
-                'code' => 404,
-                'error' => $e
-            ], 404);
-        }
+       
     }
 
     /**

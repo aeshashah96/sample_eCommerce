@@ -36,36 +36,43 @@ class CustomerController extends Controller
      */
     public function store(CustomerRequest $request)
     {   
-        
-        if($request->has('user_logo')){
-            $file = $request->file('user_logo');
-            $extention = $file->getClientOriginalExtension();
-            $user_logo_name = time().".".$extention;
-            $file->move('images/users/',$user_logo_name);
+        try{
+            if($request->has('user_logo')){
+                $file = $request->file('user_logo');
+                $extention = $file->getClientOriginalExtension();
+                $user_logo_name = time().".".$extention;
+                $file->move('images/users/',$user_logo_name);
+            }
+            
+            $password = Str::password(16, true, true, true, false);
+            $user = User::create([
+                'first_name'=>$request->first_name,
+                'last_name'=>$request->last_name,
+                'email'=>$request->email,
+                'phone_number'=>$request->phone_number,
+                'user_logo'=>$user_logo_name,
+                'password'=>Hash::make($password),
+                'isActive'=>1,
+            ]);
+            if($user){
+                SendPasswordMail::dispatch($user,$password);
+                return response()->json([
+                    'code' => 200,
+                    'message' => 'Customer Register Successfully.',
+                ],200);
+            }else {
+                return response()->json([
+                    'code' => 503,
+                    'message' => 'Customer Not Register',
+                ],503);
+            }    
+        }catch(Exception $e){
+            return response()->json([
+                'code'=>404,
+                'error'=>$e
+            ],404);
         }
         
-        $password = Str::password(16, true, true, true, false);
-        $user = User::create([
-            'first_name'=>$request->first_name,
-            'last_name'=>$request->last_name,
-            'email'=>$request->email,
-            'phone_number'=>$request->phone_number,
-            'user_logo'=>$user_logo_name,
-            'password'=>Hash::make($password),
-            'isActive'=>1,
-        ]);
-        if($user){
-            SendPasswordMail::dispatch($user,$password);
-            return response()->json([
-                'code' => 200,
-                'message' => 'Customer Register Successfully.',
-            ],200);
-        }else {
-            return response()->json([
-                'code' => 503,
-                'message' => 'Customer Not Register',
-            ],503);
-        }
     }
 
     /**
