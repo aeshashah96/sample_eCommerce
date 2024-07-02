@@ -21,21 +21,22 @@ class ContactsController extends Controller
             if ($contact) {
                 SendEmailContactUsUser::dispatch($contact);
                 return response()->json([
-                    'succsess' => true,
-                    'status' => 200,
-                    'message' => 'contacts add successfully',
+                    'success' => true,
+                    'status' => 201,
+                    'message' => 'Contacts Add Successfully',
                     'contacts' => $contact
-                ], 200);
+                ], 201);
             } else {
                 return response()->json([
                     'success' => false,
-                    'status' => 200,
-                    'mesasge' => 'contacts are not added'
-                ], 200);
+                    'status' => 404,
+                    'mesasge' => 'Contacts is Not Added'
+                ], 404);
             }
         } catch (Exception $e) {
             return response()->json([
-                'code' => $e->getCode(),
+                'success'=>false,
+                'status' => $e->getCode(),
                 'message' => $e->getMessage()
             ]);
         }

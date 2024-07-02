@@ -16,5 +16,16 @@ class Product extends Model
     public function productImages(){
         return $this->hasMany(ImageProduct::class,'product_id','id');
     }
- 
+
+    public function colors(){
+        return $this->belongsToMany(ProductColor::class,'product_varients');
+    }
+
+    public function sizes(){
+        return $this->belongsToMany(ProductSize::class,'product_varients');
+    }
+    
+    public function productReview(){
+        return $this->hasMany(ProductReview::class,'product_id','id');
+    }
 }

@@ -146,7 +146,7 @@ class CategoriesController extends Controller
             return response()->json(['success' => false, 'code' => 404, 'message' => 'Category Not Found'], 404);
         }
     }
-        
+
     public function createCategoreis(Request $request)
     {
         try {
@@ -175,26 +175,29 @@ class CategoriesController extends Controller
     public function listCategory()
     {
         try {
-            $category = Categories::orderBy('id','DESC')->get();
-            foreach($category as $cat){
-                $cat['category_image'] = url("/images/category/ ".$cat->category_image);
-            }
-            $subcategory = Categories::select('id','name')->with('subCategory')->get();
-            foreach($subcategory as $sub){
-                $sub['category_image'] = url("/images/category/ ".$sub->category_image);
-            }
+
+            $CategoryWithSubcategory = Categories::select('id','name','description','category_image')->with('subcategory:id,category_id,name')->orderBy('id','DESC')->get();
+            if ($CategoryWithSubcategory) {
+                foreach ($CategoryWithSubcategory as $sub) {
+                    $sub['category_image'] = url("/images/Categories/" . $sub->category_image);
+                }
                 return response()->json([
-                    'success'=>true,
-                    'status'=>200,
-                    'category'=>$category,
-                    'sub_category'=>$subcategory,
-                    'message'=>'Category show successfully '
-                ],200);
-            
+                    'success' => true,
+                    'status' => 200,
+                    'CategoryWith SubCategory' => $CategoryWithSubcategory,
+                    'message' => 'Category Show successfully'
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'status' => 404,
+                    'message' => 'Category Not Found'
+                ], 404);
+            }
         } catch (Exception $e) {
             return response()->json([
-                'code'=>$e->getCode(),
-                'message'=>$e->getMessage()
+                'code' => $e->getCode(),
+                'message' => $e->getMessage()
             ]);
         }
     }

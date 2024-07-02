@@ -14,19 +14,18 @@ class BannersController extends Controller
      */
     public function index()
     {
-        try{
-            $data = Banners::with('subcategory')->paginate(10);   
+        try {
+            $data = Banners::with('subcategory')->paginate(10);
             return response()->json([
-                'code'=>200,
-                'data'=>$data
-            ],200);
-        }catch(Exception $e){
+                'code' => 200,
+                'data' => $data
+            ], 200);
+        } catch (Exception $e) {
             return response()->json([
-                'code'=>404,
-                'message'=>$e
-             ],404);
+                'code' => 404,
+                'message' => $e
+            ], 404);
         }
-        
     }
 
     /**
@@ -42,39 +41,37 @@ class BannersController extends Controller
      */
     public function store(BannerValidationRequest $request)
     {
-       try{
-        if($request->has('image')){
-            $file = $request->file('image');
-            $extention = $file->getClientOriginalExtension();
-            $image_name = time().".".$extention;
-            $file->move('upload/banners/',$image_name);
+        try {
+            if ($request->has('image')) {
+                $file = $request->file('image');
+                $extention = $file->getClientOriginalExtension();
+                $image_name = time() . "." . $extention;
+                $file->move('upload/banners/', $image_name);
+            }
+            Banners::create([
+                'image' => $image_name,
+                'description' => $request->description,
+                'banner_title' => $request->banner_title,
+                'banner_url' => url("/upload/banners/$image_name"),
+                'sub_category_id' => $request->sub_category_id
+            ]);
+            return response()->json([
+                'code' => 200,
+                'message' => 'banner added successfully'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'code' => 404,
+                'message' => $e
+            ], 404);
         }
-        Banners::create([
-           'image'=>$image_name,
-           'description'=>$request->description,
-           'banner_title'=>$request->banner_title,
-           'banner_url' =>url("/upload/banners/$image_name"),
-           'sub_category_id'=>$request->sub_category_id
-        ]);
-        return response()->json([
-           'code'=>200,
-           'message'=>'banner added successfully'
-        ],200);
-       }catch(Exception $e){
-        return response()->json([
-            'code'=>404,
-            'message'=>$e
-         ],404);
-       }
-        
     }
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
-    {   
-       
+    {
     }
 
     /**
@@ -89,41 +86,40 @@ class BannersController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {   
-        try{
+    {
+        try {
             $item = Banners::find($id);
-            if(!$item){
+            if (!$item) {
                 return response()->json([
-                    'code'=>401,
-                    'message'=>'record not found'
-                 ],401);  
+                    'code' => 401,
+                    'message' => 'record not found'
+                ], 401);
             }
-            if($request->has('image')){
-                if($item->image){
+            if ($request->has('image')) {
+                if ($item->image) {
                     $name = $item->image;
-                     $image_path = "upload/banners/$name";
-                     unlink($image_path);
+                    $image_path = "upload/banners/$name";
+                    unlink($image_path);
                 }
-    
-                 $file = $request->file('image');
-                 $extention = $file->getClientOriginalExtension();
-                 $banner_name = time().".".$extention;
-                 $file->move('upload/banners/',$banner_name);
-                 $item->image = $banner_name;
-                 $item->banner_url =url("/upload/banners/$banner_name");
-             }
-               $item->update($request->input());
-               return response()->json([
-                'code'=>200,
-                'message'=>'banner updated successfully'
-             ],200); 
-        }catch(Exception $e){
+
+                $file = $request->file('image');
+                $extention = $file->getClientOriginalExtension();
+                $banner_name = time() . "." . $extention;
+                $file->move('upload/banners/', $banner_name);
+                $item->image = $banner_name;
+                $item->banner_url = url("/upload/banners/$banner_name");
+            }
+            $item->update($request->input());
             return response()->json([
-                'code'=>404,
-                'message'=>$e
-             ],404);
-           }
-        
+                'code' => 200,
+                'message' => 'banner updated successfully'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'code' => 404,
+                'message' => $e
+            ], 404);
+        }
     }
 
     /**
@@ -131,46 +127,49 @@ class BannersController extends Controller
      */
     public function destroy(string $id)
     {
-        try{
+        try {
             $item = Banners::find($id);
             unlink("upload/banners/$item->image");
             $item->delete();
             return response()->json([
-                'code'=>200,
-                'message'=>'banner deleted successfully'
-             ],200);
-        }catch(Exception $e){
-        return response()->json([
-            'code'=>404,
-            'message'=>$e
-         ],404);
-       }
-        
+                'code' => 200,
+                'message' => 'banner deleted successfully'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'code' => 404,
+                'message' => $e
+            ], 404);
+        }
     }
     // function for get banner frontend side 
     public function homeBanner()
     {
         try {
-            $banner = Banners::orderBy('id','DESC')->get();
-            foreach($banner as $ele){
-                $ele['image'] =  url("/images/banners/ ".$ele->image);
+            $BannerWithSubcategory = Banners::select('id','image','description','banner_title','sub_category_id')->with('subcategory:id,name')->orderBy('id','DESC')->get();
+            if ($BannerWithSubcategory) {
+                foreach ($BannerWithSubcategory as $subcat) {
+                    $subcat['image'] = url("/upload/banners/" . $subcat->image);
+                }
+                return response()->json([
+                    'success' => true,
+                    'status' => 200,
+                    'BannerWithSubvategory' => $BannerWithSubcategory,
+                    'message' => 'Banner Show Successfully',
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => true,
+                    'status' => 404,
+                    'message' => 'Banners Are Not Found'
+                ], 404);
             }
-            $subcategory = Banners::with('subcategory')->get();
-            foreach($subcategory as $subcat){
-                $subcat['image'] = url("/images/banners/ ".$subcat->image);
-            }
-            return response()->json([
-                'success' => true,
-                'status'=>200,
-                'banner' => $banner,
-                'subcatrgory' => $subcategory,
-                'message' => 'Banner get Successfully',
-            ], 200);
         } catch (Exception $e) {
             return response()->json([
-                'code'=>$e->getCode(),
-                'message'=>$e->getMessage()
-            ],200);
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage()
+            ], 200);
         }
     }
 }

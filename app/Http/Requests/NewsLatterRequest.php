@@ -31,8 +31,8 @@ class NewsLatterRequest extends FormRequest
     public function failedValidation(ValidationValidator $validate){
         throw new HttpResponseException(response()->json([
             'success'=>false,
-            'message' => 'validation error',
-            'data' => $validate->errors()
+            'status'=>422,
+            'message' => $validate->errors()->first(),
         ]));
     }
 }

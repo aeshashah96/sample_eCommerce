@@ -132,21 +132,21 @@ class SubCategoriesController extends Controller
     }
     public function listSubCategory(){
         try {
-            $subcategory = SubCategories::orderBy('id','DESC')->get();
+            $subcategory = SubCategories::select('id','category_id','name')->orderBy('id','DESC')->get();
             if ($subcategory){
                 return response()->json([
                     'success' => true,
                     'status'=>200,
                     'sub_category' => $subcategory,
-                    'message'=>'sub category show successfully'
+                    'message'=>'Sub Category Show Successfully'
                 ],200);
             }
             else{
                 return response()->json([
                     'succsess' => false,
-                    'status'=>200,
-                    'message' => 'sub category is not Found',
-                ],200);
+                    'status'=>404,
+                    'message' => 'Sub Category Not Found',
+                ],404);
             }
             
         } catch (Exception $e) {
