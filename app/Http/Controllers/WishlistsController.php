@@ -67,15 +67,24 @@ class WishlistsController extends Controller
             $wishlist = Wishlists::where('user_id',$user->id)->with(['products' => function($query){
                 $query->select('id','name','price');
             }])->get();
-            $id = $wishlist->pluck('product_id');
-            dd($id);
-            $review = ProductReview::where('product_id',$wishlist->product_id)->get();
-            dd($review);
+
+            foreach($wishlist as $ele){
+                $review = ProductReview::where('product_id',$ele->product_id)->pluck('rating');
+                $ratingAverage = $review->avg();
+                $totalReview = $review->count();
+                if(is_null($ratingAverage)){ 
+                    $ratingAverage=0;
+                }
+                $ele->avg_rating = $ratingAverage;
+                $ele->total_review = $totalReview;
+            }
+            
             if ($wishlist) {
                 return response()->json(
                     [
                         'success' => true,
                         'status' => 200,
+                        'message'=>'Product Found',
                         'wishlist' => $wishlist,
                     ],
                     200,
@@ -86,6 +95,7 @@ class WishlistsController extends Controller
                     [
                         'success' => false,
                         'status' => 500,
+                        'message'=>'Product Not Found'
                     ],
                     500,
                 );
