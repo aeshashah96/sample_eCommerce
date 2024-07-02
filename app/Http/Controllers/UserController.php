@@ -33,19 +33,25 @@ class UserController extends Controller
 
             if ($user) {
                 SendEmailUser::dispatch($user);
-                return response()->json([
-                    'success' => true,
-                    'status' => 200,
-                    'message' => 'User Register Successfully.',
-                    'user' => $user,
-                    'image_url' => url("/images/users/$userAvatar"),
-                ]);
+                return response()->json(
+                    [
+                        'success' => true,
+                        'status' => 201,
+                        'message' => 'User Register Successfully.',
+                        'user' => $user,
+                        'image_url' => url("/images/users/$userAvatar"),
+                    ],
+                    201,
+                );
             } else {
-                return response()->json([
-                    'success' => false,
-                    'status' => 503,
-                    'message' => 'User Not Register',
-                ]);
+                return response()->json(
+                    [
+                        'success' => false,
+                        'status' => 500,
+                        'message' => 'User Not Register',
+                    ],
+                    500,
+                );
             }
         } catch (Exception $e) {
             return response()->json([
@@ -73,11 +79,14 @@ class UserController extends Controller
                     'user' => $user,
                 ]);
             } else {
-                return response()->json([
-                    'success' => false,
-                    'status' => 401,
-                    'message' => 'Invalid Credentials',
-                ]);
+                return response()->json(
+                    [
+                        'success' => false,
+                        'status' => 401,
+                        'message' => 'Invalid Credentials',
+                    ],
+                    401,
+                );
             }
         } catch (\Throwable $th) {
             return response()->json([
@@ -118,12 +127,15 @@ class UserController extends Controller
         try {
             $user = $request->user();
             if ($user) {
-                return response()->json([
-                    'success' => true,
-                    'status' => 200,
-                    'user' => $user,
-                    'image_url' => url("/images/users/$user->user_logo"),
-                ]);
+                return response()->json(
+                    [
+                        'success' => true,
+                        'status' => 200,
+                        'user' => $user,
+                        'image_url' => url("/images/users/$user->user_logo"),
+                    ],
+                    200,
+                );
             } else {
                 return response()->json(
                     [
@@ -171,8 +183,7 @@ class UserController extends Controller
                 ],
                 200,
             );
-        } 
-        catch (Throwable $e) {
+        } catch (Throwable $e) {
             return response()->json([
                 'success' => false,
                 'status' => 'warning',
@@ -200,7 +211,9 @@ class UserController extends Controller
             if ($validator->fails()) {
                 return response()->json(
                     [
-                        'message' => 'validations fails',
+                        'status' => 422,
+                        'success' => false,
+                        'message' => 'Validations fails',
                         'errors' => $validator->errors(),
                     ],
                     422,
@@ -249,7 +262,15 @@ class UserController extends Controller
                 'email' => 'required|email',
             ]);
             if ($validator->fails()) {
-                return response()->json($validator->errors());
+                return response()->json(
+                    [
+                        'status' => 422,
+                        'success' => false,
+                        'message' => 'Validations fails',
+                        'errors' => $validator->errors(),
+                    ],
+                    422,
+                );
             }
 
             $status = Password::sendResetLink($email);
@@ -291,7 +312,15 @@ class UserController extends Controller
                 'password' => 'required|confirmed|min:3',
             ]);
             if ($validator->fails()) {
-                return response()->json($validator->errors());
+                return response()->json(
+                    [
+                        'status' => 422,
+                        'success' => false,
+                        'message' => 'Validations fails',
+                        'errors' => $validator->errors(),
+                    ],
+                    422,
+                );
             }
 
             $status = Password::reset($input, function ($user, $password) {
