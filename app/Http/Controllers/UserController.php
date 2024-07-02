@@ -78,14 +78,15 @@ class UserController extends Controller
                     'token' => $token,
                     'user' => $user,
                 ]);
-            } else {
+            } 
+            else {
                 return response()->json(
                     [
                         'success' => false,
-                        'status' => 404,
+                        'status' => 401,
                         'message' => 'Invalid Credentials',
                     ],
-                    404,
+                    401,
                 );
             }
         } catch (\Throwable $th) {
