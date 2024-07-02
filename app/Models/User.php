@@ -44,4 +44,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function productReview(){
+        return $this->hasOne(ProductReview::class,'user_id','id');
+    }
 }

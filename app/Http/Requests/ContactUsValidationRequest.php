@@ -25,7 +25,7 @@ class ContactUsValidationRequest extends FormRequest
     {
         return [
             'name'=>'required',
-            'email'=>'required|email|unique:contacts,email',
+            'email'=>'required|email',
             'subject'=>'required',
             'message'=>'required|min:5'
         ];
@@ -36,8 +36,8 @@ class ContactUsValidationRequest extends FormRequest
         throw new HttpResponseException(
             response()->json([
                 'success' => false,
-                'message' => 'Validation errors',
-                'data' => $validator->errors(),
+                'status'=>422,
+                'message' => $validator->errors()->first(),
             ]),
         );
     }

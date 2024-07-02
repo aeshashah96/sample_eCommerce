@@ -7,6 +7,7 @@ use App\Jobs\SendEmailNewsPaper;
 use App\Models\NewsLetter;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class NewsLetterController extends Controller
 {
@@ -113,20 +114,21 @@ class NewsLetterController extends Controller
                 SendEmailNewsPaper::dispatch($newsletter);
                 return response()->json([
                     'success' => true,
-                    'status' => 200,
-                    'message' => 'News Letter Add Successwfully',
+                    'status' => 201,
+                    'message' => 'News Letter Add Successfully',
                     'newsletter' => $newsletter
-                ], 200);
+                ], 201);
             } else {
                 return response()->json([
                     'success' => false,
-                    'status' => 200,
-                    'mesasge' => 'News Letters are not added'
-                ], 200);
+                    'status' => 404,
+                    'mesasge' => 'News Letter Not Added'
+                ], 404);
             }
         } catch (Exception $e) {
             return response()->json([
-                'code' => $e->getCode(),
+                'success'=>false,
+                'status' => $e->getCode(),
                 'message' => $e->getMessage()
             ]);
         }

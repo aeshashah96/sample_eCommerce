@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class ProductSize extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['size'];
+
+    public function products(){
+        return $this->belongsToMany(Product::class,'product_varients');
+    }
 }

@@ -116,3 +116,5 @@ Route::get('/show-subcategory',[SubCategoriesController::class,'showSubCategory'
 //sunil 1/7
 
 Route::apiResource('product',ProductController::class);
+
+Route::get('/list-featured-product',[ProductController::class,'list_featured_product']);
