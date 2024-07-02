@@ -50,22 +50,21 @@ Route::group(['middleware'=>'auth:api'],function(){
     Route::post('/change-password',[UserController::class,'changePassword']);
 });
 
-Route::post('/admin-login',[AdminAuthController::class,'admin_login']);
 Route::post('/forgot-password',[UserController::class,'forgotPassword']);
 Route::get('/reset-password',[UserController::class,'resetPassword'])->name('password.reset');
 // <------------------------------ User Module Completed ------------------------------------------------->
 
-Route::post('/authenticateadmin',[AdminAuthController::class,'admin_auth']);
 
 // harshvardhan 28 jun handle logout route errors
 // Route::get('/error',function(){
-//     return response()->json([
-//         'status' => 404,
-//         'msg'=>'Mismatch Token ..'
-//     ]);
-// })->name('login');
-
-
+    //     return response()->json([
+        //         'status' => 404,
+        //         'msg'=>'Mismatch Token ..'
+        //     ]);
+        // })->name('login');
+        
+        
+Route::post('/admin-login',[AdminAuthController::class,'admin_login']);
 // harshvardhan 28 jun logout route
 Route::middleware(['auth:adminApi'])->group(function(){
     Route::get('/admin-logout',[AdminAuthController::class,'admin_logout']);
