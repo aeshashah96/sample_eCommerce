@@ -28,4 +28,8 @@ class Product extends Model
     public function productReview(){
         return $this->hasMany(ProductReview::class,'product_id','id');
     }
+    // Wishlist Relationship
+    public function wishlists(){
+        return $this->hasMany(Wishlists::class);
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -47,5 +48,8 @@ class User extends Authenticatable
 
     public function productReview(){
         return $this->hasOne(ProductReview::class,'user_id','id');
+    }
+    public function wishlists(){
+        return $this->hasMany(Wishlists::class);
     }
 }
