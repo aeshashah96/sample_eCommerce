@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\BannerValidationRequest;
 use App\Models\Banners;
+use App\Models\Categories;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -14,8 +15,8 @@ class BannersController extends Controller
      */
     public function index()
     {
-        try{
-            $data = Banners::with('subcategory')->orderBy('created_at','desc')->paginate(10);   
+        try {
+            $data = Banners::with('subcategory')->orderBy('created_at', 'desc')->paginate(10);
             return response()->json([
                 'code' => 200,
                 'data' => $data
@@ -48,12 +49,15 @@ class BannersController extends Controller
                 $image_name = time() . "." . $extention;
                 $file->move('upload/banners/', $image_name);
             }
+            // $bannername = Banners::where('sub_category_id',$request->id);
+            // dd($bannername);
             Banners::create([
                 'image' => $image_name,
                 'description' => $request->description,
                 'banner_title' => $request->banner_title,
                 'banner_url' => url("/upload/banners/$image_name"),
-                'sub_category_id' => $request->sub_category_id
+                'sub_category_id' => $request->sub_category_id,
+                'category_id' => $request->category_id
             ]);
             return response()->json([
                 'code' => 200,
@@ -129,11 +133,11 @@ class BannersController extends Controller
     {
         try {
             $item = Banners::find($id);
-            if(!$item){
+            if (!$item) {
                 return response()->json([
-                    'code'=>404,
-                    'message'=>'record not found'
-                ],404);
+                    'code' => 404,
+                    'message' => 'record not found'
+                ], 404);
             }
             unlink("upload/banners/$item->image");
             $item->delete();
@@ -149,18 +153,41 @@ class BannersController extends Controller
         }
     }
     // function for get banner frontend side 
+
+    // public function createBanner(Request $request,$id){
+    //     if ($request->has('image')) {
+    //         $file = $request->file('image');
+    //         $extention = $file->getClientOriginalExtension();
+    //         $image_name = time() . "." . $extention;
+    //         $file->move('upload/banners/', $image_name);
+    //     }
+    //     // $ = Banners::find($id);
+
+    //     Banners::create([
+    //         'image'=>$image_name,
+    //         'description'=>$request->description,
+    //         'banner_title'=>$request->banner_title,
+    //         // 'sub_category_id'=>
+    //     ]);
+    // }
     public function homeBanner()
     {
         try {
-            $BannerWithSubcategory = Banners::select('id', 'image', 'description', 'banner_title', 'sub_category_id')->with('subcategory:id,name')->orderBy('id', 'DESC')->get();
+            $BannerWithSubcategory = Banners::select('id', 'image', 'description', 'banner_title', 'sub_category_id')->with('subcategory')->orderBy('id', 'DESC')->get();
             if ($BannerWithSubcategory) {
+                $BannerWithSubcategory = $BannerWithSubcategory->makeHidden('subcategory');
+                $BannerWithSubcategory = $BannerWithSubcategory->makeHidden('sub_category_id');
+                // dd($BannerWithSubcategory);
                 foreach ($BannerWithSubcategory as $subcat) {
                     $subcat['image'] = url("/upload/banners/" . $subcat->image);
+                }
+                foreach ($BannerWithSubcategory as $cat) {
+                    $cat->url = url('/' . Categories::find($cat->subcategory->category_id)->name . '/' . $cat->subcategory->name);
                 }
                 return response()->json([
                     'success' => true,
                     'status' => 200,
-                    'BannerWithSubvategory' => $BannerWithSubcategory,
+                    'bannerData' => $BannerWithSubcategory,
                     'message' => 'Banner Show Successfully',
                 ], 200);
             } else {

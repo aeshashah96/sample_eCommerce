@@ -74,11 +74,6 @@ class ProductController extends Controller
                     
                     return response()->json(['success' => true,'status'=>201, 'message' => 'Product Add Successfully']);
                 }
-
-                // ProductVarient::create([
-                //     'product_id'=> $product->id,
-                //     'product_size_id'=>$request->
-                // ]);
             } else {
                 return response()->json(['success' => false,'status'=>201, 'message' => 'Error']);
             }
@@ -121,9 +116,12 @@ class ProductController extends Controller
 
     public function list_featured_product(){
         try{
-            $productlist = Product::select('id','name','price')->with('productReview:id,product_id,user_id,rating','productImages:id,product_id,image')->where('is_featured',1)->get();
+            $productlist = Product::select('id','name','price')->with('productReview:id,user_id,product_id,rating','productImages:id,product_id,image')->where('is_featured',1)->offset(0)->limit(8)->get();
             if($productlist){
+                $productlist = $productlist->makeHidden('productReview');
+                
                 foreach($productlist as $image){
+                    // $image->productImages[0]->image = url("/images/product/".$image->productImages[0]->image);
                     foreach($image->productImages as $img){
                         $img->image=url("/images/product/".$img->image);
                     }
@@ -144,15 +142,14 @@ class ProductController extends Controller
                     'success'=>true,
                     'status'=>200,
                     'message'=>'Is Feautured Product Get Successfully',
-                    'productDetails'=>$productlist,
+                    'productData'=>$productlist,
                 ]);
             }
             else{
                 return response()->json([
                     'success'=>true,
                     'status'=>404,
-                    'message'=>'Is Feautured Product Not Found',
-                    'productDetails'=>$productlist,
+                    'message'=>'Is Feautured Product Not Found'
                 ],404);
             }
             
@@ -168,13 +165,21 @@ class ProductController extends Controller
 
     public function getProduct($id){
         try{
-            $product = Product::find($id)->with('colors')->get();
-            if($product){
+            $productlist = Product::select('id','name','description','price','long_description')->with(['colors:id,color','sizes:id,size','productImages:id,product_id,image','productReview'])->findOrFail($id);
+            // dd($productlist->productImages);
+            foreach($productlist->productImages as $list){
+                $list->image = url("/images/product/".$list->image);
+            }
+            // dd($productlist->productReview);
+            foreach($productlist->productReview as $review){
+                dd($review);
+            }
+            if($productlist){
                 return response()->json([
                     'success'=>true,
                     'status'=>200,
                     'message'=>'Product Get Successfully',
-                    'product'=>$product
+                    'product'=>$productlist
                 ],200);
             }
         }

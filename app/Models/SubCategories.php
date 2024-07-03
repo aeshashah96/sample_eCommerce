@@ -4,11 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class SubCategories extends Model
 {
     use HasFactory;
-    protected $fillable = ['category_id','name'];
+    protected $fillable = ['category_id','name','subcategory_slug'];
+
+    public function setTitleAttribute($value)
+    {
+        $this->attributes['name'] = $value;
+        if (!$this->slug) {
+            $this->attributes['subcategory_slug'] = Str::slug($value);
+        }
+    }
 
     public function products(){
         return $this->hasMany(Product::class,'sub_category_id','id');
