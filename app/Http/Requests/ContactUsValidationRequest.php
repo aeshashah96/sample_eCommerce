@@ -31,13 +31,13 @@ class ContactUsValidationRequest extends FormRequest
         ];
     }
 
-    public function failedValidation(Validator $validate)
+    public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(
             response()->json([
                 'success' => false,
                 'status'=>422,
-                'message' => $validate->errors()->first(),
+                'message' => $validator->errors()->first(),
             ]),
         );
     }

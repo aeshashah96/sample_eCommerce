@@ -15,9 +15,12 @@ class LanguageController extends Controller
     public function index()
     {   
         try{
-            $data = Language::paginate(10);
+            $data = Language::paginate(10,['id','language_name',
+        'language_code',
+        'status']);
             return response()->json([
-                'code'=>200,
+                'success'=>true,
+                'status'=>200,
                 'data'=>$data
             ],200);
         }catch (Exception $e) {
@@ -38,7 +41,8 @@ class LanguageController extends Controller
         try{
             Language::create($request->input());
             return response()->json([
-                'code'=>201,
+                'success'=>true,
+                'status'=>200,
                 'message'=>'record created successfuly'
             ],200);
         }catch (Exception $e) {
@@ -55,7 +59,30 @@ class LanguageController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try{
+            $user = Language::find($id,['id','language_name',
+        'language_code',
+        'status']);
+            if($user){
+                return response()->json([
+                    'success'=>true,
+                    'status'=>200,
+                    'data'=>$user
+                ],200);
+            }else{
+                return response()->json([
+                    'success'=>false,
+                    'status'=>404,
+                    'message'=>'record not found'
+                ]);
+            }
+        }catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
@@ -66,7 +93,8 @@ class LanguageController extends Controller
         try{
             Language::find($id)->update($request->input());
             return response()->json([
-                'code'=>200,
+                'success'=>true,
+                'status'=>200,
                 'message'=>'record updated successfully'
             ],200);
         }catch (Exception $e) {
@@ -87,13 +115,15 @@ class LanguageController extends Controller
             $item = Language::find($id);
             if(!$item){
                 return response()->json([
-                    'code'=>404,
+                    'success'=>false,
+                    'status'=>404,
                     'message'=>'record not found'
-                ],404);
+                ]);
             }
             $item->delete();
             return response()->json([
-                'code'=>200,
+                'success'=>true,
+                'status'=>200,
                 'message'=>'message deleted successfully'
             ],200);
         }catch (Exception $e) {

@@ -17,7 +17,7 @@ class Admin extends Authenticatable
         'last_name',
         'email',
         'password',
-        'phoneNumber',
+        'phone_number',
         'admin_logo',
         'admin_logo_url'
     ];

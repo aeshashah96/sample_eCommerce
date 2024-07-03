@@ -22,29 +22,33 @@ class AdminAuthController extends Controller
                 auth('adminApi')->setUser($user);
                 $token = $user->createToken('Tokenname')->accessToken;
                 return response()->json([
-                    'code'=>'200',
+                    'success'=>true,
+                    'status'=>'200',
                     'Message'=>'login successfully',
                     'Token'=>$token
-                ],200);    
+                ]);    
             }else{
                 return response()->json([
-                    'code'=>401,
+                    'success'=>false,
+                    'status'=>'401',
                     'Message'=>'incorrect password'
-                ],401);    
+                ]);    
             }
         }else{
             return response()->json([
-                'code'=>401,
+                'success'=>false,
+                'status'=>'401',
                 'Message'=>'incorrect email'
-            ],401);
+            ]);
         }
             
         }
         catch(Exception $e){
             return response()->json([
-                'code'=>404,
+                'success'=>false,
+                'status'=>404,
                 'error'=>$e
-            ],404);
+            ]);
         }
     }
 
@@ -52,30 +56,43 @@ class AdminAuthController extends Controller
         try{
         $request->user()->tokens()->delete();
             return response()->json([
-                'code'=>200,
-                'message'=>'logout successful'
-            ],200);
+                'success'=>true,
+                'status'=>200,
+                'message'=>'logout successfully'
+            ]);
         }catch(Exception $e){
             return response()->json([
-                'code'=>404,
+                'success'=>false,
+                'status'=>404,
                 'error'=>$e
-            ],404);
+            ]);
         }
         
     }
 
     public function admin_profile(Request $request){
         try{
-            $user =  $request->user();
+            $user =  $request->user()->get([
+                'first_name',
+                'last_name',
+                'email',
+                'password',
+                'phone_number',
+                'admin_logo',
+                'admin_logo_url'
+            ]);
             return response()->json([
-                'code'=>200,
-                'data'=>$user
-            ],200);
+                'success'=>true,
+                'status'=>200,
+                'data'=>$user,
+                'message'=>'admin profile data'
+            ]);
         }catch(Exception $e){
             return response()->json([
-                'code'=>404,
+                'success'=>false,
+                'status'=>404,
                 'error'=>$e
-            ],404);
+            ]);
         }
     }
 
@@ -97,20 +114,19 @@ class AdminAuthController extends Controller
              $item->admin_logo_url =url("/upload/Admin/admin_logo/$admin_logo_name");
              $item->save();
          }
-         $item->first_name = $request->first_name;
-         $item->last_name = $request->last_name;
-         $item->phone_number = $request->phone_number;
-         $item->save();
+         $item->update($request->input());
          return response()->json([
-             'code'=>200,
-             'message'=>'data updated successfully'
-         ],200);
+            'success'=>true,
+            'status'=>200,
+            'message'=>'profile updated successfully'
+         ]);
         }
         catch(Exception $e){
             return response()->json([
-                'code'=>404,
+                'success'=>false,
+                'status'=>404,
                 'error'=>$e
-            ],404);
+            ]);
         }
     }
 
@@ -118,24 +134,19 @@ class AdminAuthController extends Controller
         
         $user =  Admin::find($request->user()->id);
             if(Hash::check($request->current_password,$user->password)){
-                if($request->new_password == $request->confirm_password){
                     $user->password = Hash::make($request->new_password);
                     $user->save();
                     return response()->json([
-                        'code'=>200,
+                        'success'=>true,
+                        'status'=>200,
                         'message'=>'password change successfully'
-                    ],200);
-                }else{
-                    return response()->json([
-                        'code'=>404,
-                        'message'=>'new password and confirm password are not same'
-                    ],404);    
-                }
+                    ]);
             }else{
                 return response()->json([
-                    'code'=>404,
+                    'success'=>false,
+                    'status'=>404,
                     'message'=>'enter a correct password'
-                ],404);
+                ]);
             }
     }
     
