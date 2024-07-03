@@ -6,7 +6,9 @@ use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\SubCategoriesController;
 use App\Http\Controllers\BannersController;
 use App\Http\Controllers\CartsController;
+use App\Http\Controllers\CityController;
 use App\Http\Controllers\ContactsController;
+use App\Http\Controllers\CountryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\NewsLetterController;
@@ -15,6 +17,8 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\WishlistsController;
 use App\Http\Controllers\ProductSizeController;
+use App\Http\Controllers\StateController;
+use App\Models\ProductColor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -77,6 +81,14 @@ Route::middleware(['auth:adminApi'])->group(function(){
     Route::post('update-setting',[SettingController::class,'updateSettingData']);
     Route::apiResource('customer',CustomerController::class);
     Route::apiResource('language',LanguageController::class);
+
+    //harshvardhan 3 jul
+    Route::get('get-cities',[CityController::class,'get_cities']);
+    Route::delete('delete-city/{id}',[CityController::class,'delete_city']);
+    Route::post('edit-city/{id}',[CityController::class,'edit_city']);
+    Route::get('view-city/{id}',[CityController::class,'view_city']);
+    Route::apiResource('state',StateController::class);
+    Route::apiResource('country',CountryController::class);
 });
 // AdminLogin  && AdminLogout
 

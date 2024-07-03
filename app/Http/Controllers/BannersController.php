@@ -15,17 +15,21 @@ class BannersController extends Controller
      */
     public function index()
     {
-        try {
-            $data = Banners::with('subcategory')->orderBy('created_at', 'desc')->paginate(10);
+        try{
+            $data = Banners::with(['subcategory'=> function ($query) {
+                $query->select('id', 'name');
+            },])->orderBy('created_at','desc')->paginate(10);   
             return response()->json([
-                'code' => 200,
+                'success'=>true,
+                'status' => 200,
                 'data' => $data
-            ], 200);
-        } catch (Exception $e) {
+            ]);
+        } catch(Exception $e){
             return response()->json([
-                'code' => 404,
-                'message' => $e
-            ], 404);
+                'success'=>false,
+                'status'=>404,
+                'error'=>$e
+            ]);
         }
     }
 
@@ -60,14 +64,16 @@ class BannersController extends Controller
                 'category_id' => $request->category_id
             ]);
             return response()->json([
-                'code' => 200,
+                'success'=>true,
+                'status' => 200,
                 'message' => 'banner added successfully'
             ], 200);
-        } catch (Exception $e) {
+        } catch(Exception $e){
             return response()->json([
-                'code' => 404,
-                'message' => $e
-            ], 404);
+                'success'=>false,
+                'status'=>404,
+                'error'=>$e
+            ]);
         }
     }
 
@@ -76,6 +82,32 @@ class BannersController extends Controller
      */
     public function show(string $id)
     {
+        try{
+            $data = Banners::with(['subcategory'=> function ($query) {
+                $query->select('id', 'name');
+            },])->get()
+            ->find($id,['id','image','description']);
+            if($data){
+                return response()->json([
+                    'success'=>true,
+                    'status'=>200,
+                    'data'=>$data,
+                    'message'=>'country details fetch successfully'
+                ]);
+            }else{
+                return response()->json([
+                    'success'=>false,
+                    'code'=>404,
+                    'message'=>'record not found'
+                ]);
+            }
+        }catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
@@ -95,9 +127,10 @@ class BannersController extends Controller
             $item = Banners::find($id);
             if (!$item) {
                 return response()->json([
-                    'code' => 401,
+                    'success'=>false,
+                    'status' => 404,
                     'message' => 'record not found'
-                ], 401);
+                ]);
             }
             if ($request->has('image')) {
                 if ($item->image) {
@@ -115,14 +148,16 @@ class BannersController extends Controller
             }
             $item->update($request->input());
             return response()->json([
-                'code' => 200,
+                'success'=>true,
+                'status' => 200,
                 'message' => 'banner updated successfully'
             ], 200);
-        } catch (Exception $e) {
+        } catch(Exception $e){
             return response()->json([
-                'code' => 404,
-                'message' => $e
-            ], 404);
+                'success'=>false,
+                'status'=>404,
+                'error'=>$e
+            ]);
         }
     }
 
@@ -135,21 +170,24 @@ class BannersController extends Controller
             $item = Banners::find($id);
             if (!$item) {
                 return response()->json([
-                    'code' => 404,
-                    'message' => 'record not found'
-                ], 404);
+                    'success'=>false,
+                    'status' => 404,
+                    'message'=>'record not found'
+                ]);
             }
             unlink("upload/banners/$item->image");
             $item->delete();
             return response()->json([
-                'code' => 200,
+                'success'=>true,
+                'status' => 200,
                 'message' => 'banner deleted successfully'
             ], 200);
-        } catch (Exception $e) {
+        } catch(Exception $e){
             return response()->json([
-                'code' => 404,
-                'message' => $e
-            ], 404);
+                'success'=>false,
+                'status'=>404,
+                'error'=>$e
+            ]);
         }
     }
     // function for get banner frontend side 

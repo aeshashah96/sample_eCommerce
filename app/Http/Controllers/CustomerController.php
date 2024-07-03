@@ -20,14 +20,16 @@ class CustomerController extends Controller
         try{
             $data = User::orderBy('created_at','desc')->paginate(10);
             return response()->json([
-                'code'=>200,
+                'success'=>true,
+                'status'=>200,
                 'data'=>$data
             ],200);
-        }catch(Exception $e){
+        }catch (Exception $e) {
             return response()->json([
-                'code'=>404,
-                'error'=>$e
-            ],404);
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -57,20 +59,23 @@ class CustomerController extends Controller
             if($user){
                 SendPasswordMail::dispatch($user,$password);
                 return response()->json([
-                    'code' => 200,
+                    'success'=>true,
+                    'status' => 200,
                     'message' => 'Customer Register Successfully.',
                 ],200);
             }else {
                 return response()->json([
-                    'code' => 503,
+                    'success'=>false,
+                    'status' => 503,
                     'message' => 'Customer Not Register',
                 ],503);
             }    
-        }catch(Exception $e){
+        }catch (Exception $e) {
             return response()->json([
-                'code'=>404,
-                'error'=>$e
-            ],404);
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ]);
         }
         
     }
@@ -84,20 +89,23 @@ class CustomerController extends Controller
             $user = User::find($id);
             if($user){
                 return response()->json([
-                    'code'=>200,
+                    'success'=>true,
+                    'status'=>200,
                     'data'=>$user
                 ],200);
             }else{
                 return response()->json([
-                    'code'=>404,
+                    'success'=>false,
+                    'status'=>404,
                     'message'=>'record not found'
-                ],404);
+                ]);
             }
-        }catch(Exception $e){
+        }catch (Exception $e) {
             return response()->json([
-                'code'=>404,
-                'error'=>$e
-            ],404);
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -110,9 +118,10 @@ class CustomerController extends Controller
             $item = User::find($id);
             if(!$item){
                 return response()->json([
-                    'code'=>404,
+                    'success'=>false,
+                    'status'=>404,
                     'error'=>'record not found'
-                ],404);    
+                ]);    
             }
             if($request->has('user_logo')){
                 if($item->user_logo && $item->user_logo != 'userLogo.png'){
@@ -129,14 +138,16 @@ class CustomerController extends Controller
             }
             $item->update($request->input());
             return response()->json([
-                'code'=>200,
+                'success'=>true,
+                'status'=>200,
                 'messasge'=>'user record updated'
             ],200);
-        }catch(Exception $e){
+        }catch (Exception $e) {
             return response()->json([
-                'code'=>404,
-                'error'=>$e
-            ],404);
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ]);
         }
         
     }
@@ -150,9 +161,10 @@ class CustomerController extends Controller
             $item = User::find($id);
             if(!$item){
                 return response()->json([
-                    'code'=>404,
+                    'success'=>false,
+                    'status'=>404,
                     'error'=>'record not found'
-                ],404);    
+                ]);    
             }
             if($item->user_logo){
                 $name = $item->user_logo;
@@ -161,14 +173,16 @@ class CustomerController extends Controller
             }
             $item->delete();
             return response()->json([
-                'code'=>200,
+                'success'=>true,
+                'status'=>200,
                 'message'=>'deleted record successfully'
             ],200);
-        }catch(Exception $e){
+        }catch (Exception $e) {
             return response()->json([
-                'code'=>404,
-                'error'=>$e
-            ],404);
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ]);
         }
         
     }

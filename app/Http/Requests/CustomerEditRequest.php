@@ -36,10 +36,10 @@ class CustomerEditRequest extends FormRequest
     {
         throw new HttpResponseException(
             response()->json([
-                'code'=>401,
-                'message' => 'Validation errors',
+                'success'=>false,
+                'status'=>422,
                 'message' => $validator->errors()->first(),
-            ],401),
+            ]),
         );
     }
 }

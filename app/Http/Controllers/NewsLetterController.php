@@ -18,14 +18,16 @@ class NewsLetterController extends Controller
         try {
             $data = NewsLetter::paginate(10);
             return response()->json([
-                'code' => 200,
+                'success'=>true,
+                'status'=>200,
                 'data' => $data
             ], 200);
         } catch (Exception $e) {
             return response()->json([
-                'code' => 404,
-                'error' => $e
-            ], 404);
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -61,14 +63,16 @@ class NewsLetterController extends Controller
         try {
             NewsLetter::find($id)->delete();
             return response()->json([
-                'code' => 200,
+                'success'=>true,
+                'status'=>200,
                 'message' => 'record deleted successfully'
             ], 200);
         } catch (Exception $e) {
             return response()->json([
-                'code' => 404,
-                'error' => $e
-            ], 404);
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ]);
         }
     }
 

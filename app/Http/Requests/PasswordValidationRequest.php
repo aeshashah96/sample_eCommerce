@@ -24,12 +24,17 @@ class PasswordValidationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'new_password' =>[
-                'required',
-                'min:6',
-                'regex:/^\S*$/u',
-                'confirmed'
-            ],
+            'current_password' => 'required',
+                'new_password' => 'required|min:4|regex:/^\S*$/u',
+                'confirm_password' => 'required|same:new_password',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'confirm_password.reuired' => 'confirm_password is required.',
+            'confirm_password' => 'new password and confirm password does not match.',
         ];
     }
 
@@ -37,10 +42,10 @@ class PasswordValidationRequest extends FormRequest
     {
         throw new HttpResponseException(
             response()->json([
-                'code'=>401,
-                'message' => 'Validation errors',
+                'success'=>false,
+                'status'=>422,
                 'message' => $validator->errors()->first(),
-            ],401),
+            ]),
         );
     }
 }

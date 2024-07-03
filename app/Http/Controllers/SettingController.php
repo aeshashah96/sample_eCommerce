@@ -12,14 +12,16 @@ class SettingController extends Controller
         try{
             $data = Setting::get();
             return response()->json([
-                'code'=>200,
+                'success'=>true,
+                'status'=>200,
                 'data'=>$data
             ],200);
-        }catch(Exception $e){
+        }catch (Exception $e) {
             return response()->json([
-                'code'=>404,
-                'error'=>$e
-            ],404);
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ]);
         }
         
     }
@@ -34,14 +36,16 @@ class SettingController extends Controller
                 Setting::where('key',$key)->update(['value'=>$val]);
             }
             return response()->json([
-                'code'=>200,
+                'success'=>true,
+                'status'=>200,
                 'message'=>'Data updated sucessfully'
             ],200);
-        }catch(Exception $e){
+        }catch (Exception $e) {
             return response()->json([
-                'code'=>404,
-                'error'=>$e
-            ],404);
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ]);
         }
         
     }

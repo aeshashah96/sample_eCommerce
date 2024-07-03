@@ -24,21 +24,21 @@ class AdminEditProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-            'phone_number'=>'required|numeric',
-            'admin_logo' => 'mimes:jpeg,jpg,png,gif'
+            'first_name' => 'string',
+            'last_name' => 'string',
+            'phone_number'=>'numeric',
+            'admin_logo' => 'mimes:jpeg,jpg,png'
         ];
     }
 
-    public function failedValidation(Validator $validate)
+    public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(
             response()->json([
-                'code'=>401,
-                'message' => 'Validation errors',
-                'message' => $validate->errors()->first(),
-            ],401),
+                'success'=>false,
+                'status'=>422,
+                'message' => $validator->errors()->first(),
+            ]),
         );
     }
 }
