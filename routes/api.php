@@ -60,15 +60,6 @@ Route::get('/reset-password',[UserController::class,'resetPassword'])->name('pas
 // <------------------------------ User Module Completed ------------------------------------------------->
 
 
-// harshvardhan 28 jun handle logout route errors
-// Route::get('/error',function(){
-    //     return response()->json([
-        //         'status' => 404,
-        //         'msg'=>'Mismatch Token ..'
-        //     ]);
-        // })->name('login');
-        
-        
 Route::post('/admin-login',[AdminAuthController::class,'admin_login']);
 // harshvardhan 28 jun logout route
 Route::middleware(['auth:adminApi'])->group(function(){
@@ -130,13 +121,13 @@ Route::get('/list-featured-product',[ProductController::class,'list_featured_pro
 
 
 // <------------------------- Wishlist Module : Nehal Solanki : 2/7/2024 -------------------------> 
-/// Add Product , Show , Delete In Wishlist 
+// Add Product , Show , Delete In Wishlist 
 Route::group(['middleware'=>'auth:api'],function(){
-    Route::post('/add-product/wishlist/{id}',[WishlistsController::class,'addProductWishlist']);
+    Route::post('/add-product/wishlist/{id}',[WishlistsController::class,'addRemoveProductWishlist']);
     Route::get('/show-product/wishlist',[WishlistsController::class,'showProductWishlists']);
-    Route::delete('/delete-product/wishlist/{id}',[WishlistsController::class,'removeProductWishlist']);
 });
 // <------------------------ Wishlist Module Completed : Nehal Solanki -------------------------->
+
 //sunil 2/7
 Route::apiResource('product-color',ProductColorController::class);
 Route::apiResource('product-size',ProductSizeController::class);
