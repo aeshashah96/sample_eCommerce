@@ -16,8 +16,8 @@ class SubCategoriesController extends Controller
         //
         $subcategory = SubCategories::orderBy('created_at', 'DESC')->with('category')->paginate(10);
 
-
-        return response()->json(['success' => true, 'status' => 200, 'sub_category' => $subcategory], 200);
+        
+        return response()->json(['success' => true,'status' => 200, 'sub_category' => $subcategory]);
     }
 
     /**
@@ -30,19 +30,20 @@ class SubCategoriesController extends Controller
         try {
             $validatedData = $request->validate([
                 'name' => "required|string|max:255",
-                'category_id' => 'required'
+                'category_id'=>'required|exists:categories,id'
             ]);
             $cat = SubCategories::where('category_id', $request->category_id)->where('name', $request->name)->first();
             if ($cat != null) {
 
-                return response()->json(['success' => false, 'status' => 0, 'message' => 'do not enter same sub category']);
+                        return response()->json(['success' => false, 'status' => 0, 'message' => 'do not enter same sub-category']);
+                      
             }
 
             $subcategory =  SubCategories::create(['name' => $request->name, 'category_id' => $request->category_id, 'subcategory_slug' => Str::slug($request->name)]);
             if ($subcategory) {
-                return response()->json(['success' => true, 'status' => 201, 'message' => 'Sub Category Add Successfully'], 201);
+                return response()->json(['success' => true, 'status' => 201, 'message' => 'Sub Category Add Successfully']);
             } else {
-                return response()->json(['success' => false, 'status' => 500, 'message' => 'Error Found'], 500);
+                return response()->json(['success' => false, 'status' => 500, 'message' => 'Error Found']);
             }
         } catch (Exception $e) {
             return response()->json(['success' => false, 'status' => $e->getCode(), 'message' => $e->getMessage()]);
@@ -60,7 +61,7 @@ class SubCategoriesController extends Controller
             if ($subcategory) {
                 return response()->json(['success' => true, 'status' => 200, 'message' => 'Sub Category get Successfully', 'sub_category' => $subcategory]);
             } else {
-                return response()->json(['success' => false, 'status' => 404, 'message' => 'Sub Category Not Found'], 404);
+                return response()->json(['success' => false, 'status' => 404, 'message' => 'Sub Category Not Found']);
             }
         } catch (Exception $e) {
             return response()->json(['success' => false, 'status' => $e->getCode(), 'message' => $e->getMessage()]);
@@ -76,22 +77,23 @@ class SubCategoriesController extends Controller
         try {
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
-                'category_id' => 'required',
+                'category_id'=>'required|exists:categories,id',
             ]);
             $cat = SubCategories::where('category_id', $request->category_id)->where('name', $request->name)->first();
             if ($cat != null) {
 
-                return response()->json(['success' => false, 'status' => 0, 'message' => 'do not enter same sub category']);
+                        return response()->json(['success' => false, 'status' => 0, 'message' => 'do not enter same sub-category']);
+                      
             }
             $subcategory = SubCategories::find($id);
 
-            if ($subcategory) {
-                $subcategory->update(['name' => $request->name, 'category_id' => $request->category_id]);
-                return response()->json(['success' => true, 'status' => 200, 'message' => 'Sub Category Update Successfully']);
-            } else {
-                return response()->json(['success' => false, 'status' => 404, 'message' => 'Sub Category Not Found'], 404);
-            }
-
+                if ($subcategory) {
+                    $subcategory->update(['name' => $request->name,'category_id'=>$request->category_id]);
+                    return response()->json(['success' => true, 'status' => 200, 'message' => 'Sub Category Update Successfully']);
+                } else {
+                    return response()->json(['success' => false,'status' => 404, 'message' => 'Sub Category Not Found']);
+                }
+           
             $subcategory->save();
         } catch (Exception $e) {
             return response()->json(['success' => false, 'status' => $e->getCode(), 'message' => $e->getMessage()]);
@@ -110,7 +112,7 @@ class SubCategoriesController extends Controller
                 $subcategory->delete();
                 return response()->json(['success' => true, 'status' => 200, 'message' => 'Sub Category Delete Successfully']);
             } else {
-                return response()->json(['success' => false, 'status' => 404, 'message' => 'Sub Category Not Found'], 404);
+                return response()->json(['success' => false, 'status' => 404, 'message' => 'Sub Category Not Found']);
             }
         } catch (Exception $e) {
             return response()->json(['success' => false, 'status' => $e->getCode(), 'message' => $e->getMessage()]);
@@ -123,7 +125,7 @@ class SubCategoriesController extends Controller
         if ($subcategory) {
             return response()->json(['success' => true, 'status' => 200, 'message' => 'Sub Category Get Successfully', 'sub_category' => $subcategory]);
         } else {
-            return response()->json(['success' => false, 'status' => 200, 'message' => 'Error Found'], 200);
+            return response()->json(['success' => false, 'status' => 200, 'message' => 'Error Found']);
         }
     }
 

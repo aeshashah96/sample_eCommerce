@@ -10,6 +10,7 @@ class Categories extends Model
 {
     use HasFactory;
     protected $fillable = ['name', 'description', 'category_image', 'category_slug'];
+    protected $hidden=['description','created_at','updated_at'];
 
     public function setTitleAttribute($value)
     {
