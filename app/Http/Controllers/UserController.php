@@ -85,11 +85,11 @@ class UserController extends Controller
                     'message' => 'Invalid Credentials',
                 ]);
             }
-        } catch (\Throwable $th) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'status' => 'warning',
-                'message' => $th,
+                'message' => $e->getMessage(),
             ]);
         }
     }
@@ -178,11 +178,11 @@ class UserController extends Controller
                 ],
                 200,
             );
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'status' => 'warning',
-                'message' => $e,
+                'message' => $e->getMessage(),
             ]);
         }
     }
@@ -274,11 +274,11 @@ class UserController extends Controller
                     'status' => 400,
                     'message' => __($status),
                 ]);
-        } catch (\Throwable $th) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'status' => 'warning',
-                'message' => $th,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
             ]);
         }
     }

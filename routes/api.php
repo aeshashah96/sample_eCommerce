@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\SubCategoriesController;
 use App\Http\Controllers\BannersController;
+use App\Http\Controllers\CartsController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LanguageController;
@@ -132,3 +133,11 @@ Route::group(['middleware'=>'auth:api'],function(){
 Route::apiResource('product-color',ProductColorController::class);
 Route::apiResource('product-size',ProductSizeController::class);
 Route::get('/get-product/{id}',[ProductController::class,'getProduct']);
+
+
+// <-------------------------- Cart Module : Nehal Solanki : 3/7/2024 ------------------------------> 
+Route::group(['middleware'=>'auth:api'],function(){
+    Route::post('/add-product/cart/{id}',[CartsController::class,'addProductCart']);
+    Route::get('/show-product/cart',[CartsController::class,'showCartProduct']);
+});
+// <------------------------------------------------------------------------------------------------>

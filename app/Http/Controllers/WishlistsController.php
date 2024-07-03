@@ -71,14 +71,11 @@ class WishlistsController extends Controller
                     }
                 }
             } else {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'status' => 404,
-                        'message' => 'Product Not Found',
-                    ],
-                    404,
-                );
+                return response()->json([
+                    'success' => false,
+                    'status' => 404,
+                    'message' => 'Product Not Found',
+                ]);
             }
         } catch (Exception $e) {
             return response()->json([
@@ -124,14 +121,11 @@ class WishlistsController extends Controller
                     200,
                 );
             } else {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'status' => 500,
-                        'message' => 'Product Not Found',
-                    ],
-                    500,
-                );
+                return response()->json([
+                    'success' => false,
+                    'status' => 500,
+                    'message' => 'Product Not Found',
+                ]);
             }
         } catch (Exception $e) {
             return response()->json([
@@ -141,6 +135,4 @@ class WishlistsController extends Controller
             ]);
         }
     }
-
-
 }
