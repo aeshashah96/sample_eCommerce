@@ -252,18 +252,25 @@ dump($id);
         }
     }
 
-    public function list_featured_product(){
+    public function list_featured_product(Request $request){
         try{
-            $productlist = Product::select('id','name','price')->with('productReview:id,user_id,product_id,rating','productImages:id,product_id,image')->where('is_featured',1)->offset(0)->limit(8)->get();
+            $limit = $request->input('limit');
+            $productlist = Product::select('id','name','price')->with('productReview','productImages:id,product_id,image')->where('is_featured',1)->offset(0)->limit(4)->get();
+            $productlist = Product::limit($limit)->get()->makeHidden(['productReview','created_at','updated_at','sku','is_featured','long_description','description','slug','isActive','category_id','sub_category_id']);
+            
             if($productlist){
-                $productlist = $productlist->makeHidden('productReview');
-                
+                $images = array();
                 foreach($productlist as $image){
                     // $image->productImages[0]->image = url("/images/product/".$image->productImages[0]->image);
                     foreach($image->productImages as $img){
                         $img->image=url("/images/product/".$img->image);
+                        // dd($img->image);
+                        $images[] =  $img->image;
                     }
+                    // dd($images[0]);
                 }
+                // $productlist->xyz = $images[0];
+                
                 $rating = 0;
                 $productreview = 0;
                 foreach($productlist as $review){
@@ -304,15 +311,33 @@ dump($id);
 
     public function getProduct($id){
         try{
-            $productlist = Product::select('id','name','description','price','long_description')->with(['colors:id,color','sizes:id,size','productImages:id,product_id,image','productReview'])->findOrFail($id);
+            $productlist = Product::select('id','name','description','price','long_description')->with(['colors:id,color','sizes:id,size','productImages:id,product_id,image','productReview:id,product_id,user_id,comment,rating'])->find($id);
             // dd($productlist->productImages);
             foreach($productlist->productImages as $list){
                 $list->image = url("/images/product/".$list->image);
             }
             // dd($productlist->productReview);
+            $rat = array();
+            $total_review = array();
             foreach($productlist->productReview as $review){
-                dd($review);
+                // dd($review);
+                $rating = $review->where('product_id',$review->id)->pluck('rating')->avg();
+                $rat[] = $rating;
+                // dd($rating);
+                $final_review = $review->where('product_id',$review->id)->pluck('rating')->count();
+                // $productlist->total_review = $total_review;
+                $total_review[] = $final_review;
             }
+            if(!empty($rat) && !empty($total_review)){
+                $productlist->avg_rate = $rat[0];
+                $productlist->total_review = $total_review[0];
+            }
+            else{
+                $productlist->avg_rate = 0;
+                $productlist->total_review =0;
+            }
+            // dd($productlist);
+
             if($productlist){
                 return response()->json([
                     'success'=>true,
@@ -329,7 +354,5 @@ dump($id);
                 'message'=>$e->getMessage()
             ]);
         }
-       
-
     }
 }
