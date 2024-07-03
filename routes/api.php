@@ -14,7 +14,6 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\WishlistsController;
 use App\Http\Controllers\ProductSizeController;
-use App\Models\ProductColor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -100,6 +99,7 @@ Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCat
 
 // 28/06 Category Show Get Api  Nikunj
 Route::get('/list-category',[CategoriesController::class,'listCategory']);
+Route::post('/add-category',[CategoriesController::class,'addCategory']);
 // 1st July Banner Get Api For front end side Nikunj 
 Route::post('/createbanner',[BannersController::class,'bannerCreate']);
 
@@ -110,6 +110,7 @@ Route::get('/home-banner',[BannersController::class,'homeBanner']);
 
 // 28/06 Sub Category Show Get Api Nikunj
 Route::get('/list-subcategory',[SubCategoriesController::class,'listSubCategory']);
+Route::post('add-subcategory',[SubCategoriesController::class,'addSubCategory']);
 
 // 01/07 Add ContactUs Post Api Nikunj 
 
@@ -124,6 +125,7 @@ Route::get('/show-subcategory',[SubCategoriesController::class,'showSubCategory'
 
 Route::apiResource('product',ProductController::class);
 
+// 02/07 List Product of featured Nikunj 
 Route::get('/list-featured-product',[ProductController::class,'list_featured_product']);
 
 
@@ -138,3 +140,4 @@ Route::group(['middleware'=>'auth:api'],function(){
 //sunil 2/7
 Route::apiResource('product-color',ProductColorController::class);
 Route::apiResource('product-size',ProductSizeController::class);
+Route::get('/get-product/{id}',[ProductController::class,'getProduct']);

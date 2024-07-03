@@ -24,7 +24,6 @@ class ContactsController extends Controller
                     'success' => true,
                     'status' => 201,
                     'message' => 'Contacts Add Successfully',
-                    'contacts' => $contact
                 ], 201);
             } else {
                 return response()->json([

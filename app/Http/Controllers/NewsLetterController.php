@@ -7,7 +7,6 @@ use App\Jobs\SendEmailNewsPaper;
 use App\Models\NewsLetter;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class NewsLetterController extends Controller
 {
@@ -83,7 +82,6 @@ class NewsLetterController extends Controller
                     'success' => true,
                     'status' => 201,
                     'message' => 'News Letter Add Successfully',
-                    'newsletter' => $newsletter
                 ], 201);
             } else {
                 return response()->json([
