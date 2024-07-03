@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 class WishlistsController extends Controller
 {
     // Add Product To Wishlist
-    public function addProductWishlist(Request $request, $id)
+    public function addRemoveProductWishlist(Request $request, $id)
     {
         try {
             $user = $request->user();
@@ -45,17 +45,32 @@ class WishlistsController extends Controller
                         );
                     }
                 } else {
-                    return response()->json(
-                        [
-                            'success' => false,
-                            'status' => 500,
-                            'message' => 'Product Already Added In Wishlist',
-                        ],
-                        500,
-                    );
+                    $wishlist = Wishlists::where('product_id', $id)
+                        ->where('user_id', $user->id)
+                        ->get()
+                        ->first();
+                    if (!is_null($wishlist)) {
+                        $wishlist->delete();
+                        return response()->json(
+                            [
+                                'success' => true,
+                                'status' => 200,
+                                'message' => 'Product Removed From Wishlist',
+                            ],
+                            200,
+                        );
+                    } else {
+                        return response()->json(
+                            [
+                                'success' => false,
+                                'status' => 200,
+                                'message' => 'Product Not Found',
+                            ],
+                            200,
+                        );
+                    }
                 }
-            }
-            else{
+            } else {
                 return response()->json(
                     [
                         'success' => false,
@@ -127,33 +142,5 @@ class WishlistsController extends Controller
         }
     }
 
-    // Delete Product From Wishlist
-    public function removeProductWishlist(Request $request, $id)
-    {
-        $user = $request->user();
-        $wishlist = Wishlists::where('product_id', $id)
-            ->where('user_id', $user->id)
-            ->get()
-            ->first();
-        if (!is_null($wishlist)) {
-            $wishlist->delete();
-            return response()->json(
-                [
-                    'success' => true,
-                    'status' => 200,
-                    'message' => 'Product Removed From Wishlist',
-                ],
-                200,
-            );
-        } else {
-            return response()->json(
-                [
-                    'success' => false,
-                    'status' => 200,
-                    'message' => 'Product Not Found',
-                ],
-                200,
-            );
-        }
-    }
+
 }
