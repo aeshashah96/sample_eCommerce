@@ -28,7 +28,8 @@ class BannerValidationRequest extends FormRequest
                 'image' => 'required | mimes:jpeg,jpg,png,gif',
                 'description'=>'required',
                 'banner_title'=>'required',
-                'sub_category_id'=>'required'
+                'sub_category_id'=>'required',
+                'category_id'=>'required'
             ];
     }
 

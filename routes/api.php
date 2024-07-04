@@ -10,6 +10,7 @@ use App\Http\Controllers\CityController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\FeaturesController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\NewsLetterController;
 use App\Http\Controllers\ProductColorController;
@@ -164,4 +165,5 @@ Route::group(['middleware'=>'auth:api'],function(){
         Route::get('get-city',[CityController::class,'get_cities']);
         Route::get('search-city/{id}',[CityController::class,'search_city']);
         Route::get('select-city/{id}',[CityController::class,'select_city']);
+        Route::get('search-filter/{id}',[FeaturesController::class,'search_filter']);
 // <------------------------------------------------------------------------------------------------>

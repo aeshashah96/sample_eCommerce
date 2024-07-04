@@ -51,17 +51,18 @@ class BannersController extends Controller
                 $file = $request->file('image');
                 $extention = $file->getClientOriginalExtension();
                 $image_name = time() . "." . $extention;
-                $file->move('upload/banners/', $image_name);
+                $file->move('images/banners/', $image_name);
             }
             // $bannername = Banners::where('sub_category_id',$request->id);
-            // dd($bannername);
+
             Banners::create([
                 'image' => $image_name,
                 'description' => $request->description,
                 'banner_title' => $request->banner_title,
-                'banner_url' => url("/upload/banners/$image_name"),
+                'banner_url' => url("/images/banners/$image_name"),
                 'sub_category_id' => $request->sub_category_id,
                 'category_id' => $request->category_id
+                
             ]);
             return response()->json([
                 'success'=>true,
@@ -135,16 +136,16 @@ class BannersController extends Controller
             if ($request->has('image')) {
                 if ($item->image) {
                     $name = $item->image;
-                    $image_path = "upload/banners/$name";
+                    $image_path = "images/banners/$name";
                     unlink($image_path);
                 }
 
                 $file = $request->file('image');
                 $extention = $file->getClientOriginalExtension();
                 $banner_name = time() . "." . $extention;
-                $file->move('upload/banners/', $banner_name);
+                $file->move('images/banners/', $banner_name);
                 $item->image = $banner_name;
-                $item->banner_url = url("/upload/banners/$banner_name");
+                $item->banner_url = url("/images/banners/$banner_name");
             }
             $item->update($request->input());
             return response()->json([
@@ -175,7 +176,7 @@ class BannersController extends Controller
                     'message'=>'record not found'
                 ]);
             }
-            unlink("upload/banners/$item->image");
+            unlink("images/banners/$item->image");
             $item->delete();
             return response()->json([
                 'success'=>true,
