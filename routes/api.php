@@ -152,5 +152,8 @@ Route::get('/get-product/{id}',[ProductController::class,'getProduct']);
 Route::group(['middleware'=>'auth:api'],function(){
     Route::post('/add-product/cart/{id}',[CartsController::class,'addProductCart']);
     Route::get('/show-product/cart',[CartsController::class,'showCartProduct']);
+    Route::post('/update-item/add/cart/{id}',[CartsController::class,'addItem']);
+    Route::post('/update-item/remove/cart/{id}',[CartsController::class,'removeItem']);
+    Route::delete('/delete-product/cart/{id}',[CartsController::class,'deleteCartProduct']);
 });
 // <------------------------------------------------------------------------------------------------>
