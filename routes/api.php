@@ -18,7 +18,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\WishlistsController;
 use App\Http\Controllers\ProductSizeController;
 use App\Http\Controllers\StateController;
-use App\Models\ProductColor;
+use App\Http\Controllers\UserAddressesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -153,4 +153,15 @@ Route::group(['middleware'=>'auth:api'],function(){
     Route::post('/add-product/cart/{id}',[CartsController::class,'addProductCart']);
     Route::get('/show-product/cart',[CartsController::class,'showCartProduct']);
 });
+// <------------------------------------------------------------------------------------------------>
+
+
+// <-------------------------- User Address Module : Harshvardhan Zala : 4/7/2024 ------------------------------> 
+
+        Route::get('get-user-address/{id}',[UserAddressesController::class,'get_user_address']);
+        Route::post('add-user-address',[UserAddressesController::class,'add_user_address']);
+        Route::post('edit-user-address/{id}',[UserAddressesController::class,'edit_user_address']);
+        Route::get('get-city',[CityController::class,'get_cities']);
+        Route::get('search-city/{id}',[CityController::class,'search_city']);
+        Route::get('select-city/{id}',[CityController::class,'select_city']);
 // <------------------------------------------------------------------------------------------------>
