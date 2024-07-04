@@ -5,11 +5,16 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UserLogin;
 use App\Http\Requests\UserRequest;
 use App\Jobs\SendEmailUser;
+use App\Mail\VerifyEmail;
+use App\Models\ResetPassword;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
@@ -246,9 +251,19 @@ class UserController extends Controller
     {
         try {
             $email = $request->only('email');
-            $validator = Validator::make($email, [
-                'email' => 'required|email',
-            ]);
+            $validator = Validator::make(
+                $email,
+                [
+                    'email' => 'required|email|exists:users,email',
+                ],
+                [
+                    'email' => [
+                        'required' => 'The email field is required.',
+                        'email' => 'The email field must be a valid email address.',
+                        'exists' => 'Invalid Email Found',
+                    ],
+                ],
+            );
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
@@ -258,22 +273,34 @@ class UserController extends Controller
                 ]);
             }
 
-            $status = Password::sendResetLink($email);
-
-            return $status === Password::RESET_LINK_SENT
-                ? response()->json(
-                    [
-                        'success' => true,
-                        'status' => 200,
-                        'message' => __($status),
-                    ],
-                    200,
-                )
-                : response()->json([
-                    'success' => false,
-                    'status' => 400,
-                    'message' => __($status),
+            $user =  ResetPassword::where('email',$email['email'])->get()->first();
+            if (!is_null($user)) {
+                $user->delete();
+            }
+        
+            
+            $otp = rand(100000,999999);
+            $password_reset = DB::table('reset_passwords')->insert([
+                'email' => $email['email'],
+                'otpCode' =>  $otp,
+                'created_at' => Carbon::now('Asia/Kolkata'),
+                'expiry_at'=> Carbon::now('Asia/Kolkata')->addMinute(5),
+            ]);
+            if ($password_reset) {
+                Mail::to($email)->send(new VerifyEmail($otp,$email));
+                return response()->json([
+                    'success' => true,
+                    'status' => 200,
+                    'message' => 'A Verification Mail Has Been Sent',
                 ]);
+            }
+            else{
+                return response()->json([
+                    'success' => false,
+                    'status' => 500,
+                    'message' => 'Internal Server Error',
+                ]);
+            }
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
@@ -287,9 +314,9 @@ class UserController extends Controller
     public function resetPassword(Request $request)
     {
         try {
-            $input = $request->only('email', 'token', 'password', 'password_confirmation');
+            $input = $request->only('otp', 'email', 'password', 'password_confirmation');
             $validator = Validator::make($input, [
-                'token' => 'required',
+                'otp' => 'required',
                 'email' => 'required|email',
                 'password' => 'required|confirmed|min:3',
             ]);
