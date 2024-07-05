@@ -43,10 +43,7 @@ class UserController extends Controller
                         'success' => true,
                         'status' => 201,
                         'message' => 'User Register Successfully.',
-                        'user' => $user,
-                        'image_url' => url("/images/users/$userAvatar"),
                     ],
-                    201,
                 );
             } else {
                 return response()->json(
@@ -81,7 +78,7 @@ class UserController extends Controller
                     'status' => 200,
                     'message' => 'Login In SuccessFully',
                     'token' => $token,
-                    'user' => $user,
+                    'data' => $user,
                 ]);
             } else {
                 return response()->json([
@@ -133,7 +130,7 @@ class UserController extends Controller
                     [
                         'success' => true,
                         'status' => 200,
-                        'user' => $user,
+                        'data' => $user,
                         'image_url' => url("/images/users/$user->user_logo"),
                     ],
                     200,
@@ -178,7 +175,7 @@ class UserController extends Controller
                     'success' => true,
                     'status' => 200,
                     'message' => 'User Updated SuccessFully',
-                    'user' => $user,
+                    'data' => $user,
                     'image_url' => url("/images/users/$user->user_logo"),
                 ],
                 200,
@@ -282,9 +279,9 @@ class UserController extends Controller
             $otp = rand(100000,999999);
             $password_reset = DB::table('reset_passwords')->insert([
                 'email' => $email['email'],
-                'otpCode' =>  $otp,
+                'otpCode' =>Hash::make($otp),
                 'created_at' => Carbon::now('Asia/Kolkata'),
-                'expiry_at'=> Carbon::now('Asia/Kolkata')->addMinute(5),
+                'expiry_at'=> Carbon::now('Asia/Kolkata')->addMinute(10),
             ]);
             if ($password_reset) {
                 Mail::to($email)->send(new VerifyEmail($otp,$email));
@@ -301,7 +298,8 @@ class UserController extends Controller
                     'message' => 'Internal Server Error',
                 ]);
             }
-        } catch (Exception $e) {
+        } 
+        catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'status' => $e->getCode(),
@@ -310,6 +308,80 @@ class UserController extends Controller
         }
     }
 
+    // OTP Verification
+    public function otpVerification(Request $request){
+        try {
+            $otp = $request->only('otp');
+        $validator = Validator::make(
+            $otp,
+            [
+                'otp' => 'required',
+            ],
+            [
+                'otp' => [
+                    'required' => 'OTP is required.',
+                ],
+            ],
+        );
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'status' => 422,
+                'message' => 'Validations fails',
+                'errors' => $validator->errors()->first(),
+            ]);
+        }
+
+        $userOTP = ResetPassword::all();
+        $flag = 0;
+        if($userOTP->first()){
+            foreach($userOTP as $element){
+                if(Hash::check($otp['otp'],$element->otpCode)){
+                    if((Carbon::now('Asia/Kolkata')) > $element->expiry_at){
+                        $element->delete();
+                        return response()->json([
+                            'success' => false,
+                            'status' => 404,
+                            'message' => 'OTP Expiry',
+                        ]);
+                    }
+                    else{
+                        return response()->json([
+                            'success' => true,
+                            'status' => 200,
+                            'message' => 'OTP Verified SuccessFully',
+                        ]);
+                    }
+                }
+                else{
+                    $flag = 1;
+                }
+            }
+            if($flag == 1){
+                return response()->json([
+                    'success' => false,
+                    'status' => 404,
+                    'message' => 'Invalid OTP',
+                ]);
+            }
+        }
+        else{
+            return response()->json([
+                'success' => false,
+                'status' => 404,
+                'message' => 'Invalid OTP',
+            ]);
+        }
+        } 
+        catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ]);
+        }
+        
+    }
     // User Reset Password Link
     public function resetPassword(Request $request)
     {
@@ -317,7 +389,7 @@ class UserController extends Controller
             $input = $request->only('otp', 'email', 'password', 'password_confirmation');
             $validator = Validator::make($input, [
                 'otp' => 'required',
-                'email' => 'required|email',
+                'email' => 'required|email|exists:reset_passwords,email',
                 'password' => 'required|confirmed|min:3',
             ]);
             if ($validator->fails()) {
@@ -328,31 +400,43 @@ class UserController extends Controller
                     'errors' => $validator->errors()->first(),
                 ]);
             }
-
-            $status = Password::reset($input, function ($user, $password) {
-                $user->password = Hash::make($password);
-                $user->save();
-            });
-
-            return $status === Password::PASSWORD_RESET
-                ? response()->json(
-                    [
-                        'success' => true,
-                        'status' => 200,
-                        'message' => __($status),
-                    ],
-                    200,
-                )
-                : response()->json([
+            $verifyEmail = ResetPassword::where('email',$input['email']);
+            $otpCode = $verifyEmail->pluck('otpCode')->first();
+            $expiryDate = ResetPassword::where('email',$input['email'])->pluck('expiry_at')->first();
+            if(Hash::check($input['otp'],$otpCode)){
+                if((Carbon::now('Asia/Kolkata')) > $expiryDate){
+                    $verifyEmail->delete();
+                    return response()->json([
+                        'success' => false,
+                        'status' => 404,
+                        'message' => 'OTP Expiry',
+                    ]);
+                }
+                else{
+                   $user = User::where('email',$input['email'])->first();
+                   $user->password = Hash::make($input['password']);
+                   $user->save();
+                   $verifyEmail->delete();
+                   return response()->json([
+                    'success' => true,
+                    'status' => 200,
+                    'message' => 'Password has been successfully reset',
+                ]);
+                }
+            }
+            else{
+                return response()->json([
                     'success' => false,
                     'status' => 404,
-                    'message' => __($status),
+                    'message' => 'Invalid OTP',
                 ]);
-        } catch (\Throwable $th) {
+            }
+        }
+        catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'status' => 'warning',
-                'message' => $th,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
             ]);
         }
     }
