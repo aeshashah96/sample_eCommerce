@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 class SubCategories extends Model
 {
     use HasFactory;
-    protected $fillable = ['category_id','name','subcategory_slug'];
+    protected $fillable = ['category_id','name','subcategory_slug','isActive'];
 
     public function setTitleAttribute($value)
     {

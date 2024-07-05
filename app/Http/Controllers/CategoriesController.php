@@ -18,7 +18,7 @@ class CategoriesController extends Controller
     public function index()
     {
         //
-        $category = Categories::orderBy('created_at', 'DESC')->with('subCategory:id,name,category_id')->paginate(10)->makeHidden(['created_at', 'updated_at']);
+        $category = Categories::orderBy('created_at', 'DESC')->with('subCategory:id,name,category_id')->paginate(10);
 
         foreach ($category as $cat) {
             $cat['category_image'] = url('/images/Categories/' . $cat['category_image']);
@@ -33,13 +33,13 @@ class CategoriesController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'name' => 'required|string|max:255|unique:categories,name',
+                'name' => 'required|string|max:15|unique:categories,name',
                 'category_image' => 'required|image',
             ]);
             $image = $request->file('category_image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
 
-            $category = Categories::create(['name' => $request->name, 'description' => $request->description, 'category_image' => $imageName, 'is_Active' => true, 'category_slug' => Str::slug($request->name)]);
+            $category = Categories::create(['name' => $request->name, 'description' => 'null', 'category_image' => $imageName, 'is_Active' => 1, 'category_slug' => Str::slug($request->name)]);
             if ($category) {
                 $image->move(public_path('/images/Categories'), $imageName);
                 return response()->json(['success' => true, 'status' => 201, 'message' => 'Category Add Successfully']);
@@ -80,30 +80,29 @@ class CategoriesController extends Controller
 
             $validatedData = Validator::make($request->all(), [
 
-                'name' => 'required|string|max:255',
-                'description' => 'required',
+                'name' => 'required|string|max:15',
                 'category_image' => 'image',
             ]);
             $category = Categories::find($id);
-            $image = $request->file('category_image');
-            if ($image) {
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
-                unlink(public_path('/images/Categories/' . $category->category_image));
-                $image->move(public_path('/images/Categories'), $imageName);
-
-                if ($category) {
-                    $category->update(['name' => $request->name, 'description' => $request->description, 'category_image' => $imageName]);
+            
+            
+            if ($category) {
+                    if ($request->hasFile('category_image')) {
+                        $image = $request->file('category_image');
+                        $imageName = time() . '.' . $image->getClientOriginalExtension();
+                        unlink(public_path('/images/Categories/' . $category->category_image));
+                        $image->move(public_path('/images/Categories'), $imageName);
+                    $category->update(['name' => $request->name, 'description' => 'null', 'category_image' => $imageName]);
                     return response()->json(['success' => true, 'status' => 200, 'message' => 'Category Update Successfully']);
                 } else {
-                    return response()->json(['success' => false, 'status' => 404, 'message' => 'Category Not Found']);
+                    $category->update(['name' => $request->name, 'description' => 'null']);
+                    return response()->json(['success' => true, 'status' => 200, 'message' => 'Category Update Successfully']);
+                    
                 }
             } else {
-                if ($category) {
-                    $category->update(['name' => $request->name, 'description' => $request->description]);
-                    return response()->json(['success' => true, 'status' => 200, 'message' => 'Category Update Successfully']);
-                } else {
+                
                     return response()->json(['success' => false, 'status' => 404, 'message' => 'Category Not Found']);
-                }
+            
             }
             $category->save();
         } catch (Exception $e) {
@@ -134,7 +133,7 @@ class CategoriesController extends Controller
 
     public function SearchCategory(Request $request)
     {
-        $category = Categories::where('name', 'LIKE', '%' . $request->name . '%')->paginate(10);
+        $category = Categories::where('name', 'LIKE', $request->name . '%')->paginate(10);
         foreach ($category as $cat) {
             $cat['category_image'] = url('/images/Categories/' . $cat['category_image']);
         }
@@ -145,6 +144,24 @@ class CategoriesController extends Controller
         }
     }
 
+    public function changeActiveStatus($id){
+        $category=Categories::find($id);
+        if($category){
+
+            if($category->is_Active){
+                // dd($id);
+                $category->is_Active=0;
+                $category->save();
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Category Status Change Successfully']);
+            }else{
+                $category->is_Active=1;
+                $category->save();
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Category Status Change Successfully']);
+            }
+        }else{
+            return response()->json(['success' => false, 'status' => 404, 'message' => 'Category Not Found']);
+        }
+    }
     public function addCategory(Request $request)
     {
         try {
