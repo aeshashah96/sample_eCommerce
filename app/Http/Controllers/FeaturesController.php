@@ -45,8 +45,8 @@ class FeaturesController extends Controller
 
         //color search
         if($color->count()){
-        //    $data =  $color->with('products');
-        // dd($color->get());
+           $data =  $color->with('products');
+        dd($color->get());
            $data =  $color->first()->products->with('productImages');
 
             dd($data);
