@@ -49,12 +49,12 @@ Route::get('/error',function(){
 // <---------------------------- User Module : Nehal Solanki------------------------------------------->
 
 // User Register && Login Route && LogOut 
-Route::post('/userRegister',[UserController::class,'userRegister']);
-Route::post('/userLogin',[UserController::class,'userLogin']);
+Route::post('/user-register',[UserController::class,'userRegister']);
+Route::post('/user-login',[UserController::class,'userLogin']);
 
 // User Logout && My Profile && Forgot-Password && Reset Password 
 Route::group(['middleware'=>'auth:api'],function(){
-    Route::get('/userLogout',[UserController::class,'userLogout']);
+    Route::get('/user-logout',[UserController::class,'userLogout']);
     Route::get('/my-profile',[UserController::class,'userProfile']);
     Route::post('/update-profile',[UserController::class,'updateProfile']);
     Route::post('/change-password',[UserController::class,'changePassword']);
