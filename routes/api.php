@@ -133,7 +133,6 @@ Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCat
 
 Route::get('/subcategory-status/{id}',[SubCategoriesController::class,'changeActiveStatus']);
 
-
 //sunil product module
 Route::apiResource('product',ProductController::class);
 Route::apiResource('product-color',ProductColorController::class);
