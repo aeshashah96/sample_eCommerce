@@ -182,8 +182,8 @@ class SubCategoriesController extends Controller
                 return response()->json([
                     'success' => true,
                     'status' => 200,
-                    'subcategoryData' => $subcategory,
-                    'message' => 'Sub Category Show Successfully'
+                    'message' => 'Sub Category Show Successfully',
+                    'data' => $subcategory,
                 ], 200);
             } else {
                 return response()->json([
@@ -194,7 +194,8 @@ class SubCategoriesController extends Controller
             }
         } catch (Exception $e) {
             return response()->json([
-                'code' => $e->getCode(),
+                'success'=>false,
+                'status' => $e->getCode(),
                 'message' => $e->getMessage()
             ], 200);
         }

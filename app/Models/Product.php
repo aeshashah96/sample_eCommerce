@@ -37,4 +37,15 @@ class Product extends Model
     public function wishlists(){
         return $this->hasMany(Wishlists::class);
     }
+    public function subcategory(){
+        return $this->belongsTo(SubCategories::class,'sub_category_id','id');
+    }
+    public function productInformation(){
+        return $this->hasOne(ProductDescription::class,'product_id','id');
+    }
+
+    public function item_orders(){
+        return $this->hasMany(ItemOrder::class,'product_id','id');
+    }
+
 }

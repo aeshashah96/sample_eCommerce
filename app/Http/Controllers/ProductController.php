@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\addProductReviewRequest;
+use App\Models\Categories;
 use App\Models\ImageProduct;
 use App\Models\Product;
 use App\Models\ProductColor;
 use App\Models\ProductDescription;
+use App\Models\ProductReview;
 use App\Models\ProductSize;
 use App\Models\ProductVarient;
 use Exception;
@@ -241,6 +244,8 @@ class ProductController extends Controller
                 }
             }
 
+        //
+    
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
                 'category_id' => 'required|exists:categories,id',
@@ -357,36 +362,25 @@ class ProductController extends Controller
     {
         try {
             $limit = $request->input('limit');
-            $productlist = Product::select('id', 'name', 'price')->with('productReview', 'productImages:id,product_id,image')->where('is_featured', 1)->offset(0)->limit(4)->get();
-            $productlist = Product::limit($limit)
-                ->get()
-                ->makeHidden(['productReview', 'created_at', 'updated_at', 'sku', 'is_featured', 'long_description', 'description', 'slug', 'isActive', 'category_id', 'sub_category_id']);
+            $productlist = Product::select('id', 'name', 'price')->with('productReview', 'productImages:id,product_id,image')->where('is_featured', 1)->get();
+            $productlist = Product::limit($limit)->get()->makeHidden(['productReview', 'created_at', 'updated_at', 'sku', 'is_featured', 'long_description', 'description', 'slug', 'isActive', 'category_id', 'sub_category_id']);
 
             if ($productlist) {
-                $images = [];
                 foreach ($productlist as $image) {
                     // $image->productImages[0]->image = url("/images/product/".$image->productImages[0]->image);
                     foreach ($image->productImages as $img) {
-                        $img->image = url('/images/product/' . $img->image);
-                        // dd($img->image);
-                        $images[] = $img->image;
+                        $img->image = url("/images/product/" . $img->image);
                     }
-                    // dd($images[0]);
                 }
-                // $productlist->xyz = $images[0];
 
                 $rating = 0;
                 $productreview = 0;
                 foreach ($productlist as $review) {
+                    // dd($review);
                     foreach ($review->productReview as $ele) {
-                        $rating = $ele
-                            ->where('product_id', $review->id)
-                            ->pluck('rating')
-                            ->avg();
-                        $productreview = $ele
-                            ->where('product_id', $review->id)
-                            ->pluck('rating')
-                            ->count();
+                        // dd($ele);
+                        $rating = $ele->where('product_id', $review->id)->pluck('rating')->avg();
+                        $productreview = $ele->where('product_id', $review->id)->pluck('rating')->count();
                     }
                     $review->avg_rating = $rating;
                     $review->total_review = $productreview;
@@ -396,18 +390,16 @@ class ProductController extends Controller
                 return response()->json([
                     'success' => true,
                     'status' => 200,
-                    'message' => 'Is Feautured Product Get Successfully',
-                    'productData' => $productlist,
-                ]);
+                    'message' => 'Feautured Products Get Successfully',
+                    'data' => $productlist,
+                ], 200);
             } else {
                 return response()->json(
                     [
                         'success' => true,
                         'status' => 404,
-                        'message' => 'Is Feautured Product Not Found',
-                        'productDetails' => $productlist,
-                    ],
-                    404,
+                        'message' => 'Feautured Products Not Found',
+                    ]
                 );
             }
         } catch (Exception $e) {
@@ -419,31 +411,22 @@ class ProductController extends Controller
         }
     }
 
-    public function getProduct($id)
+    public function getProduct($slug)
     {
         try {
-            $productlist = Product::select('id', 'name', 'description', 'price', 'long_description')
-                ->with(['colors:id,color', 'sizes:id,size', 'productImages:id,product_id,image', 'productReview:id,product_id,user_id,comment,rating'])
-                ->find($id);
-            // dd($productlist->productImages);
+            $productlist = Product::select('id', 'name', 'description', 'price', 'long_description')->with(['colors:id,color', 'sizes:id,size', 'productImages:id,product_id,image', 'productReview:id,product_id,user_id,comment,rating'])->where('slug', $slug)->first();
             foreach ($productlist->productImages as $list) {
-                $list->image = url('/images/product/' . $list->image);
+                $list->image = url("/images/product/" . $list->image);
             }
             // dd($productlist->productReview);
-            $rat = [];
-            $total_review = [];
+            $rat = array();
+            $total_review = array();
+            // dd($productlist);
             foreach ($productlist->productReview as $review) {
                 // dd($review);
-                $rating = $review
-                    ->where('product_id', $review->id)
-                    ->pluck('rating')
-                    ->avg();
+                $rating = $review->where('product_id', $productlist->id)->pluck('rating')->avg();
                 $rat[] = $rating;
-                // dd($rating);
-                $final_review = $review
-                    ->where('product_id', $review->id)
-                    ->pluck('rating')
-                    ->count();
+                $final_review = $review->where('product_id', $productlist->id)->pluck('rating')->count();
                 // $productlist->total_review = $total_review;
                 $total_review[] = $final_review;
             }
@@ -454,24 +437,189 @@ class ProductController extends Controller
                 $productlist->avg_rate = 0;
                 $productlist->total_review = 0;
             }
-            // dd($productlist);
 
             if ($productlist) {
-                return response()->json(
-                    [
-                        'success' => true,
-                        'status' => 200,
-                        'message' => 'Product Get Successfully',
-                        'product' => $productlist,
-                    ],
-                    200,
-                );
+                return response()->json([
+                    'success' => true,
+                    'status' => 200,
+                    'message' => 'Product Get Successfully',
+                    'data' => $productlist
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => true,
+                    'status' => 404,
+                    'message' => 'Product Not Found',
+                ]);
             }
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'status' => $e->getCode(),
-                'message' => $e->getMessage(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function productAdditionalInformation(Request $request)
+    {
+        try {
+            $request->validate([
+                'id' => 'required|integer'
+            ]);
+            $id = $request->query('id');
+
+            $productData = Product::select('id', 'name')->with('productInformation:id,product_id,description,additional_information')->findOrFail($id);
+            if ($productData) {
+                return response()->json([
+                    'success' => true,
+                    'status' => 200,
+                    'message' => 'Product Information Get Successfully',
+                    'data' => $productData,
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'status' => 404,
+                    'message' => 'Product Information Not Found'
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function productReview(Request $request)
+    {
+        try {
+            $request->validate([
+                'id' => 'required|integer'
+            ]);
+            $id = $request->query('id');
+            $productData = Product::select('id', 'name')->with('productReview:id,product_id,user_id,comment,rating,created_at')->findOrFail($id);
+            foreach ($productData->productReview as $product) {
+                $img = $product->user->user_logo;
+                // dump($img);
+                $product->user->image = url("/images/users/$img");
+            }
+            // dd('hi');
+
+            if ($productData) {
+                $productData = $productData->makeHidden('user');
+                return response()->json([
+                    'success' => true,
+                    'status' => 200,
+                    'message' => 'Product Review Get Successfully',
+                    'data' =>  $productData,
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'status' => 404,
+                    'message' => 'Product Review Not Found'
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function addProductReview(addProductReviewRequest $request, $id)
+    {
+        try {
+            $user = $request->user();
+            // dd($user);
+            $productId = Product::find($id);
+            // dd($productId);
+            if ($productId) {
+                $productReview = ProductReview::create([
+                    'user_id' => $user->id,
+                    'product_id' => $id,
+                    'comment' => $request->comment,
+                    'rating' => $request->rating
+                ]);
+                if ($productReview) {
+                    return response()->json([
+                        'success' => true,
+                        'status' => 201,
+                        'message' => 'Product Review Add Successfully'
+                    ], 201);
+                } else {
+                    return response()->json([
+                        'success' => true,
+                        'status' => 500,
+                        'message' => 'Product Review Not Added'
+                    ]);
+                }
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function getRelatedProduct($slug)
+    {
+        try {
+            $relatedProduct = Product::with('category', 'subcategory', 'productReview', 'productImages:id,product_id,image')->where('slug', $slug)->get();
+            $products = array();
+            // $avg_rating = 0;
+
+            foreach ($relatedProduct as $product) {
+                // dd($product);
+                $products = $product->where('sub_category_id', $product->subcategory->id)->with('category', 'subcategory', 'productReview', 'productImages')->get();
+                $relatedProduct = $products;
+            }
+            $rating = 0;
+            $total = 0;
+            foreach ($relatedProduct as $ele) {
+                foreach ($ele->productReview as $review) {
+                    $rating = $review->where('product_id', $ele->id)->pluck('rating')->avg();
+                    $total = $review->where('product_id', $ele->id)->pluck('rating')->count();
+                }
+                $ele->avg_rating = $rating;
+                $ele->total_review = $total;
+                $rating = 0;
+                $total = 0;
+            }
+            if ($relatedProduct) {
+                foreach ($relatedProduct as $product) {
+                    foreach ($product->productImages as $img) {
+                        // $img = $image->image;
+                        // dd(url("/images/product/".$img->image));
+                        $img->image = url("/images/product/" . $img->image);
+                    }
+                }
+                $relatedProduct = $relatedProduct->makeHidden(['productReview', 'subcategory', 'category', 'category_id', 'sub_category_id', 'sku', 'slug', 'isActive', 'is_featured', 'description', 'long_description'])->toArray();
+                return response()->json([
+                    'success' => true,
+                    'status' => 200,
+                    'message' => 'Related Product Get Successfully',
+                    'data' => $relatedProduct
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => true,
+                    'status' => 404,
+                    'message' => 'Related Product Not Found'
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage()
             ]);
         }
     }

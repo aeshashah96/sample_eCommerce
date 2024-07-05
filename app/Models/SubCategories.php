@@ -11,6 +11,8 @@ class SubCategories extends Model
     use HasFactory;
     protected $fillable = ['category_id','name','subcategory_slug','isActive'];
 
+    protected $hidden = ['created_at', 'updated_at'];
+    
     public function setTitleAttribute($value)
     {
         $this->attributes['name'] = $value;
@@ -19,13 +21,13 @@ class SubCategories extends Model
         }
     }
 
-    protected $hidden=['created_at','updated_at'];
-    public function products(){
-        return $this->hasMany(Product::class,'sub_category_id','id');
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'sub_category_id', 'id');
     }
 
-    public function category(){
-        return $this->belongsTo(Categories::class,'category_id','id');
+    public function category()
+    {
+        return $this->belongsTo(Categories::class, 'category_id', 'id');
     }
-
 }

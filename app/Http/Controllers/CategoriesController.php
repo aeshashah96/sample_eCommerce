@@ -180,20 +180,22 @@ class CategoriesController extends Controller
                 $image->move(public_path('/images/Categories'), $imageName);
                 return response()->json([
                     'success' => true,
+                    'status'=>201,
                     'category' => $category
-                ], 200);
+                ], 201);
             }
             else{
                 return response()->json([
                     'success' => false,
+                    'status'=>404,
                     'message' => 'Category is not Added'
-                ], 200);
+                ]);
             }
         } catch (Exception $e) {
             return response()->json([
                 'succsess' => false,
-                'message' => 'Category is not get',
-                'error' => $e
+                'status'=>$e->getCode(),
+                'message'=>$e->getMessage()
             ]);
         }
     }
@@ -203,28 +205,32 @@ class CategoriesController extends Controller
     public function listCategory()
     {
         try {
-
-            $CategoryWithSubcategory = Categories::select('id', 'name', 'description', 'category_image','category_slug')->with('subcategory:id,category_id,name')->orderBy('id', 'DESC')->get();
+            $CategoryWithSubcategory = Categories::select('id', 'name', 'description', 'category_image','category_slug')->with('subcategory:id,category_id,name','products')->orderBy('id', 'DESC')->get();
             if ($CategoryWithSubcategory) {
                 foreach ($CategoryWithSubcategory as $sub) {
                     $sub['category_image'] = url("/images/Categories/" . $sub->category_image);
                 }
+                foreach($CategoryWithSubcategory as $cat){
+                    $cat->total_products = $cat->products->where('category_id',$cat->id)->count();
+                }
+                $CategoryWithSubcategory =  $CategoryWithSubcategory->makeHidden('products');
                 return response()->json([
                     'success' => true,
                     'status' => 200,
-                    'categoryData' => $CategoryWithSubcategory,
-                    'message' => 'Category Show successfully'
+                    'message' => 'Category Get successfully',
+                    'data' => $CategoryWithSubcategory,
                 ], 200);
             } else {
                 return response()->json([
                     'success' => false,
                     'status' => 404,
                     'message' => 'Category Not Found'
-                ], 404);
+                ]);
             }
         } catch (Exception $e) {
             return response()->json([
-                'code' => $e->getCode(),
+                'success'=>false,
+                'status' => $e->getCode(),
                 'message' => $e->getMessage()
             ]);
         }
