@@ -215,7 +215,6 @@ Route::group(['middleware'=>'auth:api'],function(){
 // <------------------------------------------------------------------------------------------------>
 
     Route::post('/add-product-review/{id}',[ProductController::class,'addProductReview']);
-    Route::get('/get-product-review',[ProductController::class,'productReview']);
 });
 // <------------------------------------------------------------------------------------------------>
 
@@ -225,3 +224,4 @@ Route::get('/list-featured-product',[ProductController::class,'list_featured_pro
 Route::get('/get-product/{slug}',[ProductController::class,'getProduct']);
 Route::get('/get-product-details',[ProductController::class,'productAdditionalInformation']);
 Route::get('/get-related-product/{slug}',[ProductController::class,'getRelatedProduct']);
+Route::get('/get-product-review',[ProductController::class,'productReview']);
