@@ -354,10 +354,8 @@ class ProductController extends Controller
     {
         try {
             $limit = $request->input('limit');
-            $productlist = Product::select('id', 'name', 'price')->with('productReview', 'productImages:id,product_id,image')->where('is_featured', 1)->get();
-            $productlist = Product::limit($limit)
-                ->get()
-                ->makeHidden(['productReview', 'created_at', 'updated_at', 'sku', 'is_featured', 'long_description', 'description', 'slug', 'isActive', 'category_id', 'sub_category_id']);
+            $productlist = Product::select('id', 'name', 'price','slug')->with('productReview', 'productImages:id,product_id,image')->where('is_featured', 1)->get();
+            $productlist = Product::limit($limit)->get()->makeHidden(['productReview', 'created_at', 'updated_at', 'sku', 'is_featured', 'long_description', 'description', 'isActive', 'category_id', 'sub_category_id']);
 
             if ($productlist) {
                 foreach ($productlist as $image) {
