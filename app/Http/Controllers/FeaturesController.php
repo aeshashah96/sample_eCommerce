@@ -6,6 +6,7 @@ use App\Models\Categories;
 use App\Models\ImageProduct;
 use App\Models\Product;
 use App\Models\ProductColor;
+use App\Models\ProductSize;
 use App\Models\SubCategories;
 use Illuminate\Http\Request;
 
@@ -15,8 +16,12 @@ class FeaturesController extends Controller
         $category =  Categories::where('name',$id);
         $subcategory = SubCategories::where('name',$id);
         $color = ProductColor::where('color',$id);
+        $size =  ProductSize::where('size',$id);
+
+        //category search
         if($category->count()){
-            $data = $category->with('products')->get();
+            $category_id = $category->first()->id;
+            $data = Product::with('productImages')->where('category_id',$category_id)->get();
             return response()->json([
                 'success'=>true,
                 'status'=>200,
@@ -24,21 +29,32 @@ class FeaturesController extends Controller
                 'data'=>$data
             ]);
         }
+
+        //sub category search
         if($subcategory->count()){
-            // $data = $subcategory->with('products')->get();
-           $data = $subcategory->first()->products;
-            foreach($data as $e){
-                $id = $e->id;
-                $img = ImageProduct::where('product_id',$id)->get()->pluck('image');
-                $e->img = $img;                
-            }
-            
+            $sub_category_id = $subcategory->first()->id;
+            $data = Product::with('productImages')->where('sub_category_id',$sub_category_id)->get();
 
             return response()->json([
                 'success'=>true,
                 'status'=>200,
                 'message'=>"$id sub-category wise data fetch successfully",
                 'data'=>$data
+            ]);
+        }
+
+        //color search
+        if($color->count()){
+        //    $data =  $color->with('products');
+        // dd($color->get());
+           $data =  $color->first()->products->with('productImages');
+
+            dd($data);
+            return response()->json([
+                'success'=>true,
+                'status'=>200,
+                'message'=>"$id sub-category wise data fetch successfully",
+                // 'data'=>$data
             ]);
         }
         

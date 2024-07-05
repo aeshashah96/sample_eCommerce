@@ -14,13 +14,13 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         Admin::create([
-            'first_name'=>'admin',
-            'last_name'=>'admin',
-            'email'=>'admin@gmail.com',
-            'admin_logo' => 'userLogo.png',
-            'password'=>Hash::make('11111111'),
+            'first_name'=>'admin2',
+            'last_name'=>'admin2',
+            'email'=>'admin2@gmail.com',
+            // 'admin_logo' => 'userLogo.png',
+            'password'=>Hash::make('123456'),
             'phone_number'=>6353454561,
-            'admin_logo_url'=>url('upload/Admin/admin_logo/userLogo.png')
+            // 'admin_logo_url'=>url('upload/Admin/admin_logo/userLogo.png')
         ]);
     }
 }

@@ -22,6 +22,7 @@ class BannersController extends Controller
             return response()->json([
                 'success'=>true,
                 'status' => 200,
+                'message' => 'fetch banners successfully',
                 'data' => $data
             ]);
         } catch(Exception $e){
@@ -84,16 +85,17 @@ class BannersController extends Controller
     public function show(string $id)
     {
         try{
-            $data = Banners::with(['subcategory'=> function ($query) {
-                $query->select('id', 'name');
-            },])->get()
-            ->find($id,['id','image','description']);
-            if($data){
+            $check = Banners::find($id);
+            if($check){
+                $data = $check->with(['subcategory'=> function ($query) {
+                    $query->select('id', 'name');
+                },])->get()
+                ->find($id);
                 return response()->json([
                     'success'=>true,
                     'status'=>200,
-                    'data'=>$data,
-                    'message'=>'country details fetch successfully'
+                    'message'=>'banner details fetch successfully',
+                    'data'=>$data
                 ]);
             }else{
                 return response()->json([

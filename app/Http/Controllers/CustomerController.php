@@ -61,7 +61,7 @@ class CustomerController extends Controller
                 return response()->json([
                     'success'=>true,
                     'status' => 200,
-                    'message' => 'Customer Register Successfully.',
+                    'message' => 'customer added successfully',
                 ],200);
             }else {
                 return response()->json([

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SettingRequest;
 use App\Models\Setting;
 use Exception;
 use Illuminate\Http\Request;
@@ -14,6 +15,7 @@ class SettingController extends Controller
             return response()->json([
                 'success'=>true,
                 'status'=>200,
+                'message'=>'fetch setting data successfully',
                 'data'=>$data
             ],200);
         }catch (Exception $e) {
@@ -25,7 +27,7 @@ class SettingController extends Controller
         }
         
     }
-    public function updateSettingData(Request $request){
+    public function updateSettingData(SettingRequest $request){
         try{
             if($request->has('LOGO')){
                 $image = $request->LOGO;
