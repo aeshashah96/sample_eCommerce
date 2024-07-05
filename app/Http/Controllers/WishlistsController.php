@@ -97,15 +97,18 @@ class WishlistsController extends Controller
                         $query->select('id', 'name', 'price');
                     },
                 ])
-                ->get();
+                ->paginate(5);
 
             foreach ($wishlist as $ele) {
+                $productId = $ele->products->id;
+                $productImg = Product::find($productId)->productImages->pluck('image')->first();
                 $review = ProductReview::where('product_id', $ele->product_id)->pluck('rating');
                 $ratingAverage = $review->avg();
                 $totalReview = $review->count();
                 if (is_null($ratingAverage)) {
                     $ratingAverage = 0;
                 }
+                $ele->product_images = url("/images/product/$productImg");;
                 $ele->avg_rating = $ratingAverage;
                 $ele->total_review = $totalReview;
             }
@@ -116,7 +119,7 @@ class WishlistsController extends Controller
                         'success' => true,
                         'status' => 200,
                         'message' => 'Product Found',
-                        'wishlist' => $wishlist,
+                        'data' => $wishlist,
                     ],
                     200,
                 );

@@ -49,19 +49,20 @@ Route::get('/error',function(){
 // <---------------------------- User Module : Nehal Solanki------------------------------------------->
 
 // User Register && Login Route && LogOut 
-Route::post('/userRegister',[UserController::class,'userRegister']);
-Route::post('/userLogin',[UserController::class,'userLogin']);
+Route::post('/user-register',[UserController::class,'userRegister']);
+Route::post('/user-login',[UserController::class,'userLogin']);
 
 // User Logout && My Profile && Forgot-Password && Reset Password 
 Route::group(['middleware'=>'auth:api'],function(){
-    Route::get('/userLogout',[UserController::class,'userLogout']);
+    Route::get('/user-logout',[UserController::class,'userLogout']);
     Route::get('/my-profile',[UserController::class,'userProfile']);
     Route::post('/update-profile',[UserController::class,'updateProfile']);
     Route::post('/change-password',[UserController::class,'changePassword']);
 });
 
 Route::post('/forgot-password',[UserController::class,'forgotPassword']);
-Route::get('/reset-password',[UserController::class,'resetPassword'])->name('password.reset');
+Route::post('/otp-verification',[UserController::class,'otpVerification']);
+Route::post('/reset-password',[UserController::class,'resetPassword']);
 // <------------------------------ User Module Completed ------------------------------------------------->
 
 
@@ -152,5 +153,8 @@ Route::get('/get-product/{id}',[ProductController::class,'getProduct']);
 Route::group(['middleware'=>'auth:api'],function(){
     Route::post('/add-product/cart/{id}',[CartsController::class,'addProductCart']);
     Route::get('/show-product/cart',[CartsController::class,'showCartProduct']);
+    Route::post('/update-item/add/cart/{id}',[CartsController::class,'addItem']);
+    Route::post('/update-item/remove/cart/{id}',[CartsController::class,'removeItem']);
+    Route::delete('/delete-product/cart/{id}',[CartsController::class,'deleteCartProduct']);
 });
 // <------------------------------------------------------------------------------------------------>
