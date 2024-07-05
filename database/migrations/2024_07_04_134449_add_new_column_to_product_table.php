@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_sizes', function (Blueprint $table) {
-            $table->id();
-            $table->string('size',15);
-            $table->timestamps();
+        Schema::table('products', function (Blueprint $table) {
+            //
+            $table->boolean('isWishlist')->default(false);
         });
     }
 
@@ -23,6 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_sizes');
+        Schema::table('products', function (Blueprint $table) {
+            //
+            $table->dropColumn('isWishlist');
+        });
     }
 };

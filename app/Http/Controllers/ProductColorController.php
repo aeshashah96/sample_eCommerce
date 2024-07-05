@@ -13,13 +13,11 @@ class ProductColorController extends Controller
      */
     public function index()
     {
-        //
         $color=ProductColor::orderBy('created_at','DESC')->paginate(10);
         if($color){
-
-            return response()->json(['success'=>true,'code'=>200,'color'=>$color]);
+            return response()->json(['success'=>true,'status'=>200,'message'=>'Color Get Successfully','data'=>$color]);
         }else{
-            return response()->json(['success'=>false,'code'=>404,'message'=>'No Recode Found']);
+            return response()->json(['success'=>false,'status'=>404,'message'=>'No Recode Found']);
         }
     }
 
@@ -28,7 +26,6 @@ class ProductColorController extends Controller
      */
     public function store(Request $request)
     {
-        //
         try{
             $validatedData = $request->validate([
                 'color' => 'required|string|max:255|unique:product_colors,color',
@@ -39,13 +36,13 @@ class ProductColorController extends Controller
                 'hex_code'=>$request->hex_code,
             ]);
             if($color){
-                return response()->json(['success' => true, 'code' => 201, 'message' => 'Color Add Successfully'], 201);
+                return response()->json(['success' => true, 'status' => 201, 'message' => 'Color Add Successfully']);
             }else{
-                return response()->json(['success' => false, 'code' => 500, 'message' => 'Error Found'], 500);
+                return response()->json(['success' => false, 'status' => 500, 'message' => 'Error Found']);
 
             }
         }catch(Exception $e){
-            return response()->json(['success' => false,'code' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['success' => false,'status' => $e->getCode(), 'message' => $e->getMessage()]);
 
         }
     }
@@ -55,13 +52,12 @@ class ProductColorController extends Controller
      */
     public function show(string $id)
     {
-        //
         $color=ProductColor::find($id);
         if($color){
+            return response()->json(['success'=>true,'status'=>200,'message'=>'Color Get Successfully','data'=>$color]);
 
-            return response()->json(['success'=>true,'code'=>200,'color'=>$color]);
         }else{
-            return response()->json(['success'=>false,'code'=>404,'message'=>'No Color Found']);
+            return response()->json(['success'=>false,'status'=>404,'message'=>'No Color Found']);
         }
     }
 
@@ -70,24 +66,24 @@ class ProductColorController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
         try{
             $validatedData = $request->validate([
-                'color' => 'string|max:255|unique:product_colors,color',
+                'color' => 'string|max:15|unique:product_colors,color',
                 'hex_code'=>'string'
             ]);
-           $color = ProductColor::find($id)->update([
-                'color'=>$request->color,
-                'hex_code'=>$request->hex_code,
-            ]);
+            $color = ProductColor::find($id);
             if($color){
-                return response()->json(['success' => true, 'code' => 201, 'message' => 'Color Update Successfully'], 201);
+                $color->update([
+                     'color'=>$request->color,
+                     'hex_code'=>$request->hex_code,
+                 ]);
+                return response()->json(['success' => true, 'status' => 201, 'message' => 'Color Update Successfully']);
             }else{
-                return response()->json(['success' => false, 'code' => 404, 'message' => 'Color Not Found'], 404);
+                return response()->json(['success' => false, 'status' => 404, 'message' => 'Color Not Found']);
 
             }
         }catch(Exception $e){
-            return response()->json(['success' => false,'code' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['success' => false,'status' => $e->getCode(), 'message' => $e->getMessage()]);
 
         }
     }
@@ -97,17 +93,16 @@ class ProductColorController extends Controller
      */
     public function destroy(string $id)
     {
-        //
         try{
             $color=ProductColor::find($id);
             if($color){
                 $color->delete();
-                return response()->json(['success' => true, 'code' => 200, 'message' => 'Color Deleted Successfully'], 200);
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Color Deleted Successfully']);
             }else{
-                return response()->json(['success' => false, 'code' => 404, 'message' => 'Color Not Found'], 404);
+                return response()->json(['success' => false, 'status' => 404, 'message' => 'Color Not Found']);
             }
         }catch(Exception $e){
-            return response()->json(['success' => false,'code' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['success' => false,'status' => $e->getCode(), 'message' => $e->getMessage()]);
 
         }
     }

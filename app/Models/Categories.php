@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 class Categories extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'description', 'category_image', 'category_slug'];
+    protected $fillable = ['name', 'description', 'category_image', 'category_slug','is_Active'];
     protected $hidden=['description','created_at','updated_at'];
 
     public function setTitleAttribute($value)

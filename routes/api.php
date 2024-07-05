@@ -13,6 +13,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\FeaturesController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\NewsLetterController;
+use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductColorController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ProductController;
@@ -117,14 +118,37 @@ Route::middleware(['auth:adminApi'])->group(function(){
     Route::apiResource('country',CountryController::class);
 // <------------------------------end of country module ------------------------------------------------->
 
-});
-
 //sunil 28/6
+
+// <-------------------------- Category Crud : Sunil Sorani : 28/6/2024 ------------------------------> 
+
 Route::apiResource('/category',CategoriesController::class);
 Route::post('/category-search',[CategoriesController::class,'SearchCategory']);
+Route::get('/category-status/{id}',[CategoriesController::class,'changeActiveStatus']);
 
+
+// <-------------------------- SubCategory Crud : Sunil Sorani : 28/6/2024 ------------------------------> 
 Route::apiResource('/sub-category',SubCategoriesController::class);
 Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCategory']);
+
+Route::get('/subcategory-status/{id}',[SubCategoriesController::class,'changeActiveStatus']);
+
+// <-------------------------- Color Crud : Sunil Sorani : 2/7/2024 ------------------------------> 
+Route::apiResource('product-color',ProductColorController::class);
+
+//sunil product module
+Route::apiResource('product',ProductController::class);
+Route::apiResource('product-color',ProductColorController::class);
+Route::apiResource('product-size',ProductSizeController::class);
+Route::get('/get-product/{id}',[ProductController::class,'getProduct']);
+Route::get('/remove-product-image/{id}',[ProductController::class,'removeImageOfProduct']);
+
+Route::apiResource('order',OrdersController::class);
+});
+// AdminLogin  && AdminLogout
+
+
+
 
 
 // 28/06 Category Show Get Api  Nikunj
@@ -147,9 +171,8 @@ Route::post('/add-contact',[ContactsController::class,'addContactUs']);
 Route::post('/add-news-letter',[NewsLetterController::class,'addNewsLetter']);
 Route::get('/show-subcategory',[SubCategoriesController::class,'showSubCategory']);
 
-//sunil 1/7
 
-Route::apiResource('product',ProductController::class);
+
 
 // 02/07 List Product of featured Nikunj 
 Route::get('/list-featured-product',[ProductController::class,'list_featured_product']);
@@ -164,9 +187,7 @@ Route::group(['middleware'=>'auth:api'],function(){
 });
 // <------------------------ Wishlist Module Completed : Nehal Solanki -------------------------->
 
-//sunil 2/7
-Route::apiResource('product-color',ProductColorController::class);
-Route::apiResource('product-size',ProductSizeController::class);
+
 Route::get('/get-product/{id}',[ProductController::class,'getProduct']);
 
 
@@ -193,3 +214,4 @@ Route::group(['middleware'=>'auth:api'],function(){
 // <-------------------------- search Module : Harshvardhan Zala : 4/7/2024 ------------------------------> 
         Route::get('search-filter/{id}',[FeaturesController::class,'search_filter']);
 // <------------------------------------------------------------------------------------------------>
+
