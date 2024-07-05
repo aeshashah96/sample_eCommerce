@@ -95,14 +95,14 @@ class NewsLetterController extends Controller
                 return response()->json([
                     'success' => true,
                     'status' => 201,
-                    'message' => 'News Letter Add Successfully',
+                    'message' => 'NewsLetter Add Successfully',
                 ], 201);
             } else {
                 return response()->json([
                     'success' => false,
                     'status' => 404,
-                    'mesasge' => 'News Letter Not Added'
-                ], 404);
+                    'mesasge' => 'NewsLetter Not Added'
+                ]);
             }
         } catch (Exception $e) {
             return response()->json([

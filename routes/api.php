@@ -168,15 +168,14 @@ Route::post('/add-contact',[ContactsController::class,'addContactUs']);
 
 // 01/07 Add NewsLetter Post Api Front Side Nikunj 
 
-Route::post('/add-news-letter',[NewsLetterController::class,'addNewsLetter']);
+Route::post('/news-letter',[NewsLetterController::class,'addNewsLetter']);
 Route::get('/show-subcategory',[SubCategoriesController::class,'showSubCategory']);
 
 
 
 
 // 02/07 List Product of featured Nikunj 
-Route::get('/list-featured-product',[ProductController::class,'list_featured_product']);
-Route::get('/get-product/{id}',[ProductController::class,'getProduct']);
+
 
 
 // <------------------------- Wishlist Module : Nehal Solanki : 2/7/2024 -------------------------> 
@@ -198,7 +197,7 @@ Route::group(['middleware'=>'auth:api'],function(){
     Route::post('/update-item/add/cart/{id}',[CartsController::class,'addItem']);
     Route::post('/update-item/remove/cart/{id}',[CartsController::class,'removeItem']);
     Route::delete('/delete-product/cart/{id}',[CartsController::class,'deleteCartProduct']);
-});
+
 // <------------------------------------------------------------------------------------------------>
 
 
@@ -215,3 +214,14 @@ Route::group(['middleware'=>'auth:api'],function(){
         Route::get('search-filter/{id}',[FeaturesController::class,'search_filter']);
 // <------------------------------------------------------------------------------------------------>
 
+    Route::post('/add-product-review/{id}',[ProductController::class,'addProductReview']);
+    Route::get('/get-product-review',[ProductController::class,'productReview']);
+});
+// <------------------------------------------------------------------------------------------------>
+
+// ------------------------------Product Details APi : Nikunj -------------------------------
+
+Route::get('/list-featured-product',[ProductController::class,'list_featured_product']);
+Route::get('/get-product/{slug}',[ProductController::class,'getProduct']);
+Route::get('/get-product-details',[ProductController::class,'productAdditionalInformation']);
+Route::get('/get-related-product/{slug}',[ProductController::class,'getRelatedProduct']);

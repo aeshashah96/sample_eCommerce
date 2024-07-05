@@ -29,8 +29,8 @@ class ContactsController extends Controller
                 return response()->json([
                     'success' => false,
                     'status' => 404,
-                    'mesasge' => 'Contacts is Not Added'
-                ], 404);
+                    'message' => 'Contacts is Not Added'
+                ]);
             }
         } catch (Exception $e) {
             return response()->json([

@@ -220,23 +220,23 @@ class BannersController extends Controller
                 $BannerWithSubcategory = $BannerWithSubcategory->makeHidden('sub_category_id');
                 // dd($BannerWithSubcategory);
                 foreach ($BannerWithSubcategory as $subcat) {
-                    $subcat['image'] = url("/upload/banners/" . $subcat->image);
+                    $subcat['image'] = url("/images/banners/" . $subcat->image);
                 }
                 foreach ($BannerWithSubcategory as $cat) {
-                    $cat->url = url('/' . Categories::find($cat->subcategory->category_id)->name . '/' . $cat->subcategory->name);
+                    $cat->url = '/' . Categories::find($cat->subcategory->category_id)->name . '/' . $cat->subcategory->name;                                
                 }
                 return response()->json([
                     'success' => true,
                     'status' => 200,
-                    'bannerData' => $BannerWithSubcategory,
-                    'message' => 'Banner Show Successfully',
+                    'message' => 'Banner Get Successfully',
+                    'data' => $BannerWithSubcategory,
                 ], 200);
             } else {
                 return response()->json([
                     'success' => true,
                     'status' => 404,
                     'message' => 'Banners Are Not Found'
-                ], 404);
+                ]);
             }
         } catch (Exception $e) {
             return response()->json([

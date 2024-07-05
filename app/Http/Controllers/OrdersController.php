@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Orders;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class OrdersController extends Controller
@@ -16,5 +17,12 @@ class OrdersController extends Controller
         }else{
             return response()->json(['success'=>false,'status'=>404,'message'=>'No Data found']);
         }
+    }
+    
+    public function orders(Request $request,$id){
+        $user = $request->user();
+        
+        $productId = Product::find($id);
+        dd($productId);
     }
 }
