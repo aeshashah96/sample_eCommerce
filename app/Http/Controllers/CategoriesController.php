@@ -20,10 +20,15 @@ class CategoriesController extends Controller
         //
         $category = Categories::orderBy('created_at', 'DESC')->with('subCategory:id,name,category_id')->paginate(10);
 
-        foreach ($category as $cat) {
-            $cat['category_image'] = url('/images/Categories/' . $cat['category_image']);
+        if($category){
+
+            foreach ($category as $cat) {
+                $cat['category_image'] = url('/images/Categories/' . $cat['category_image']);
+            }
+            return response()->json(['success' => true, 'status' => 200,'message'=>'Category Get Successfully', 'data' => $category]);
+        }else{
+            return response()->json(['success' => false, 'status' => 404, 'message' =>'Category Not Found']);
         }
-        return response()->json(['success' => true, 'status' => 200, 'Categories' => $category]);
     }
 
     /**
@@ -61,7 +66,7 @@ class CategoriesController extends Controller
             $category = Categories::with('subCategory')->where('id', $id)->first();
             if ($category) {
                 $category->category_image = url('/images/Categories/' . $category->category_image);
-                return response()->json(['success' => true, 'status' => 200, 'message' => 'Category get Successfully', 'category' => $category]);
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Category get Successfully', 'data' => $category]);
             } else {
                 return response()->json(['success' => false, 'status' => 404, 'message' => 'Category Not Found']);
             }
@@ -138,7 +143,7 @@ class CategoriesController extends Controller
             $cat['category_image'] = url('/images/Categories/' . $cat['category_image']);
         }
         if ($category) {
-            return response()->json(['success' => true, 'status' => 200, 'message' => 'Category Get Successfully', 'Categories' => $category]);
+            return response()->json(['success' => true, 'status' => 200, 'message' => 'Category Get Successfully', 'data' => $category]);
         } else {
             return response()->json(['success' => false, 'status' => 404, 'message' => 'Category Not Found']);
         }

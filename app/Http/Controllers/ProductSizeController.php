@@ -13,13 +13,13 @@ class ProductSizeController extends Controller
      */
     public function index()
     {
-        //
+        //get all sizes
         $size=ProductSize::orderBy('created_at','DESC')->paginate(10);
         if($size){
 
-            return response()->json(['success'=>true,'code'=>200,'size'=>$size]);
+            return response()->json(['success'=>true,'status'=>200,'message'=>'Product Size Get Successfully','data'=>$size]);
         }else{
-            return response()->json(['success'=>false,'code'=>404,'message'=>'No Recode Found']);
+            return response()->json(['success'=>false,'status'=>404,'message'=>'No Recode Found']);
         }
     }
 
@@ -28,22 +28,22 @@ class ProductSizeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //add a new size in database
         try{
             $validatedData = $request->validate([
-                'size' => 'required|string|max:255|unique:product_sizes,size',
+                'size' => 'required|string|max:15|unique:product_sizes,size',
             ]);
            $size = ProductSize::create([
                 'size'=>$request->size,
             ]);
             if($size){
-                return response()->json(['success' => true, 'code' => 201, 'message' => 'Size Add Successfully'], 201);
+                return response()->json(['success' => true, 'status' => 201, 'message' => 'Size Add Successfully']);
             }else{
-                return response()->json(['success' => false, 'code' => 500, 'message' => 'Error Found'], 500);
+                return response()->json(['success' => false, 'status' => 500, 'message' => 'Error Found']);
 
             }
         }catch(Exception $e){
-            return response()->json(['success' => false,'code' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['success' => false,'status' => $e->getCode(), 'message' => $e->getMessage()]);
 
         }
     }
@@ -53,13 +53,13 @@ class ProductSizeController extends Controller
      */
     public function show(string $id)
     {
-        //
+        //for get a single size data
         $size=ProductSize::find($id);
         if($size){
 
-            return response()->json(['success'=>true,'code'=>200,'size'=>$size]);
+            return response()->json(['success'=>true,'status'=>200,'data'=>$size]);
         }else{
-            return response()->json(['success'=>false,'code'=>404,'message'=>'No Size Found']);
+            return response()->json(['success'=>false,'status'=>404,'message'=>'No Size Found']);
         }
     }
 
@@ -68,22 +68,24 @@ class ProductSizeController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        //update a specific size
         try{
             $validatedData = $request->validate([
-                'size' => 'required|string|max:255|unique:product_sizes,size',
+                'size' => 'required|string|max:15|unique:product_sizes,size',
             ]);
-           $size = ProductSize::find($id)->update([
-                'size'=>$request->size,
-            ]);
-            if($size){
-                return response()->json(['success' => true, 'code' => 201, 'message' => 'Size Update Successfully'], 201);
+           $size = ProductSize::find($id);
+        
+           if($size){
+                $size->update([
+                     'size'=>$request->size,
+                 ]);
+                return response()->json(['success' => true, 'status' => 201, 'message' => 'Size Update Successfully']);
             }else{
-                return response()->json(['success' => false, 'code' => 404, 'message' => 'Size Not Found'], 404);
+                return response()->json(['success' => false, 'status' => 404, 'message' => 'Size Not Found'],);
 
             }
         }catch(Exception $e){
-            return response()->json(['success' => false,'code' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['success' => false,'status' => $e->getCode(), 'message' => $e->getMessage()]);
 
         }
     }
@@ -93,17 +95,17 @@ class ProductSizeController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        //delete a specific size
         try{
             $size=ProductSize::find($id);
             if($size){
                 $size->delete();
-                return response()->json(['success' => true, 'code' => 200, 'message' => 'Size Deleted Successfully'], 200);
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Size Deleted Successfully']);
             }else{
-                return response()->json(['success' => false, 'code' => 404, 'message' => 'Size Not Found'], 404);
+                return response()->json(['success' => false, 'status' => 404, 'message' => 'Size Not Found']);
             }
         }catch(Exception $e){
-            return response()->json(['success' => false,'code' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['success' => false,'status' => $e->getCode(), 'message' => $e->getMessage()]);
 
         }
     }

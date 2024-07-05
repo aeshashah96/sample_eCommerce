@@ -13,6 +13,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\FeaturesController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\NewsLetterController;
+use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductColorController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ProductController;
@@ -118,14 +119,22 @@ Route::middleware(['auth:adminApi'])->group(function(){
 // <------------------------------end of country module ------------------------------------------------->
 
 //sunil 28/6
+
+// <-------------------------- Category Crud : Sunil Sorani : 28/6/2024 ------------------------------> 
+
 Route::apiResource('/category',CategoriesController::class);
 Route::post('/category-search',[CategoriesController::class,'SearchCategory']);
+Route::get('/category-status/{id}',[CategoriesController::class,'changeActiveStatus']);
 
+
+// <-------------------------- SubCategory Crud : Sunil Sorani : 28/6/2024 ------------------------------> 
 Route::apiResource('/sub-category',SubCategoriesController::class);
 Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCategory']);
 
 Route::get('/subcategory-status/{id}',[SubCategoriesController::class,'changeActiveStatus']);
-Route::get('/category-status/{id}',[CategoriesController::class,'changeActiveStatus']);
+
+// <-------------------------- Color Crud : Sunil Sorani : 2/7/2024 ------------------------------> 
+Route::apiResource('product-color',ProductColorController::class);
 
 //sunil product module
 Route::apiResource('product',ProductController::class);
@@ -133,6 +142,8 @@ Route::apiResource('product-color',ProductColorController::class);
 Route::apiResource('product-size',ProductSizeController::class);
 Route::get('/get-product/{id}',[ProductController::class,'getProduct']);
 Route::get('/remove-product-image/{id}',[ProductController::class,'removeImageOfProduct']);
+
+Route::apiResource('order',OrdersController::class);
 });
 // AdminLogin  && AdminLogout
 
@@ -160,6 +171,9 @@ Route::post('/add-contact',[ContactsController::class,'addContactUs']);
 Route::post('/add-news-letter',[NewsLetterController::class,'addNewsLetter']);
 Route::get('/show-subcategory',[SubCategoriesController::class,'showSubCategory']);
 
+
+
+
 // 02/07 List Product of featured Nikunj 
 Route::get('/list-featured-product',[ProductController::class,'list_featured_product']);
 Route::get('/get-product/{id}',[ProductController::class,'getProduct']);
@@ -172,6 +186,10 @@ Route::group(['middleware'=>'auth:api'],function(){
     Route::get('/show-product/wishlist',[WishlistsController::class,'showProductWishlists']);
 });
 // <------------------------ Wishlist Module Completed : Nehal Solanki -------------------------->
+
+
+Route::get('/get-product/{id}',[ProductController::class,'getProduct']);
+
 
 // <-------------------------- Cart Module : Nehal Solanki : 3/7/2024 ------------------------------> 
 Route::group(['middleware'=>'auth:api'],function(){
