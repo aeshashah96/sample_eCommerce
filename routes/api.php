@@ -61,7 +61,8 @@ Route::group(['middleware'=>'auth:api'],function(){
 });
 
 Route::post('/forgot-password',[UserController::class,'forgotPassword']);
-Route::get('/reset-password',[UserController::class,'resetPassword'])->name('password.reset');
+Route::post('/otp-verification',[UserController::class,'otpVerification']);
+Route::post('/reset-password',[UserController::class,'resetPassword']);
 // <------------------------------ User Module Completed ------------------------------------------------->
 
 

@@ -119,7 +119,7 @@ class WishlistsController extends Controller
                         'success' => true,
                         'status' => 200,
                         'message' => 'Product Found',
-                        'wishlist' => $wishlist,
+                        'data' => $wishlist,
                     ],
                     200,
                 );

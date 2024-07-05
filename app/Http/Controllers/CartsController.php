@@ -126,7 +126,7 @@ class CartsController extends Controller
                 'success' => true,
                 'status' => 200,
                 'message' => 'Your Cart History',
-                'product' => $cart,
+                'data' => $cart,
             ]);
         } else {
             return response()->json([
