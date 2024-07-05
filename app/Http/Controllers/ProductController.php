@@ -32,7 +32,7 @@ class ProductController extends Controller
                 foreach ($image->productImages as $img) {
                     $img->image = url('/images/product/' . $img->image);
                 }
-                $image->images = $image->productImages->pluck('image');
+                // $image->images = $image->productImages->pluck('image');
                 $stock = ProductVarient::where('product_id', $image->id)
                     ->whereIn('stock', ['unlimited'])
                     ->get();
@@ -61,7 +61,7 @@ class ProductController extends Controller
                 $review->avg_rating = $rating;
                 $rating = 0;
             }
-            return response()->json(['success' => true, 'status' => 200, 'message' => 'Product Get Successfully', 'Product Data' => $product]);
+            return response()->json(['success' => true, 'status' => 200, 'message' => 'Product Get Successfully', 'data' => $product]);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'status' => $e->getCode(), 'message' => $e->getMessage()]);
         }
@@ -88,6 +88,7 @@ class ProductController extends Controller
                 'long_description' => 'required',
                 'image' => 'required',
             ]);
+
             $randomString = fake()->regexify('[A-Z0-9]{10}');
             //add Product in Product
             $product = Product::create([
@@ -347,7 +348,33 @@ class ProductController extends Controller
     public function removeImageOfProduct($id)
     {
         $productImage = ImageProduct::where('image', $id)->first();
-        dd($productImage->delete());
+        if($productImage){
+
+            $productImage->delete();
+            return response()->json(['success' => true, 'status' => 200, 'message' => 'Product Image Remove Successfully']);
+
+        }else{
+            return response()->json(['success' => false, 'status' => 404, 'message' => 'Product Not Found']);
+        }
+    }
+
+    public function changeActiveStatus($id){
+        $product=Product::find($id);
+        if($product){
+
+            if($product->isActive){
+                // dd($id);
+                $product->isActive=0;
+                $product->save();
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Product Status Change Successfully']);
+            }else{
+                $product->isActive=1;
+                $product->save();
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Product Status Change Successfully']);
+            }
+        }else{
+            return response()->json(['success' => false, 'status' => 404, 'message' => 'Product Not Found']);
+        }
     }
 
     public function list_featured_product(Request $request)

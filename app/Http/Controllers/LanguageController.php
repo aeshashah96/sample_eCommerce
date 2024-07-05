@@ -16,7 +16,7 @@ class LanguageController extends Controller
     public function index()
     {   
         try{
-            $data = Language::paginate(10,['id','language_name',
+            $data = Language::orderBy('created_at','DESC')->paginate(10,['id','language_name',
         'language_code',
         'status']);
             return response()->json([
@@ -89,9 +89,13 @@ class LanguageController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(LanguageUpdate $request, string $id)
+    public function update(Request $request, string $id)
     {   
         try{
+            $validatedData = $request->validate([
+                'language_name' => 'required',
+                'language_code' => 'required',
+            ]);
             $item = Language::find($id);
             if($item){
                 $item->update($request->input());
@@ -145,5 +149,23 @@ class LanguageController extends Controller
             ]);
         }
         
+    }
+    public function changeStatus($id){
+        $language=Language::find($id);
+
+        if($language){
+            if($language->status){
+                // dd($id);
+                $language->status=0;
+                $language->save();
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Language Status Change Successfully']);
+            }else{
+                $language->status=1;
+                $language->save();
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Language Status Change Successfully']);
+            }
+        }else{
+            return response()->json(['success'=>false,'status'=>404,'message'=>'Language Not Found']);
+        }
     }
 }

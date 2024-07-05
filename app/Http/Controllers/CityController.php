@@ -137,4 +137,23 @@ class CityController extends Controller
             ]);
         }
     }
+
+    public function changeActiveStatus($id){
+        $city=City::find($id);
+        if($city){
+
+            if($city->status){
+                // dd($id);
+                $city->status=0;
+                $city->save();
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'City Status Change Successfully']);
+            }else{
+                $city->status=1;
+                $city->save();
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'City Status Change Successfully']);
+            }
+        }else{
+            return response()->json(['success' => false, 'status' => 404, 'message' => 'City Not Found']);
+        }
+    }
 }

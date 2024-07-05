@@ -10,4 +10,5 @@ class Contacts extends Model
     use HasFactory;
     // protected $table = 'contacts';
     protected $fillable = ['name','email','subject','message'];
+    protected $hidden = ['created_at','updated_at'];
 }
