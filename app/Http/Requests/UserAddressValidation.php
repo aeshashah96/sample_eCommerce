@@ -6,8 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator as ValidationValidator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-
-class BannerValidationRequest extends FormRequest
+class UserAddressValidation extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,11 +24,14 @@ class BannerValidationRequest extends FormRequest
     public function rules(): array
     {
             return [
-                'image' => 'required | mimes:jpeg,jpg,png,gif',
-                'description'=>'required',
-                'banner_title'=>'required',
-                'sub_category_id'=>'required',
-                'category_id'=>'required'
+                'user_id'=>'required',
+                'address_line_1' =>'required',
+                'address_line_2' =>'required',
+                'city'=>'required|string',
+                'state'=>'required|string',
+                'country'=>'required|string',
+                'zipcode'=>'required|numeric',
+                'ship_to_different_address'=>'required|boolean'
             ];
     }
 

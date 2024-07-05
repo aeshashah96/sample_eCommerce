@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
+use App\Models\State;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -74,8 +75,8 @@ class CityController extends Controller
                 return response()->json([
                     'success'=>true,
                     'status'=>200,
-                    'data'=>$data,
-                    'message'=>'city details fetch successfully'
+                    'message'=>'city details fetch successfully',
+                    'data'=>$data
                 ]);
             }else{
                 return response()->json([
@@ -92,5 +93,48 @@ class CityController extends Controller
             ]);
         }
         
+    }
+    //search city api
+    public function search_city($id){
+        try{
+            $data = City::where('city_name','like',"%$id%")->get(['id','city_name']);
+            return response()->json([
+                'success'=>true,
+                'status'=>200,
+                'message'=>'cities fetch successfully',
+                'data'=>$data
+            ]);
+        }catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    //select city
+    public function select_city($id){
+        try{
+            $city = City::with('get_state_from_city')->get()->find($id);
+            $state = State::with('get_country_from_state')->get()->find($city->get_state_from_city->id);
+            $data = [
+                'city_name'=>$city->city_name,
+                'state_name'=>$city->get_state_from_city->state_name,
+                'country_name'=>$state->get_country_from_state->country_name
+            ];
+            return response()->json([
+                'success'=>true,
+                'status'=>200,
+                'message'=>'city fetch successfully',
+                'data'=>$data
+            ]);
+        }catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 }

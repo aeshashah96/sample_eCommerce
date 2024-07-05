@@ -22,6 +22,7 @@ class BannersController extends Controller
             return response()->json([
                 'success'=>true,
                 'status' => 200,
+                'message' => 'fetch banners successfully',
                 'data' => $data
             ]);
         } catch(Exception $e){
@@ -51,17 +52,18 @@ class BannersController extends Controller
                 $file = $request->file('image');
                 $extention = $file->getClientOriginalExtension();
                 $image_name = time() . "." . $extention;
-                $file->move('upload/banners/', $image_name);
+                $file->move('images/banners/', $image_name);
             }
             // $bannername = Banners::where('sub_category_id',$request->id);
-            // dd($bannername);
+
             Banners::create([
                 'image' => $image_name,
                 'description' => $request->description,
                 'banner_title' => $request->banner_title,
-                'banner_url' => url("/upload/banners/$image_name"),
+                'banner_url' => url("/images/banners/$image_name"),
                 'sub_category_id' => $request->sub_category_id,
                 'category_id' => $request->category_id
+                
             ]);
             return response()->json([
                 'success'=>true,
@@ -83,16 +85,17 @@ class BannersController extends Controller
     public function show(string $id)
     {
         try{
-            $data = Banners::with(['subcategory'=> function ($query) {
-                $query->select('id', 'name');
-            },])->get()
-            ->find($id,['id','image','description']);
-            if($data){
+            $check = Banners::find($id);
+            if($check){
+                $data = $check->with(['subcategory'=> function ($query) {
+                    $query->select('id', 'name');
+                },])->get()
+                ->find($id);
                 return response()->json([
                     'success'=>true,
                     'status'=>200,
-                    'data'=>$data,
-                    'message'=>'country details fetch successfully'
+                    'message'=>'banner details fetch successfully',
+                    'data'=>$data
                 ]);
             }else{
                 return response()->json([
@@ -135,16 +138,16 @@ class BannersController extends Controller
             if ($request->has('image')) {
                 if ($item->image) {
                     $name = $item->image;
-                    $image_path = "upload/banners/$name";
+                    $image_path = "images/banners/$name";
                     unlink($image_path);
                 }
 
                 $file = $request->file('image');
                 $extention = $file->getClientOriginalExtension();
                 $banner_name = time() . "." . $extention;
-                $file->move('upload/banners/', $banner_name);
+                $file->move('images/banners/', $banner_name);
                 $item->image = $banner_name;
-                $item->banner_url = url("/upload/banners/$banner_name");
+                $item->banner_url = url("/images/banners/$banner_name");
             }
             $item->update($request->input());
             return response()->json([
@@ -175,7 +178,7 @@ class BannersController extends Controller
                     'message'=>'record not found'
                 ]);
             }
-            unlink("upload/banners/$item->image");
+            unlink("images/banners/$item->image");
             $item->delete();
             return response()->json([
                 'success'=>true,

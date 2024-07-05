@@ -16,6 +16,7 @@ class Banners extends Model
         'sub_category_id',
         'category_id'
     ]; 
+    protected $hidden = ['created_at','updated_at','sub_category_id','category_id'];
     public function subcategory(){
         return $this->belongsTo(SubCategories::class,'sub_category_id','id');
     }

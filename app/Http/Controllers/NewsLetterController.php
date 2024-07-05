@@ -61,12 +61,22 @@ class NewsLetterController extends Controller
     public function destroy(string $id)
     {
         try {
-            NewsLetter::find($id)->delete();
-            return response()->json([
-                'success'=>true,
-                'status'=>200,
-                'message' => 'record deleted successfully'
-            ], 200);
+            $item = NewsLetter::find($id);
+            if($item){
+                $item->delete();
+                return response()->json([
+                    'success'=>true,
+                    'status'=>200,
+                    'message' => 'record deleted successfully'
+                ], 200);
+            }else{
+                return response()->json([
+                    'success'=>false,
+                    'status'=>404,
+                    'message' => 'record not found'
+                ]);
+            }
+            
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,

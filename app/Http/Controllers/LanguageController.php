@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LanguageRequest;
+use App\Http\Requests\LanguageUpdate;
 use App\Models\Language;
 use Exception;
 use Illuminate\Http\Request;
@@ -88,15 +89,25 @@ class LanguageController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(LanguageUpdate $request, string $id)
     {   
         try{
-            Language::find($id)->update($request->input());
-            return response()->json([
-                'success'=>true,
-                'status'=>200,
-                'message'=>'record updated successfully'
-            ],200);
+            $item = Language::find($id);
+            if($item){
+                $item->update($request->input());
+                return response()->json([
+                    'success'=>true,
+                    'status'=>200,
+                    'message'=>'record updated successfully'
+                ],200);
+            }else{
+                return response()->json([
+                    'success'=>false,
+                    'status'=>404,
+                    'message'=>'record not found'
+                ]);
+            }
+            
         }catch (Exception $e) {
             return response()->json([
                 'success' => false,
@@ -124,7 +135,7 @@ class LanguageController extends Controller
             return response()->json([
                 'success'=>true,
                 'status'=>200,
-                'message'=>'message deleted successfully'
+                'message'=>'language deleted successfully'
             ],200);
         }catch (Exception $e) {
             return response()->json([

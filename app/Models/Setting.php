@@ -13,4 +13,5 @@ class Setting extends Model
         'key',
         'value'
     ];
+    protected $hidden =  ['created_at','updated_at'];
 }

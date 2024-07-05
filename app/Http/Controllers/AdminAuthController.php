@@ -24,21 +24,21 @@ class AdminAuthController extends Controller
                 return response()->json([
                     'success'=>true,
                     'status'=>'200',
-                    'Message'=>'login successfully',
-                    'Token'=>$token
+                    'message'=>'login successfully',
+                    'token'=>$token
                 ]);    
             }else{
                 return response()->json([
                     'success'=>false,
                     'status'=>'401',
-                    'Message'=>'incorrect password'
+                    'message'=>'incorrect password'
                 ]);    
             }
         }else{
             return response()->json([
                 'success'=>false,
                 'status'=>'401',
-                'Message'=>'incorrect email'
+                'message'=>'incorrect email'
             ]);
         }
             

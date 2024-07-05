@@ -10,6 +10,7 @@ use App\Http\Controllers\CityController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\FeaturesController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\NewsLetterController;
 use App\Http\Controllers\ProductColorController;
@@ -18,7 +19,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\WishlistsController;
 use App\Http\Controllers\ProductSizeController;
 use App\Http\Controllers\StateController;
-use App\Models\ProductColor;
+use App\Http\Controllers\UserAddressesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -65,34 +66,58 @@ Route::post('/otp-verification',[UserController::class,'otpVerification']);
 Route::post('/reset-password',[UserController::class,'resetPassword']);
 // <------------------------------ User Module Completed ------------------------------------------------->
 
-
+// <------------------------------ login module ------------------------------------------------->
 Route::post('/admin-login',[AdminAuthController::class,'admin_login']);
+// <------------------------------ login module Completed ------------------------------------------------->
+
 // harshvardhan 28 jun logout route
 Route::middleware(['auth:adminApi'])->group(function(){
+
+// <------------------------------ Admin profile module ------------------------------------------------->
     Route::get('/admin-logout',[AdminAuthController::class,'admin_logout']);
     Route::get('/admin-profile',[AdminAuthController::class,'admin_profile']);
     Route::post('/edit-admin-profile',[AdminAuthController::class,'edit_admin_profile']);
     Route::post('/change-admin-password',[AdminAuthController::class,'change_admin_password']);
+// <------------------------------end of Admin profile module ------------------------------------------------->
+
+// <------------------------------ Banner module ------------------------------------------------->
     Route::resource('/banner',BannersController::class);
+// <------------------------------end of Banner module ------------------------------------------------->
 
-    // harshvardhan 1 jul news letter task 
+// <------------------------------ newsletter module ------------------------------------------------->
     Route::apiResource('newsletter',NewsLetterController::class);
-
+// <------------------------------end of newsletter module ------------------------------------------------->
+    
+// <------------------------------ setting module ------------------------------------------------->
     Route::get('get-setting',[SettingController::class,'getSettingData']);
     Route::post('update-setting',[SettingController::class,'updateSettingData']);
-    Route::apiResource('customer',CustomerController::class);
-    Route::apiResource('language',LanguageController::class);
+// <------------------------------end of setting module ------------------------------------------------->
 
-    //harshvardhan 3 jul
+// <------------------------------ customer module ------------------------------------------------->
+    Route::apiResource('customer',CustomerController::class);
+// <------------------------------end of customer module ------------------------------------------------->
+
+// <------------------------------ language module ------------------------------------------------->
+    Route::apiResource('language',LanguageController::class);
+// <------------------------------end of language module ------------------------------------------------->
+
+
+// <------------------------------ city module ------------------------------------------------->
     Route::get('get-cities',[CityController::class,'get_cities']);
     Route::delete('delete-city/{id}',[CityController::class,'delete_city']);
     Route::post('edit-city/{id}',[CityController::class,'edit_city']);
     Route::get('view-city/{id}',[CityController::class,'view_city']);
-    Route::apiResource('state',StateController::class);
-    Route::apiResource('country',CountryController::class);
-});
-// AdminLogin  && AdminLogout
+// <------------------------------end of city module ------------------------------------------------->
 
+// <------------------------------state module ------------------------------------------------->
+    Route::apiResource('state',StateController::class);
+// <------------------------------end of state module ------------------------------------------------->
+
+// <------------------------------country module ------------------------------------------------->
+    Route::apiResource('country',CountryController::class);
+// <------------------------------end of country module ------------------------------------------------->
+
+});
 
 //sunil 28/6
 Route::apiResource('/category',CategoriesController::class);
@@ -105,10 +130,6 @@ Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCat
 // 28/06 Category Show Get Api  Nikunj
 Route::get('/list-category',[CategoriesController::class,'listCategory']);
 Route::post('/add-category',[CategoriesController::class,'addCategory']);
-// 1st July Banner Get Api For front end side Nikunj 
-Route::post('/createbanner',[BannersController::class,'bannerCreate']);
-
-Route::post('/createbanner',[BannersController::class,'bannerCreate']);
 
 // 1st July Banner Get Api For front end side Nikunj 
 Route::get('/home-banner',[BannersController::class,'homeBanner']);
@@ -157,4 +178,18 @@ Route::group(['middleware'=>'auth:api'],function(){
     Route::post('/update-item/remove/cart/{id}',[CartsController::class,'removeItem']);
     Route::delete('/delete-product/cart/{id}',[CartsController::class,'deleteCartProduct']);
 });
+// <------------------------------------------------------------------------------------------------>
+
+
+// <-------------------------- User Address Module : Harshvardhan Zala : 4/7/2024 ------------------------------> 
+        Route::get('get-user-address/{id}',[UserAddressesController::class,'get_user_address']);
+        Route::post('add-user-address',[UserAddressesController::class,'add_user_address']);
+        Route::post('edit-user-address/{id}',[UserAddressesController::class,'edit_user_address']);
+        Route::get('get-city',[CityController::class,'get_cities']);
+        Route::get('search-city/{id}',[CityController::class,'search_city']);
+        Route::get('select-city/{id}',[CityController::class,'select_city']);
+// <------------------------------------------------------------------------------------------------>
+
+// <-------------------------- search Module : Harshvardhan Zala : 4/7/2024 ------------------------------> 
+        Route::get('search-filter/{id}',[FeaturesController::class,'search_filter']);
 // <------------------------------------------------------------------------------------------------>
