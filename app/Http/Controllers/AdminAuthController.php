@@ -47,7 +47,7 @@ class AdminAuthController extends Controller
             return response()->json([
                 'success'=>false,
                 'status'=>404,
-                'error'=>$e
+                'error'=>$e->getMessage()
             ]);
         }
     }
