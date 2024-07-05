@@ -133,8 +133,6 @@ Route::post('/sub-category-search',[SubCategoriesController::class,'SearchSubCat
 
 Route::get('/subcategory-status/{id}',[SubCategoriesController::class,'changeActiveStatus']);
 
-// <-------------------------- Color Crud : Sunil Sorani : 2/7/2024 ------------------------------> 
-Route::apiResource('product-color',ProductColorController::class);
 
 //sunil product module
 Route::apiResource('product',ProductController::class);
