@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\addProductReviewRequest;
-use App\Models\Categories;
 use App\Models\ImageProduct;
 use App\Models\Product;
 use App\Models\ProductColor;
@@ -13,6 +12,7 @@ use App\Models\ProductSize;
 use App\Models\ProductVarient;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -73,9 +73,8 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         try {
-            $varient = [[1, null, 20], [5, null, 30], [3, null, 50]];
+            // $varient = [[1, null, 20], [5, null, 30], [3, null, 50]];
             // $varient = [[4, 2, 100], [5, 3, 500], [3, 2, 5]];
-
 
             $validatedData = $request->validate([
                 'name' => 'required|string|max:30|unique:products,name',
@@ -83,10 +82,10 @@ class ProductController extends Controller
                 'description' => 'required',
                 'price' => 'required|numeric',
                 'sub_category_id' => 'required|exists:sub_categories,id',
-                'slug' => 'required',
                 'is_featured' => 'required',
                 'long_description' => 'required',
                 'image' => 'required',
+                'varient' => 'required',
             ]);
 
             $randomString = fake()->regexify('[A-Z0-9]{10}');
@@ -99,17 +98,19 @@ class ProductController extends Controller
                 'sub_category_id' => $request->sub_category_id,
                 'sku' => $randomString,
                 'isActive' => 1,
-                'slug' => $request->slug,
+                'slug' => Str::slug($request->name, '-'),
                 'is_featured' => $request->is_featured,
                 'long_description' => $request->long_description,
             ]);
             if ($product) {
                 //for add in Product in ProductVarient
-                foreach ($varient as $col) {
-                    $color = ProductColor::find($col[0]);
+
+                foreach ($request->varient as $col) {
+                    $color = ProductColor::find($col['color']);
+
                     if ($color) {
-                        if ($col[1] != null) {
-                            $size = ProductSize::find($col[1])->size;
+                        if ($col['size'] != null) {
+                            $size = ProductSize::find($col['size'])->size;
                             $varient_name = $color->color . ' ' . $size . ' ' . $request->name;
                         } else {
                             $size = null;
@@ -117,15 +118,15 @@ class ProductController extends Controller
                         }
                         $productVarient = ProductVarient::create([
                             'product_id' => $product->id,
-                            'product_color_id' => $col[0],
-                            'product_size_id' => $col[1],
+                            'product_color_id' => $col['color'],
+                            'product_size_id' => $col['size'],
                             'variant_name' => $varient_name,
-                            'stock' => $col[2],
+                            'stock' => $col['stock'],
                         ]);
                         $varient_name = '';
                     } else {
                         Product::find($product->id)->delete();
-                        return response()->json(['success' => true, 'status' => 422, 'message' => 'Please Enter Valid Data']);
+                        return response()->json(['success' => false, 'status' => 422, 'message' => 'Please Enter Valid Data']);
                     }
                 }
                 //add Product in Product Description
@@ -164,34 +165,44 @@ class ProductController extends Controller
     public function show(string $id)
     {
         //
+
         try {
-            $product = Product::find($id)->makeHidden(['productImages', 'productReview', 'sku']);
-            $product->images = $product->productImages->pluck('image');
-            $product->avrageRating = $product->productReview->pluck('rating')->avg();
-            $colors = $product->colors->pluck('color');
-            $product->color = $colors;
-            $product->size = $product->sizes->pluck('size');
-            $product->categoryName = $product->category->name;
-            $product->subcategoryName = $product->subcategory->name;
-
-            $stock = ProductVarient::where('product_id', $product->id)
-                ->whereIn('stock', ['unlimited'])
-                ->get();
-
-            if ($stock->first()) {
-                $product->stock = 'UNLIMITED';
-            } else {
-                $sum = ProductVarient::where('product_id', $product->id)
-                    ->pluck('stock')
-                    ->sum();
-                if ($sum == 0) {
-                    $product->stock = 'UNAVAILABLE';
-                } else {
-                    $product->stock = $sum;
+            $product = Product::find($id);
+            if ($product) {
+                $product->makeHidden(['productImages', 'productReview', 'sku']);
+                $img = $product->productImages->pluck('image');
+                $product->productInformation->additional_information;
+                $product->avrageRating = $product->productReview->pluck('rating')->avg();
+                $colors = $product->colors->pluck('color');
+                $product->color = $colors;
+                $product->size = $product->sizes->pluck('size');
+                $product->categoryName = $product->category->name;
+                $product->subcategoryName = $product->subcategory->name;
+                foreach ($img as $key => $imgs) {
+                    $img[$key] = url('images/product/' . $imgs);
                 }
-            }
+                $product->images = $img;
+                $stock = ProductVarient::where('product_id', $product->id)
+                    ->whereIn('stock', ['unlimited'])
+                    ->get();
 
-            return response()->json(['success' => true, 'status' => 200, 'message' => 'Product Get Successfully', 'Product Data' => $product]);
+                if ($stock->first()) {
+                    $product->stock = 'UNLIMITED';
+                } else {
+                    $sum = ProductVarient::where('product_id', $product->id)
+                        ->pluck('stock')
+                        ->sum();
+                    if ($sum == 0) {
+                        $product->stock = 'UNAVAILABLE';
+                    } else {
+                        $product->stock = $sum;
+                    }
+                }
+
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Product Get Successfully', 'Product Data' => $product]);
+            } else {
+                return response()->json(['success' => false, 'status' => 404, 'message' => 'Product Not Found']);
+            }
         } catch (Exception $e) {
             return response()->json(['success' => true, 'status' => $e->getCode(), 'message' => $e->getMessage()]);
         }
@@ -202,46 +213,32 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //for generate varientName
-        function generateVarientName($col, $si, $name)
-        {
-            $color = ProductColor::find($col)->color;
-            if ($si != null) {
-                $size = ProductSize::find($si)->size;
-                $varient_name = $color . ' ' . $size . ' ' . $name;
-                return $varient_name;
-            } else {
-                $size = null;
-                $varient_name = $color . ' ' . $name;
-                return $varient_name;
-            }
-        }
-        //dummy data for product varient
-        $varientupdated = [[3, 2, 'unlimited'], [4, null, 'unlimited'], [3, null, 'unlimited'], [5, null, 22], [3, null, 10]];
-        $varientNewData = [[5, null, '10']];
-
         try {
+            function generateVarientName($col, $si, $name)
+            {
+                $color = ProductColor::find($col)->color;
+                if ($si != null) {
+                    $size = ProductSize::find($si)->size;
+                    $varient_name = $color . ' ' . $size . ' ' . $name;
+                    return $varient_name;
+                } else {
+                    $size = null;
+                    $varient_name = $color . ' ' . $name;
+                    return $varient_name;
+                }
+            }
             // validation for new varienrt data
-            foreach ($varientNewData as $varient) {
-                if ($varient[2] == null && $varient[0] == null) {
+            foreach ($request->varinet as $varient) {
+                if ($varient['stock'] == null && $varient['color'] == null) {
                     return response()->json(['success' => true, 'status' => 422, 'message' => 'Please Enter Valid Data']);
                 }
-                $check = ProductVarient::where('product_color_id', $varient[0])
-                    ->where('product_size_id', $varient[1])
+                $check = ProductVarient::where('product_color_id', $varient['color'])
+                    ->where('product_size_id', $varient['size'])
                     ->first();
                 if ($check) {
                     return response()->json(['success' => true, 'status' => 422, 'message' => 'Do not Enter Same Data']);
                 }
             }
-
-            //validation for old data
-            foreach ($varientupdated as $varient) {
-                if ($varient[2] == null && $varient[0] == null) {
-                    return response()->json(['success' => true, 'status' => 422, 'message' => 'Please Enter Valid Data']);
-                }
-            }
-
-            //
 
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
@@ -249,37 +246,37 @@ class ProductController extends Controller
                 'description' => 'required',
                 'price' => 'required|numeric',
                 'sub_category_id' => 'required|exists:sub_categories,id',
-                'slug' => 'required',
                 'is_featured' => 'required',
                 'long_description' => 'required',
+                'varient' => 'required',
             ]);
 
             //update existing varient table data
             $varientid = ProductVarient::where('product_id', $id)->get();
-            foreach ($varientid as $key => $varientid) {
-                $varient_name = generateVarientName($varientupdated[$key][0], $varientupdated[$key][1], $request->name);
+            // dd(count($varientid));
+            foreach ($request->varient as $key => $varient) {
+                // dump($varient['color']);
+                $varient_name = generateVarientName($varient['color'], $varient['size'], $request->name);
 
-                ProductVarient::find($varientid->id)->update([
-                    'product_color_id' => $varientupdated[$key][0],
-                    'product_size_id' => $varientupdated[$key][1],
-                    'variant_name' => $varient_name,
-                    'stock' => $varientupdated[$key][2],
-                ]);
+                if ($key < count($varientid)) {
+                    ProductVarient::find($varientid[$key]->id)->update([
+                        'product_color_id' => $varient['color'],
+                        'product_size_id' => $varient['size'],
+                        'variant_name' => $varient_name,
+                        'stock' => $varient['stock'],
+                    ]);
+                } else {
+                    // dump($varient_name."add");
+                    $productVarient = ProductVarient::create([
+                        'product_id' => $id,
+                        'product_color_id' => $varient['color'],
+                        'product_size_id' => $varient['size'],
+                        'variant_name' => $varient_name,
+                        'stock' => $varient['stock'],
+                    ]);
+                }
             }
 
-            //for add a new data for product varient table
-            foreach ($varientNewData as $col) {
-                $varient_name = generateVarientName($col[0], $col[1], $request->name);
-                $productVarient = ProductVarient::create([
-                    'product_id' => $id,
-                    'product_color_id' => $col[0],
-                    'product_size_id' => $col[1],
-                    'variant_name' => $varient_name,
-                    'stock' => $col[2],
-                ]);
-            }
-
-            // dd($request->all());
             //update data in Product table
             $product = Product::find($id)->update([
                 'name' => $request->name,
@@ -287,7 +284,7 @@ class ProductController extends Controller
                 'price' => $request->price,
                 'category_id' => $request->category_id,
                 'sub_category_id' => $request->sub_category_id,
-                'slug' => $request->slug,
+                'slug' => Str::slug($request->name, '-'),
                 'is_featured' => $request->is_featured,
                 'long_description' => $request->long_description,
             ]);
@@ -308,12 +305,16 @@ class ProductController extends Controller
                             'image' => $imageName,
                         ]);
                     }
+                    if ($productImage != null && $productDescription != null) {
+                        return response()->json(['success' => true, 'status' => 201, 'message' => 'Product Update Successfully']);
+                    } else {
+                        return response()->json(['success' => false, 'status' => 422, 'message' => 'Some Error Found']);
+                    }
                 }
-
-                if ($productImage != null && $productDescription != null && $productVarient != null) {
+                if ($productDescription != null) {
                     return response()->json(['success' => true, 'status' => 201, 'message' => 'Product Update Successfully']);
                 } else {
-                    return response()->json(['success' => true, 'status' => 422, 'message' => 'Some Error Found']);
+                    return response()->json(['success' => false, 'status' => 422, 'message' => 'Some Error Found']);
                 }
             } else {
                 return response()->json(['success' => false, 'status' => 201, 'message' => 'Error']);
@@ -348,31 +349,29 @@ class ProductController extends Controller
     public function removeImageOfProduct($id)
     {
         $productImage = ImageProduct::where('image', $id)->first();
-        if($productImage){
-
+        if ($productImage) {
             $productImage->delete();
             return response()->json(['success' => true, 'status' => 200, 'message' => 'Product Image Remove Successfully']);
-
-        }else{
+        } else {
             return response()->json(['success' => false, 'status' => 404, 'message' => 'Product Not Found']);
         }
     }
 
-    public function changeActiveStatus($id){
-        $product=Product::find($id);
-        if($product){
-
-            if($product->isActive){
+    public function changeActiveStatus($id)
+    {
+        $product = Product::find($id);
+        if ($product) {
+            if ($product->isActive) {
                 // dd($id);
-                $product->isActive=0;
+                $product->isActive = 0;
                 $product->save();
                 return response()->json(['success' => true, 'status' => 200, 'message' => 'Product Status Change Successfully']);
-            }else{
-                $product->isActive=1;
+            } else {
+                $product->isActive = 1;
                 $product->save();
                 return response()->json(['success' => true, 'status' => 200, 'message' => 'Product Status Change Successfully']);
             }
-        }else{
+        } else {
             return response()->json(['success' => false, 'status' => 404, 'message' => 'Product Not Found']);
         }
     }
