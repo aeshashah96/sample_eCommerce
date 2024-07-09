@@ -37,6 +37,7 @@ class UserController extends Controller
             ]);
 
             if ($user) {
+                // $user->sendEmailVerificationNotification();
                 SendEmailUser::dispatch($user);
                 return response()->json([
                     'success' => true,
@@ -429,7 +430,7 @@ class UserController extends Controller
         }
     }
     // Verification Mail
-    public function verify(Request $request)
+    public function verify($id,Request $request)
     {   
         if (!$request->hasValidSignature()) {
             return response()->json([
@@ -439,11 +440,11 @@ class UserController extends Controller
             ]);
         }
 
-        // $user = User::findOrFail($user_id);
+        $user = User::findOrFail($id);
 
-        // if (!$user->hasVerifiedEmail()) {
-        //     $user->markEmailAsVerified();
-        // }
+        if (!$user->hasVerifiedEmail()) {
+            $user->markEmailAsVerified();
+        }
 
         return response()->json([
             'success' => true,
@@ -452,13 +453,13 @@ class UserController extends Controller
         ]);
     }
 
-    // public function resend() {
-    //     if (auth()->user()->hasVerifiedEmail()) {
-    //         return response()->json(["msg" => "Email already verified."], 400);
-    //     }
+    public function resend(Request $request) {
+        if ($request->user()->hasVerifiedEmail()) {
+            return response()->json(["msg" => "Email already verified."], 400);
+        }
 
-    //     auth()->user()->sendEmailVerificationNotification();
+        $request->user()->sendEmailVerificationNotification();
 
-    //     return response()->json(["msg" => "Email verification link sent on your email id"]);
-    // }
+        return response()->json(["msg" => "Email verification link sent on your email id"]);
+    }
 }

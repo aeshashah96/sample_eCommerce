@@ -14,9 +14,9 @@ class CartsController extends Controller
     public function addProductCart(Request $request, $id)
     {
         $user = $request->user();
-        $productId = Product::find($id);
+        $productId = Product::where('id',$id)->first();
         if ($productId) {
-            $productPrice = $productId->pluck('price')->first();
+            $productPrice = $productId->price;
             $colorId = ProductColor::where('color', $request->color)
                 ->pluck('id')
                 ->first();
@@ -39,7 +39,7 @@ class CartsController extends Controller
                             'product_id' => $id,
                             'product_varient_id' => $variantId,
                             'quantity' => $request->quantity,
-                            'total' => $productId->pluck('price')->first() * $request->quantity,
+                            'total' => $productPrice * $request->quantity,
                             'color' => $request->color,
                             'size' => $request->size,
                         ]);
@@ -104,20 +104,18 @@ class CartsController extends Controller
     public function showCartProduct(Request $request)
     {
         $user = $request->user();
-        $cart = Carts::where('user_id', $user->id)
-            ->with([
-                'products' => function ($query) {
-                    $query->select('id', 'name', 'price');
-                },
-            ])
-            ->get();
+        $cart = Carts::where('user_id', $user->id)->get();
 
         if ($cart->first()) {
             foreach ($cart as $element) {
-                $varaintFlag = $element->product_varient_id;;
+                $varaintFlag = $element->product_varient_id;
                 $productVariant = ProductVarient::where('id', $varaintFlag)->get();
-                $productId = $element->products->id;
+                $productId = $element->product_id;
+                $product = Product::where('id',$productId)->first();
                 $productImg = Product::find($productId)->productImages->pluck('image')->first();
+                $element->product_name = $product->name;
+                $element->product_prize = $product->price;
+                $element->slug = $product->slug;
                 $element->stock = $productVariant->pluck('stock')->first();
                 $element->stock_status = $productVariant->pluck('stock_status')->first();
                 $element->product_img = url("/images/product/$productImg");

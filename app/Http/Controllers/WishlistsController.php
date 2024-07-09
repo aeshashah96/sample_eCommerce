@@ -94,7 +94,7 @@ class WishlistsController extends Controller
             $wishlist = Wishlists::where('user_id', $user->id)
                 ->with([
                     'products' => function ($query) {
-                        $query->select('id', 'name', 'price');
+                        $query->select('id', 'name', 'price','slug');
                     },
                 ])
                 ->paginate(5);
@@ -109,7 +109,7 @@ class WishlistsController extends Controller
                     $ratingAverage = 0;
                 }
                 $ele->product_images = url("/images/product/$productImg");
-                $ele->avg_rating = $ratingAverage;
+                $ele->avg_rating = number_format((float)$ratingAverage, 2, '.', '');
                 $ele->total_review = $totalReview;
             }
 
