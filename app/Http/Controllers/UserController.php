@@ -265,8 +265,7 @@ class UserController extends Controller
                 return response()->json([
                     'success' => false,
                     'status' => 422,
-                    'message' => 'Validations fails',
-                    'errors' => $validator->errors()->first(),
+                    'message' => $validator->errors()->first(),
                 ]);
             }
 
@@ -327,8 +326,7 @@ class UserController extends Controller
             return response()->json([
                 'success' => false,
                 'status' => 422,
-                'message' => 'Validations fails',
-                'errors' => $validator->errors()->first(),
+                'message' => $validator->errors()->first(),
             ]);
         }
 
@@ -396,8 +394,7 @@ class UserController extends Controller
                 return response()->json([
                     'success' => false,
                     'status' => 422,
-                    'message' => 'Validations fails',
-                    'errors' => $validator->errors()->first(),
+                    'message' => $validator->errors()->first(),
                 ]);
             }
             $verifyEmail = ResetPassword::where('email',$input['email']);

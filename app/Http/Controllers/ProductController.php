@@ -14,6 +14,8 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
+use function PHPUnit\Framework\isEmpty;
+
 class ProductController extends Controller
 {
     /**
@@ -380,8 +382,10 @@ class ProductController extends Controller
     {
         try {
             $limit = $request->input('limit');
-            $productlist = Product::select('id', 'name', 'price','slug')->with('productReview', 'productImages:id,product_id,image')->where('is_featured', 1)->get();
-            $productlist = Product::limit($limit)->get()->makeHidden(['productReview', 'created_at', 'updated_at', 'sku', 'is_featured', 'long_description', 'description', 'isActive', 'category_id', 'sub_category_id']);
+            $productlist = Product::select('id', 'name', 'price')->with('productReview', 'productImages:id,product_id,image')->where('is_featured', 1)->get();
+            $productlist = Product::limit($limit)
+                ->get()
+                ->makeHidden(['productReview', 'created_at', 'updated_at', 'sku', 'is_featured', 'long_description', 'description', 'isActive', 'category_id', 'sub_category_id']);
 
             if ($productlist) {
                 foreach ($productlist as $image) {
@@ -394,6 +398,9 @@ class ProductController extends Controller
                 $rating = 0;
                 $productreview = 0;
                 foreach ($productlist as $review) {
+                    $review->isWishlist = 0;
+                    $review->save();
+
                     // dd($review);
                     foreach ($review->productReview as $ele) {
                         // dd($ele);
@@ -440,13 +447,22 @@ class ProductController extends Controller
     {
         try {
             $productlist = Product::select('id', 'name', 'description', 'price', 'long_description')
-                ->with(['colors:id,color', 'sizes:id,size', 'productImages:id,product_id,image', 'productReview:id,product_id,user_id,comment,rating'])
+                ->with(['colors:id,color', 'productImages:id,product_id,image', 'productReview:id,product_id,user_id,comment,rating'])
                 ->where('slug', $slug)
                 ->first();
             foreach ($productlist->productImages as $list) {
                 $list->image = url('/images/product/' . $list->image);
             }
-            // dd($productlist->productReview);
+            $arrSize = [];
+            $arrId = [];
+            foreach ($productlist->sizes as $size) {
+                array_push($arrId,$size->id);
+                array_push($arrSize,$size->size);
+            }
+            $arrayMerge = array_combine($arrId, $arrSize);
+            if(!empty($arrayMerge)){
+                $productlist->size = $arrayMerge;
+            }
             $rat = [];
             $total_review = [];
             // dd($productlist);

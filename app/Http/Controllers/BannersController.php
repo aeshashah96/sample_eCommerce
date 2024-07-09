@@ -222,7 +222,7 @@ class BannersController extends Controller
                     $subcat['image'] = url("/images/banners/" . $subcat->image);
                 }
                 foreach ($BannerWithSubcategory as $cat) {
-                    $cat->url = '/' . Categories::find($cat->subcategory->category_id)->name . '/' . $cat->subcategory->name;                                
+                    $cat->url = '/' . strtolower(Categories::find($cat->subcategory->category_id)->name). '/' .strtolower($cat->subcategory->name);                                
                 }
                 return response()->json([
                     'success' => true,
