@@ -222,3 +222,13 @@ Route::get('/get-product/{slug}',[ProductController::class,'getProduct']);
 Route::get('/get-product-details',[ProductController::class,'productAdditionalInformation']);
 Route::get('/get-related-product/{slug}',[ProductController::class,'getRelatedProduct']);
 Route::get('/get-product-review',[ProductController::class,'productReview']);
+
+// <-------------------------- search Module : Harshvardhan Zala : 4/7/2024 ------------------------------> 
+Route::post('/fitler',[FeaturesController::class,'filter_product']);
+
+Route::get('search/{id}',[FeaturesController::class,'search_by_vatiant']);
+Route::post('/varient-fitler',[FeaturesController::class,'filter_by_vatiant']);
+
+
+// <------------------------------------------------------------------------------------------------>
+
