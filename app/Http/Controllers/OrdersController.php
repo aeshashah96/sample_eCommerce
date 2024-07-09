@@ -9,7 +9,6 @@ use App\Models\Orders;
 use App\Models\Product;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -65,14 +64,12 @@ class OrdersController extends Controller
             //         'data'=>$cart
             //     ]);
             // }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'status' => $e->getCode(),
                 'message' => $e->getMessage(),
             ]);
-            // Handle transaction failure
-            // DB::rollBack();
         }
     }
 
