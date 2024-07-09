@@ -150,11 +150,13 @@ Route::middleware(['auth:adminApi'])->group(function () {
     Route::apiResource('product-color', ProductColorController::class);
     Route::apiResource('product-size', ProductSizeController::class);
     Route::get('/get-product/{id}', [ProductController::class, 'getProduct']);
-    Route::get('/remove-product-image/{id}', [ProductController::class, 'removeImageOfProduct']);
+    Route::delete('/remove-product-image/{id}', [ProductController::class, 'removeImageOfProduct']);
 
     Route::apiResource('order', OrdersController::class);
     Route::get('/contact-us', [ContactsController::class, 'getAllContactUs']);
     Route::get('/contact-us/{id}', [ContactsController::class, 'showDetailsOfContactUs']);
+    Route::delete('/contact-delete/{id}', [ContactsController::class, 'deleteContactUs']);
+
 
     Route::get('/product-status/{id}', [ProductController::class, 'changeActiveStatus']);
     Route::get('/banner-status/{id}', [BannersController::class, 'changeStatus']);

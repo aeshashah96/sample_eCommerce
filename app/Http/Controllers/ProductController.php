@@ -173,10 +173,13 @@ class ProductController extends Controller
         try {
             $product = Product::find($id);
             if ($product) {
-
-                $product->makeHidden(['productImages', 'productReview', 'sku', 'productInformation']);
-                $longdes = ($product->productInformation->additional_information);
-                $product->additional_information = $longdes;
+                
+                $product->makeHidden(['productReview', 'sku','productInformation']);
+                $longdes=($product->productInformation->additional_information);
+                $product->additional_information=$longdes;
+                foreach ($product->productImages as $img) {
+                    $img->image = url('/images/product/' . $img->image);
+                }
                 $img = $product->productImages->pluck('image');
                 $product->avrageRating = $product->productReview->pluck('rating')->avg();
                 $colors = $product->colors->pluck('color');
@@ -224,36 +227,32 @@ class ProductController extends Controller
             {
                 $color = ProductColor::find($col)->color;
                 if ($si != null) {
-                    $size = ProductSize::find($si)->size;
-                    $varient_name = $color . ' ' . $size . ' ' . $name;
+                    $si = ProductSize::find($si);
+             if(is_null($si)){
+                $varient_name = $color . ' ' . $name;
+                return $varient_name;
+                    }       
+                    
+                    $varient_name = $color . ' ' . $si . ' ' . $name;
                     return $varient_name;
                 } else {
-                    $size = null;
                     $varient_name = $color . ' ' . $name;
                     return $varient_name;
                 }
             }
-            $varientid = ProductVarient::where('product_id', $id)->get();
 
             // validation for new varienrt data
-
-            foreach ($request->varient as $key => $varient) {
-
-
-
-                if ($key < count($varientid)) {
-                } else {
-                    $check = ProductVarient::where('product_color_id', $varient['color'])
-                        ->where('product_size_id', $varient['size'])
+         
+            if($request->varient){
+                foreach ($request->varient as $key => $varient) {
+                        $check = ProductVarient::where('product_color_id', $varient['color'])
+                        ->where('product_size_id', $varient['size'])->where('product_id',$id)
                         ->first();
-                    if ($check) {
-                        return response()->json(['success' => true, 'status' => 422, 'message' => 'Do not Enter Same Data']);
-                    }
+                        if ($check) {
+                            return response()->json(['success' => false, 'status' => 422, 'message' => 'Do not Enter Same Data']);
+                        }
                 }
             }
-
-
-
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
                 'category_id' => 'required|exists:categories,id',
@@ -262,34 +261,8 @@ class ProductController extends Controller
                 'sub_category_id' => 'required|exists:sub_categories,id',
                 'is_featured' => 'required',
                 'long_description' => 'required',
-                'varient' => 'required',
+                'additional_information' => 'required',
             ]);
-
-            //update existing varient table data
-            // dd(count($varientid));
-            foreach ($request->varient as $key => $varient) {
-                // dump($varient['color']);
-                $varient_name = generateVarientName($varient['color'], $varient['size'], $request->name);
-
-                if ($key < count($varientid)) {
-                    ProductVarient::find($varientid[$key]->id)->update([
-                        'product_color_id' => $varient['color'],
-                        'product_size_id' => $varient['size'],
-                        'variant_name' => $varient_name,
-                        'stock' => $varient['stock'],
-                    ]);
-                } else {
-                    // dump($varient_name."add");
-                    $productVarient = ProductVarient::create([
-                        'product_id' => $id,
-                        'product_color_id' => $varient['color'],
-                        'product_size_id' => $varient['size'],
-                        'variant_name' => $varient_name,
-                        'stock' => $varient['stock'],
-                    ]);
-                }
-            }
-
             //update data in Product table
             $product = Product::find($id)->update([
                 'name' => $request->name,
@@ -301,12 +274,14 @@ class ProductController extends Controller
                 'is_featured' => $request->is_featured,
                 'long_description' => $request->long_description,
             ]);
+
             if ($product) {
                 //update Product in Product Description
+                // if($request->)
                 $productDescription = ProductDescription::where('product_id', $id)
                     ->first()
                     ->update(['additional_information' => $request->additional_information, 'description' => $request->description]);
-
+                    
                 //add data for new images enter in product update
                 if ($request->hasFile('image')) {
                     $files = $request->file('image');
@@ -322,6 +297,20 @@ class ProductController extends Controller
                         return response()->json(['success' => true, 'status' => 201, 'message' => 'Product Update Successfully']);
                     } else {
                         return response()->json(['success' => false, 'status' => 422, 'message' => 'Some Error Found']);
+                    }
+                }
+                if($request->varient ){
+                    foreach ($request->varient as $varient) {
+                        $varient_name = generateVarientName($varient['color'], $varient['size'], $request->name);
+                            $productVarient = ProductVarient::create([
+                                'product_id' => $id,
+                                'product_color_id' => $varient['color'],
+                                
+                                'product_size_id' => $varient['size'],
+                                'variant_name' => $varient_name,
+                                'stock' => $varient['stock'],
+                            ]);
+                      
                     }
                 }
                 if ($productDescription != null) {
@@ -361,7 +350,7 @@ class ProductController extends Controller
 
     public function removeImageOfProduct($id)
     {
-        $productImage = ImageProduct::where('image', $id)->first();
+        $productImage = ImageProduct::find($id);
         if ($productImage) {
             $productImage->delete();
             return response()->json(['success' => true, 'status' => 200, 'message' => 'Product Image Remove Successfully']);
