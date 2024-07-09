@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BannerValidationRequest;
 use App\Models\Banners;
 use App\Models\Categories;
+use App\Models\Product;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -264,4 +265,20 @@ class BannersController extends Controller
             return response()->json(['success'=>false,'status'=>404,'message'=>'Banner Not Found']);
         }
     }
+    // public function getProduct(){
+    //     $banner = Banners::with('subcategory')->get();
+    //     foreach($banner as $ban){
+    //         $category = Categories::where('id',$ban->subcategory->id)->with('products')->get();
+    //         foreach($category as $cat){
+    //             $product = Product::where('category_id',$cat->id)->with('productImages','productReview')->get();
+    //             dd($product);
+    //         }
+    //         // dd($category);
+    //     }
+    //     // dd($banner->subcategory);
+    //     // foreach($banner-> as $ban){
+    //     //     dump($ban);
+    //     // }
+    //     // dd($banner);
+    // }
 }

@@ -1,30 +1,29 @@
 <?php
 
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\AdminAuthController;
-use App\Http\Controllers\CategoriesController;
-use App\Http\Controllers\SubCategoriesController;
-use App\Http\Controllers\BannersController;
-use App\Http\Controllers\CartsController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CityController;
-use App\Http\Controllers\ContactsController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\CartsController;
+use App\Http\Controllers\StateController;
+use App\Http\Controllers\OrdersController;
+use App\Http\Controllers\BannersController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\FeaturesController;
 use App\Http\Controllers\LanguageController;
-use App\Http\Controllers\NewsLetterController;
-use App\Http\Controllers\OrdersController;
-use App\Http\Controllers\ProductColorController;
-use App\Http\Controllers\SettingController;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\WishlistsController;
+use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\NewsLetterController;
 use App\Http\Controllers\ProductSizeController;
-use App\Http\Controllers\StateController;
 use App\Http\Controllers\TestFeatureSearchController;
+use App\Http\Controllers\ProductColorController;
+use App\Http\Controllers\SubCategoriesController;
 use App\Http\Controllers\UserAddressesController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -230,7 +229,22 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('search-filter/{id}', [FeaturesController::class, 'search_filter']);
     // <------------------------------------------------------------------------------------------------>
 
-    Route::post('/add-product-review/{id}', [ProductController::class, 'addProductReview']);
+// <-------------------------- User Address Module : Harshvardhan Zala : 4/7/2024 ------------------------------> 
+        Route::get('get-user-address/{id}',[UserAddressesController::class,'get_user_address']);
+        Route::post('add-user-address',[UserAddressesController::class,'add_user_address']);
+        Route::post('edit-user-address/{id}',[UserAddressesController::class,'edit_user_address']);
+        Route::get('get-city',[CityController::class,'get_cities']);
+        Route::get('search-city/{id}',[CityController::class,'search_city']);
+        Route::get('select-city/{id}',[CityController::class,'select_city']);
+// <------------------------------------------------------------------------------------------------>
+
+// <-------------------------- search Module : Harshvardhan Zala : 4/7/2024 ------------------------------> 
+        Route::get('search-filter/{id}',[FeaturesController::class,'search_filter']);
+// <------------------------------------------------------------------------------------------------>
+    // <=====================================Nikunj Product And Order==========================================> 
+    Route::post('/add-product-review/{id}',[ProductController::class,'addProductReview']);
+    Route::get('/checkout',[OrdersController::class,'checkoutOrder']);
+    Route::post('/add-order',[OrdersController::class,'orderDetails']);
 });
 // <------------------------------------------------------------------------------------------------>
 
