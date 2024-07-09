@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BannerValidationRequest;
 use App\Models\Banners;
 use App\Models\Categories;
+use App\Models\ImageProduct;
+use App\Models\Product;
+use App\Models\ProductReview;
+use App\Models\SubCategories;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -60,8 +64,9 @@ class BannersController extends Controller
                 'image' => $image_name,
                 'description' => $request->description,
                 'banner_title' => $request->banner_title,
-                'banner_url' => url("/images/banners/$image_name"),
                 'sub_category_id' => $request->sub_category_id,
+                'category_id' => $request-> category_id,
+                'banner_url' => '/' . Categories::find($request->category_id)->category_slug. '/' . SubCategories::find( $request->sub_category_id)->subcategory_slug
                 
             ]);
             return response()->json([
@@ -262,6 +267,48 @@ class BannersController extends Controller
             }
         }else{
             return response()->json(['success'=>false,'status'=>404,'message'=>'Banner Not Found']);
+        }
+    }
+    public function getProduct($category,$subcategory){
+        try{
+            $slugUrl = '/'.$category.'/'.$subcategory;
+            // dd($slugUrl);
+            $banner = Banners::where('banner_url',$slugUrl)->first();
+            // dd($banner->category_id);
+            $product = Product::where('category_id',$banner->category_id)->where('sub_category_id',$banner->sub_category_id)->get();
+            // dd($product);
+    
+            foreach($product as $item){
+                // dd($item);
+                $item->product_image= url("/images/product/".ImageProduct::where('product_id',$item->id)->pluck('image')->first());
+                // dd($productImage);
+                $item->avg_rating = ProductReview::where('product_id',$item->id)->pluck('rating')->avg();
+                // dd($productRating);
+                $item->total_review= ProductReview::where('product_id',$item->id)->pluck('rating')->count();
+            }
+            if($product){
+                $product = $product->makeHidden(['description','category_id','sub_category_id','sku','isActive','is_featured','long_description'])->toArray();
+                return response()->json([
+                    'success'=>true,
+                    'status'=>200,
+                    'message'=>'Products Get Successfully',
+                    'data'=>$product
+                ]);
+            }
+            else{
+                return response()->json([
+                    'success' => true,
+                    'status' => 404,
+                    'message' => 'Products Not Found',
+                ]);
+            }
+        }
+        catch(Exception $e){
+            return response()->json([
+                'success'=>false,
+                'status'=>$e->getCode(),
+                'message'=>$e->getMessage()
+            ]);
         }
     }
 }
