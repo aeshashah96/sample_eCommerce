@@ -14,9 +14,6 @@ use App\Models\Wishlists;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-
-use function PHPUnit\Framework\isEmpty;
-
 class ProductController extends Controller
 {
     /**
@@ -75,6 +72,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+     dd($request->additional_information);
         try {
             // $varient = [[1, null, 20], [5, null, 30], [3, null, 50]];
             // $varient = [[4, 2, 100], [5, 3, 500], [3, 2, 5]];
@@ -93,6 +91,7 @@ class ProductController extends Controller
 
             $randomString = fake()->regexify('[A-Z0-9]{10}');
             //add Product in Product
+    
             $product = Product::create([
                 'name' => $request->name,
                 'description' => $request->description,
@@ -137,6 +136,7 @@ class ProductController extends Controller
 
                 if ($request->hasFile('image')) {
                     $files = $request->file('image');
+
                     foreach ($files as $file) {
                         $imageName = time() . '' . $file->getClientOriginalName();
                         $file->move(public_path('/images/product'), $imageName);
@@ -172,9 +172,11 @@ class ProductController extends Controller
         try {
             $product = Product::find($id);
             if ($product) {
-                $product->makeHidden(['productImages', 'productReview', 'sku']);
+                
+                $product->makeHidden(['productImages', 'productReview', 'sku','productInformation']);
+                $longdes=($product->productInformation->additional_information);
+                $product->additional_information=$longdes;
                 $img = $product->productImages->pluck('image');
-                $product->productInformation->additional_information;
                 $product->avrageRating = $product->productReview->pluck('rating')->avg();
                 $colors = $product->colors->pluck('color');
                 $product->color = $colors;
@@ -202,7 +204,7 @@ class ProductController extends Controller
                     }
                 }
 
-                return response()->json(['success' => true, 'status' => 200, 'message' => 'Product Get Successfully', 'Product Data' => $product]);
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Product Get Successfully', 'data' => $product]);
             } else {
                 return response()->json(['success' => false, 'status' => 404, 'message' => 'Product Not Found']);
             }
@@ -230,18 +232,27 @@ class ProductController extends Controller
                     return $varient_name;
                 }
             }
+            $varientid = ProductVarient::where('product_id', $id)->get();
+
             // validation for new varienrt data
-            foreach ($request->varinet as $varient) {
-                if ($varient['stock'] == null && $varient['color'] == null) {
-                    return response()->json(['success' => true, 'status' => 422, 'message' => 'Please Enter Valid Data']);
-                }
-                $check = ProductVarient::where('product_color_id', $varient['color'])
+            
+            foreach ($request->varient as $key => $varient) {
+               
+             
+
+                if ($key < count($varientid)) {
+                    
+                } else {
+                    $check = ProductVarient::where('product_color_id', $varient['color'])
                     ->where('product_size_id', $varient['size'])
                     ->first();
-                if ($check) {
-                    return response()->json(['success' => true, 'status' => 422, 'message' => 'Do not Enter Same Data']);
+                    if ($check) {
+                        return response()->json(['success' => true, 'status' => 422, 'message' => 'Do not Enter Same Data']);
+                    }
                 }
             }
+
+           
 
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
@@ -255,7 +266,6 @@ class ProductController extends Controller
             ]);
 
             //update existing varient table data
-            $varientid = ProductVarient::where('product_id', $id)->get();
             // dd(count($varientid));
             foreach ($request->varient as $key => $varient) {
                 // dump($varient['color']);
