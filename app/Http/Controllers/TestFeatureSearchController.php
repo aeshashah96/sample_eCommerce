@@ -8,99 +8,103 @@ use App\Models\ProductColor;
 use App\Models\ProductSize;
 use App\Models\SubCategories;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 use function PHPUnit\Framework\isEmpty;
 
 class TestFeatureSearchController extends Controller
-{
+{   
+    public function product_search($data,$id){
+        $data = $data->where('products.name','like',"%$id%");
+        return $data;
+    }
+    public function category_search($data,$id){
+        $data = $data->where('categories.name','like',"%$id%");
+        return $data;
+    }
+    public function sub_category_search($data,$id){
+        $data = $data->where('sub_categories.name','like',"%$id%");
+        return $data;
+    }
+    public function color_search($data,$id){
+        $data = $data->where('product_colors.color','like',"%$id%");
+        return $data;
+    }
+    public function size_search($data,$id){
+        $data = $data->where('product_sizes.size','like',"%$id%");
+        return $data;
+    }
+    public function redirect_search($data,$id,$flag){
+            $product = Product::where('name','like',"%$id%");
+            if($product->count()){
+                $data = TestFeatureSearchController::product_search($data,$id);
+                $flag = true;
+                return ['flag'=>$flag,'data'=>$data];
+            }
+            $category = Categories::where('name','like',"%$id%");
+            if($category->count()){
+                $data = TestFeatureSearchController::category_search($data,$id);
+                $flag = true;
+                return ['flag'=>$flag,'data'=>$data];
+            }
+            $sub_category = SubCategories::where('name','like',"%$id%");
+            if($sub_category->count()){
+                $data = TestFeatureSearchController::sub_category_search($data,$id);
+                $flag = true;
+                return ['flag'=>$flag,'data'=>$data];
+
+            }
+            $color = ProductColor::where('color','like',"%$id%");
+            if($color->count()){
+                $data = TestFeatureSearchController::color_search($data,$id);
+                $flag = true;
+                return ['flag'=>$flag,'data'=>$data];
+            }
+            $size = ProductSize::where('size','like',"%$id%");
+            if($size->count()){
+                $data = TestFeatureSearchController::size_search($data,$id);
+                $flag = true;
+                return ['flag'=>$flag,'data'=>$data];
+            }
+    }
+
     public function test_search($id){
 
-
+        $data = DB::table('products')
+                ->join('product_varients','products.id','=','product_varients.product_id')
+                ->join('categories','categories.id','=','products.category_id')
+                ->join('sub_categories','sub_categories.id','=','products.sub_category_id')
+                ->leftJoin('product_sizes','product_sizes.id','=','product_varients.product_size_id',)
+                ->leftJoin('product_colors','product_colors.id','=','product_varients.product_color_id',);
+                
+                
+        $value =  TestFeatureSearchController::redirect_search($data,$id,$flag=false);
+        if($value['flag']){
+            $data = $value['data']
+            ->join('product_images','product_images.product_id','=','products.id')
+            ->select('products.*','product_images.image')
+            // ->groupBy('products.id')
+            ->paginate(10);
+            return response()->json([
+                'success'=>true,
+                'status'=>200,
+                'message'=>'products fetch successfully',
+                'data'=>$data
+            ]);
+        }
         $key_words = explode(" ",$id);
 
-        $data =[];
-
         foreach($key_words as $word){
-
-            $category = Categories::where('name','like',"%$word%");
-            if($category->count()){
-                $data = Product::whereHas('category',function($query) use ($word){
-                    $query->where('name','like',"%$word%");
-                });
-                array_shift($passed_word,$word);
-                break;
-            }
-
-            $subcategory = SubCategories::where('name','like',"%$word");
-            if($subcategory->count()){
-                $data = Product::whereHas('subcategory',function($query) use ($word){
-                    $query->where('name','like',"%$word%");
-                });
-                array_shift($passed_word,$word);
-                break;
-            }
-
-            $color = ProductColor::where('color','like',"%$word%");
-            if($color->count()){
-                $data = Product::whereHas('colors',function($query) use ($word){
-                    $query->where('color','like',"%$word%");
-                });
-                array_shift($passed_word,$word);
-                break;
-            }
-
-            $size = ProductSize::where('size','like',"%$word%");
-            if($size->count()){
-                $data = Product::whereHas('colors',function($query) use ($word){
-                    $query->where('size','like',"%$word%");
-                });
-                array_shift($passed_word,$word);
-                break;
-            }
-
-            array_shift($passed_word,$word);
+            $value =  TestFeatureSearchController::redirect_search($data,$word,$flag=false);
+            $data = $value['data'];
         }
 
-        // if(!isEmpty($data)){
-        //     foreach($key_words as $word){
-
-        //         $category = Categories::where('name','like',"%$word%");
-        //         if($category->count()){
-        //             $data->whereHas('category',function($query) use ($word){
-        //                 $query->where('name','like',"%$word%");
-        //             });
-        //             array_shift($passed_word,$word);
-        //             continue;
-        //         }
-    
-        //         $subcategory = SubCategories::where('name','like',"%$word");
-        //         if($subcategory->count()){
-        //             $data->whereHas('subcategory',function($query) use ($word){
-        //                 $query->where('name','like',"%$word%");
-        //             });
-        //             array_shift($passed_word,$word);
-        //             continue;
-        //         }
-    
-        //         $color = ProductColor::where('color','like',"%$word%");
-        //         if($color->count()){
-        //             $data->whereHas('colors',function($query) use ($word){
-        //                 $query->where('color','like',"%$word%");
-        //             });
-        //             array_shift($passed_word,$word);
-        //             continue;
-        //         }
-    
-        //         $size = ProductSize::where('size','like',"%$word%");
-        //         if($size->count()){
-        //             $data->whereHas('colors',function($query) use ($word){
-        //                 $query->where('size','like',"%$word%");
-        //             });
-        //             array_shift($passed_word,$word);
-        //             continue;
-        //         }
-        //     }
-        // }
+        return response()->json([
+                'success'=>true,
+                'status'=>200,
+                'message'=>'products fetch successfully',
+                'data'=>$data
+        ]);
         
     }
 }
