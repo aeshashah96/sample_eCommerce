@@ -12,6 +12,8 @@ class SettingController extends Controller
     public function getSettingData(){
         try{
             $data = Setting::get();
+
+            ($data[0]->value=url('upload/logo/'.$data[0]->value));
             return response()->json([
                 'success'=>true,
                 'status'=>200,
@@ -29,10 +31,13 @@ class SettingController extends Controller
     }
     public function updateSettingData(SettingRequest $request){
         try{
+
             if($request->has('LOGO')){
                 $image = $request->LOGO;
-                unlink(public_path('/upload/logo/logo.png'));
-                $image->move(public_path('/upload/logo'), 'logo.png');
+                $logoname=Setting::where('key','LOGO')->first()->value;
+                unlink(public_path('/upload/logo/'.$logoname));
+                $image->move(public_path('/upload/logo/'), $image->getClientOriginalName());
+                Setting::where('key','LOGO')->update(['value'=>$image->getClientOriginalName()]);
             }
             foreach($request->input() as $key=>$val){
                 Setting::where('key',$key)->update(['value'=>$val]);
@@ -40,7 +45,7 @@ class SettingController extends Controller
             return response()->json([
                 'success'=>true,
                 'status'=>200,
-                'message'=>'Data updated sucessfully'
+                'message'=>'Data updated sucessfully '
             ],200);
         }catch (Exception $e) {
             return response()->json([

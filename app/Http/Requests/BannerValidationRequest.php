@@ -29,7 +29,6 @@ class BannerValidationRequest extends FormRequest
                 'description'=>'required',
                 'banner_title'=>'required',
                 'sub_category_id'=>'required',
-                'category_id'=>'required'
             ];
     }
 

@@ -90,7 +90,6 @@ Route::middleware(['auth:adminApi'])->group(function(){
 // <------------------------------end of newsletter module ------------------------------------------------->
     
 // <------------------------------ setting module ------------------------------------------------->
-    Route::get('get-setting',[SettingController::class,'getSettingData']);
     Route::post('update-setting',[SettingController::class,'updateSettingData']);
 // <------------------------------end of setting module ------------------------------------------------->
 
@@ -141,11 +140,28 @@ Route::get('/get-product/{id}',[ProductController::class,'getProduct']);
 Route::get('/remove-product-image/{id}',[ProductController::class,'removeImageOfProduct']);
 
 Route::apiResource('order',OrdersController::class);
+Route::get('/contact-us',[ContactsController::class,'getAllContactUs']);
+Route::get('/contact-us/{id}',[ContactsController::class,'showDetailsOfCountectUs']);
+
+
+Route::get('/product-status/{id}',[ProductController::class,'changeActiveStatus']);
+Route::get('/banner-status/{id}',[BannersController::class,'changeStatus']);
+Route::get('/language-status/{id}',[LanguageController::class,'changeStatus']);
+
+Route::get('/city-status/{id}',[CityController::class,'changeActiveStatus']);
+Route::get('/state-status/{id}',[StateController::class,'changeActiveStatus']);
+Route::get('/country-status/{id}',[CountryController::class,'changeActiveStatus']);
+
+
+
+
+
 });
 // AdminLogin  && AdminLogout
 
 
-
+//get setting api.............................................................
+Route::get('get-setting',[SettingController::class,'getSettingData']);
 
 
 // 28/06 Category Show Get Api  Nikunj

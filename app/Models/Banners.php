@@ -14,7 +14,7 @@ class Banners extends Model
         'banner_title',
         'banner_url',
         'sub_category_id',
-        'category_id'
+        'is_active',
     ]; 
     protected $hidden = ['created_at','updated_at','sub_category_id','category_id'];
     public function subcategory(){

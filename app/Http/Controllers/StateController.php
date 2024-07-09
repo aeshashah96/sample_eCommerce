@@ -133,4 +133,23 @@ class StateController extends Controller
             ]);
         }
     }
+
+    public function changeActiveStatus($id){
+        $state=State::find($id);
+        if($state){
+
+            if($state->status){
+                // dd($id);
+                $state->status=0;
+                $state->save();
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'State Status Change Successfully']);
+            }else{
+                $state->status=1;
+                $state->save();
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'State Status Change Successfully']);
+            }
+        }else{
+            return response()->json(['success' => false, 'status' => 404, 'message' => 'State Not Found']);
+        }
+    }
 }

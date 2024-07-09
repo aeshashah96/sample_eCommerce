@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\City;
 use App\Models\Country;
 use App\Models\State;
 use Exception;
@@ -115,7 +114,7 @@ class CountryController extends Controller
             if($item){
                 $states = State::where('country_id',$id)->get();
                 foreach($states as $state){
-                    City::where('state_id',$state->id)->delete();
+                    Country::where('state_id',$state->id)->delete();
                 }
                 State::where('country_id',$id)->delete();
                 $item->delete();
@@ -137,6 +136,25 @@ class CountryController extends Controller
                 'status' => 422,
                 'message' => $e->getMessage()
             ]);
+        }
+    }
+
+    public function changeActiveStatus($id){
+        $country=Country::find($id);
+        if($country){
+
+            if($country->status){
+                // dd($id);
+                $country->status=0;
+                $country->save();
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Country Status Change Successfully']);
+            }else{
+                $country->status=1;
+                $country->save();
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Country Status Change Successfully']);
+            }
+        }else{
+            return response()->json(['success' => false, 'status' => 404, 'message' => 'Country Not Found']);
         }
     }
 }

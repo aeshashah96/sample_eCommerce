@@ -18,11 +18,16 @@ class CustomerController extends Controller
     public function index()
     {   
         try{
-            $data = User::orderBy('created_at','desc')->paginate(10);
+            $datas = User::orderBy('created_at','desc')->paginate();
+           foreach($datas as $data){
+            // dump($data);
+            $data->user_logo=url('images/users/'.$data->user_logo);
+           }
+
             return response()->json([
                 'success'=>true,
                 'status'=>200,
-                'data'=>$data
+                'data'=>$datas
             ],200);
         }catch (Exception $e) {
             return response()->json([
@@ -87,6 +92,7 @@ class CustomerController extends Controller
     {   
         try{
             $user = User::find($id);
+            $user->user_logo=url('images/users/'.$user->user_logo);
             if($user){
                 return response()->json([
                     'success'=>true,

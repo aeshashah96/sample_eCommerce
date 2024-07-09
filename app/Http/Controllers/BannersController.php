@@ -62,7 +62,6 @@ class BannersController extends Controller
                 'banner_title' => $request->banner_title,
                 'banner_url' => url("/images/banners/$image_name"),
                 'sub_category_id' => $request->sub_category_id,
-                'category_id' => $request->category_id
                 
             ]);
             return response()->json([
@@ -244,6 +243,25 @@ class BannersController extends Controller
                 'status' => $e->getCode(),
                 'message' => $e->getMessage()
             ], 200);
+        }
+    }
+
+    public function changeStatus($id){
+        $banner=Banners::find($id);
+
+        if($banner){
+            if($banner->is_active){
+                // dd($id);
+                $banner->is_active=0;
+                $banner->save();
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Banner Status Change Successfully']);
+            }else{
+                $banner->is_active=1;
+                $banner->save();
+                return response()->json(['success' => true, 'status' => 200, 'message' => 'Banner Status Change Successfully']);
+            }
+        }else{
+            return response()->json(['success'=>false,'status'=>404,'message'=>'Banner Not Found']);
         }
     }
 }
