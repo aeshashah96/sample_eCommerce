@@ -58,11 +58,11 @@ Route::get('/error', function () {
 Route::post('/user-register', [UserController::class, 'userRegister']);
 Route::post('/user-login', [UserController::class, 'userLogin']);
 
-Route::get('/email/verify', [UserController::class,'verify'])->name('verification.notice');
+Route::get('/email/verify/{id}', [UserController::class, 'verify'])->name('verification.verify');
+Route::get('email/resend', [UserController::class,'resend'])->name('verification.resend');
 // User Logout && My Profile && Forgot-Password && Reset Password
 Route::group(['middleware' => 'auth:api'], function () {
-    Route::get('/featured-product', [ProductController::class, 'list_featured_product'])->middleware('verified');
-    Route::get('/user-logout', [UserController::class, 'userLogout']);
+    Route::post('/user-logout', [UserController::class, 'userLogout']);
     Route::get('/my-profile', [UserController::class, 'userProfile']);
     Route::post('/update-profile', [UserController::class, 'updateProfile']);
     Route::post('/change-password', [UserController::class, 'changePassword']);
@@ -143,47 +143,40 @@ Route::middleware(['auth:adminApi'])->group(function () {
     Route::get('/get-product/{id}', [ProductController::class, 'getProduct']);
     Route::get('/remove-product-image/{id}', [ProductController::class, 'removeImageOfProduct']);
 
-Route::get('/subcategory-status/{id}',[SubCategoriesController::class,'changeActiveStatus']);
+    Route::get('/subcategory-status/{id}', [SubCategoriesController::class, 'changeActiveStatus']);
 
-//sunil product module
-Route::apiResource('product',ProductController::class);
-Route::apiResource('product-color',ProductColorController::class);
-Route::apiResource('product-size',ProductSizeController::class);
-Route::get('/get-product/{id}',[ProductController::class,'getProduct']);
-Route::get('/remove-product-image/{id}',[ProductController::class,'removeImageOfProduct']);
+    //sunil product module
+    Route::apiResource('product', ProductController::class);
+    Route::apiResource('product-color', ProductColorController::class);
+    Route::apiResource('product-size', ProductSizeController::class);
+    Route::get('/get-product/{id}', [ProductController::class, 'getProduct']);
+    Route::get('/remove-product-image/{id}', [ProductController::class, 'removeImageOfProduct']);
 
-Route::apiResource('order',OrdersController::class);
-Route::get('/contact-us',[ContactsController::class,'getAllContactUs']);
-Route::get('/contact-us/{id}',[ContactsController::class,'showDetailsOfCountectUs']);
+    Route::apiResource('order', OrdersController::class);
+    Route::get('/contact-us', [ContactsController::class, 'getAllContactUs']);
+    Route::get('/contact-us/{id}', [ContactsController::class, 'showDetailsOfCountectUs']);
 
+    Route::get('/product-status/{id}', [ProductController::class, 'changeActiveStatus']);
+    Route::get('/banner-status/{id}', [BannersController::class, 'changeStatus']);
+    Route::get('/language-status/{id}', [LanguageController::class, 'changeStatus']);
 
-Route::get('/product-status/{id}',[ProductController::class,'changeActiveStatus']);
-Route::get('/banner-status/{id}',[BannersController::class,'changeStatus']);
-Route::get('/language-status/{id}',[LanguageController::class,'changeStatus']);
-
-Route::get('/city-status/{id}',[CityController::class,'changeActiveStatus']);
-Route::get('/state-status/{id}',[StateController::class,'changeActiveStatus']);
-Route::get('/country-status/{id}',[CountryController::class,'changeActiveStatus']);
-
-
-
-
-
+    Route::get('/city-status/{id}', [CityController::class, 'changeActiveStatus']);
+    Route::get('/state-status/{id}', [StateController::class, 'changeActiveStatus']);
+    Route::get('/country-status/{id}', [CountryController::class, 'changeActiveStatus']);
 });
 // AdminLogin  && AdminLogout
 
-
 //get setting api.............................................................
-Route::get('get-setting',[SettingController::class,'getSettingData']);
+Route::get('get-setting', [SettingController::class, 'getSettingData']);
 
-
-    Route::apiResource('order', OrdersController::class);
+Route::apiResource('order', OrdersController::class);
 
 // AdminLogin  && AdminLogout
 
 // 28/06 Category Show Get Api  Nikunj
 Route::get('/list-category', [CategoriesController::class, 'listCategory']);
 Route::post('/add-category', [CategoriesController::class, 'addCategory']);
+
 
 // 1st July Banner Get Api For front end side Nikunj
 Route::get('/home-banner', [BannersController::class, 'homeBanner']);
@@ -242,14 +235,11 @@ Route::group(['middleware' => 'auth:api'], function () {
 
 // ------------------------------Product Details APi : Nikunj -------------------------------
 
+// <-------------------------- search Module : Harshvardhan Zala : 4/7/2024 ------------------------------>
+Route::post('/fitler', [FeaturesController::class, 'filter_product']);
 
-
-// <-------------------------- search Module : Harshvardhan Zala : 4/7/2024 ------------------------------> 
-Route::post('/fitler',[FeaturesController::class,'filter_product']);
-
-Route::get('search/{id}',[FeaturesController::class,'search_by_vatiant']);
-Route::post('/varient-fitler',[FeaturesController::class,'filter_by_vatiant']);
-
+Route::get('search/{id}', [FeaturesController::class, 'search_by_vatiant']);
+Route::post('/varient-fitler', [FeaturesController::class, 'filter_by_vatiant']);
 
 // <------------------------------------------------------------------------------------------------>
 
@@ -260,4 +250,5 @@ Route::get('/get-product-review', [ProductController::class, 'productReview']);
 Route::group(['middleware' => 'guest:api'], function () {
     Route::get('/list-featured-product', [ProductController::class, 'list_featured_product']);
     Route::get('/get-related-product/{slug}', [ProductController::class, 'getRelatedProduct']);
+    Route::get('category/product/{id}', [CategoriesController::class, 'getProductBasedCategory']);
 });

@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categories;
+use App\Models\ImageProduct;
+use App\Models\Product;
+use App\Models\ProductReview;
 use App\Models\SubCategories;
+use App\Models\Wishlists;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -235,4 +239,73 @@ class CategoriesController extends Controller
             ]);
         }
     }
+
+    public function getProductBasedCategory($id){
+        try {
+            $user = auth()->guard('api')->user();
+            $categoryId = Categories::find($id);
+            if($categoryId){
+                $product = Product::where('category_id',$id)->get();
+                if($product->first()){
+                    if ($user) {
+                        foreach ($product as $ele) {
+                            $wishlistProduct = Wishlists::where('user_id', $user->id)
+                                ->where('product_id', $ele->id)
+                                ->first();
+                            if ($wishlistProduct) {
+                                $ele->isWishlist = 1;
+                            } else {
+                                $ele->isWishlist = 0;
+                            }
+                        }
+                    } else {
+                        foreach ($product as $ele) {
+                            $ele->isWishlist = 0;
+                        }
+                    }
+                    foreach($product as $element){
+                        $productReview = ProductReview::where('product_id',$element->id)->pluck('rating');
+                        $productImg = ImageProduct::where('product_id',$element->id)->pluck('image')->first();
+                        $ratingAverage = $productReview->avg();
+                        $totalReview = $productReview->count();
+                        if (is_null($ratingAverage)) {
+                            $ratingAverage = 0;
+                        }
+                        $element->product_images = url("/images/product/$productImg");
+                        $element->avg_rating = number_format((float)$ratingAverage, 2, '.', '');
+                        $element->total_review = $totalReview;
+                    }
+                    return response()->json([
+                        'success' => true,
+                        'status' => 200,
+                        'message' => 'Product Found',
+                        'data' => $product,
+                    ]);
+                }
+                else{
+                    return response()->json([
+                        'success' => false,
+                        'status' => 404,
+                        'message' => 'Product Not Found'
+                    ]);
+                }
+            }
+            else{
+                return response()->json([
+                    'success' => false,
+                    'status' => 404,
+                    'message' => 'Category Not Found'
+                ]);
+            }
+        } 
+        catch (Exception $e) {
+            return response()->json([
+                'success'=>false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage()
+            ]);
+        }
+
+    }
+
 }
