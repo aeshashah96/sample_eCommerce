@@ -268,8 +268,6 @@ Route::group(['middleware' => 'guest:api'], function () {
     Route::get('category/product/{id}', [CategoriesController::class, 'getProductBasedCategory']);
 });
 
-
-Route::get('testSearch/{id}',[TestFeatureSearchController::class,'test_search']);
-
-Route::get('product-banner/{category}/{subcategory}',[BannersController::class,'getProduct']);
+Route::get('search',[TestFeatureSearchController::class,'search_filter']);
+Route::post('filter-feature',[TestFeatureSearchController::class,'filter_feature']);
 

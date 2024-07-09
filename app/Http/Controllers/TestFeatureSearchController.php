@@ -35,12 +35,7 @@ class TestFeatureSearchController extends Controller
         return $data;
     }
     public function redirect_search($data,$id,$flag){
-            $product = Product::where('name','like',"%$id%");
-            if($product->count()){
-                $data = TestFeatureSearchController::product_search($data,$id);
-                $flag = true;
-                return ['flag'=>$flag,'data'=>$data];
-            }
+       
             $category = Categories::where('name','like',"%$id%");
             if($category->count()){
                 $data = TestFeatureSearchController::category_search($data,$id);
@@ -66,6 +61,13 @@ class TestFeatureSearchController extends Controller
                 $flag = true;
                 return ['flag'=>$flag,'data'=>$data];
             }
+            $product = Product::where('name','like',"%$id%");
+            if($product->count()){
+                $data = TestFeatureSearchController::product_search($data,$id);
+                $flag = true;
+                return ['flag'=>$flag,'data'=>$data];
+            }
+            return ['flag'=>$flag,'data'=>$data];
     }
 
     public function test_search($id){
@@ -77,34 +79,54 @@ class TestFeatureSearchController extends Controller
                 ->leftJoin('product_sizes','product_sizes.id','=','product_varients.product_size_id',)
                 ->leftJoin('product_colors','product_colors.id','=','product_varients.product_color_id',);
                 
-                
+        
         $value =  TestFeatureSearchController::redirect_search($data,$id,$flag=false);
         if($value['flag']){
-            $data = $value['data']
-            ->join('product_images','product_images.product_id','=','products.id')
-            ->select('products.*','product_images.image')
-            // ->groupBy('products.id')
-            ->paginate(10);
-            return response()->json([
-                'success'=>true,
-                'status'=>200,
-                'message'=>'products fetch successfully',
-                'data'=>$data
-            ]);
+            return $value['data'];
+            
         }
         $key_words = explode(" ",$id);
 
         foreach($key_words as $word){
             $value =  TestFeatureSearchController::redirect_search($data,$word,$flag=false);
             $data = $value['data'];
-        }
-
-        return response()->json([
-                'success'=>true,
-                'status'=>200,
-                'message'=>'products fetch successfully',
-                'data'=>$data
-        ]);
+        }   
+        return $value['data'];
         
+    }
+
+    public function search_filter(Request $request){
+        $value = TestFeatureSearchController::test_search($request->search);
+        $data = $value->get('products.id')->toArray();
+        $final = array_unique(array_column($data, 'id'));
+        $product = Product::whereIn('id',$final)->with('productImages')->paginate(10);
+        return response()->json([
+            'success'=>true,
+            'status'=>200,
+            'message'=>'products fetch successfully',
+            'data'=>$product
+        ]);
+    }
+    public function filter_feature(Request $request){
+        
+        $value = TestFeatureSearchController::test_search($request->search);
+        if($request->price){
+            $value->where('products.price','<',$request->price);
+        }
+        if($request->color){
+            $value->where('product_colors.color',$request->color);
+        }
+        if($request->size){
+            $value->where('product_sizes.size',$request->size);
+        }
+        $data = $value->get('products.id')->toArray();
+        $final = array_unique(array_column($data, 'id'));
+        $product = Product::whereIn('id',$final)->with('productImages')->paginate(10);
+        return response()->json([
+            'success'=>true,
+            'status'=>200,
+            'message'=>'products fetch successfully',
+            'data'=>$product
+        ]);
     }
 }
