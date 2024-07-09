@@ -20,6 +20,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\WishlistsController;
 use App\Http\Controllers\ProductSizeController;
 use App\Http\Controllers\StateController;
+use App\Http\Controllers\TestFeatureSearchController;
 use App\Http\Controllers\UserAddressesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -261,3 +262,5 @@ Route::group(['middleware' => 'guest:api'], function () {
     Route::get('/list-featured-product', [ProductController::class, 'list_featured_product']);
     Route::get('/get-related-product/{slug}', [ProductController::class, 'getRelatedProduct']);
 });
+
+Route::get('testSearch/{id}',[TestFeatureSearchController::class,'test_search']);
