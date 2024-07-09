@@ -10,6 +10,7 @@ use App\Models\ProductDescription;
 use App\Models\ProductReview;
 use App\Models\ProductSize;
 use App\Models\ProductVarient;
+use App\Models\Wishlists;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -381,6 +382,7 @@ class ProductController extends Controller
     public function list_featured_product(Request $request)
     {
         try {
+            $user = auth()->guard('api')->user();
             $limit = $request->input('limit');
             $productlist = Product::select('id', 'name', 'price')->with('productReview', 'productImages:id,product_id,image')->where('is_featured', 1)->get();
             $productlist = Product::limit($limit)
@@ -398,12 +400,7 @@ class ProductController extends Controller
                 $rating = 0;
                 $productreview = 0;
                 foreach ($productlist as $review) {
-                    $review->isWishlist = 0;
-                    $review->save();
-
-                    // dd($review);
                     foreach ($review->productReview as $ele) {
-                        // dd($ele);
                         $rating = $ele
                             ->where('product_id', $review->id)
                             ->pluck('rating')
@@ -417,6 +414,23 @@ class ProductController extends Controller
                     $review->total_review = $productreview;
                     $rating = 0;
                     $productreview = 0;
+                }
+
+                if ($user) {
+                    foreach ($productlist as $ele) {
+                        $wishlistProduct = Wishlists::where('user_id', $user->id)
+                            ->where('product_id', $ele->id)
+                            ->first();
+                        if ($wishlistProduct) {
+                            $ele->isWishlist = 1;
+                        } else {
+                            $ele->isWishlist = 0;
+                        }
+                    }
+                } else {
+                    foreach ($productlist as $ele) {
+                        $ele->isWishlist = 0;
+                    }
                 }
                 return response()->json(
                     [
@@ -456,11 +470,11 @@ class ProductController extends Controller
             $arrSize = [];
             $arrId = [];
             foreach ($productlist->sizes as $size) {
-                array_push($arrId,$size->id);
-                array_push($arrSize,$size->size);
+                array_push($arrId, $size->id);
+                array_push($arrSize, $size->size);
             }
             $arrayMerge = array_combine($arrId, $arrSize);
-            if(!empty($arrayMerge)){
+            if (!empty($arrayMerge)) {
                 $productlist->size = $arrayMerge;
             }
             $rat = [];
@@ -553,14 +567,11 @@ class ProductController extends Controller
                 'id' => 'required|integer',
             ]);
             $id = $request->query('id');
-            $productData = Product::select('id', 'name')->with('productReview:id,product_id,user_id,comment,rating,created_at')->findOrFail($id);
+            $productData = Product::select('id', 'name')->orderBy('created_at','DESC')->with('productReview:id,product_id,user_id,comment,rating,created_at')->findOrFail($id);
             foreach ($productData->productReview as $product) {
                 $img = $product->user->user_logo;
-                // dump($img);
-                $product->user->image = url("/images/users/$img");
+                $product->user->image = url('/images/users/' . $img);
             }
-            // dd('hi');
-
             if ($productData) {
                 $productData = $productData->makeHidden('user');
                 return response()->json(
@@ -596,12 +607,27 @@ class ProductController extends Controller
             $productId = Product::find($id);
             // dd($productId);
             if ($productId) {
+                $existingReview = productReview::where('user_id', $user->id)
+                    ->where('product_id', $productId->id)
+                    ->first();
+                if ($existingReview) {
+                    return response()->json(
+                        [
+                            'success' => true,
+                            'status' => 200,
+                            'message' => 'You Have Already Reviewed This Product.',
+                        ],
+                        200,
+                    );
+                }
+
                 $productReview = ProductReview::create([
                     'user_id' => $user->id,
                     'product_id' => $id,
                     'comment' => $request->comment,
                     'rating' => $request->rating,
                 ]);
+
                 if ($productReview) {
                     return response()->json(
                         [
@@ -631,6 +657,7 @@ class ProductController extends Controller
     public function getRelatedProduct($slug)
     {
         try {
+            $user = auth()->guard('api')->user();
             $relatedProduct = Product::with('category', 'subcategory', 'productReview', 'productImages:id,product_id,image')->where('slug', $slug)->get();
             $products = [];
             // $avg_rating = 0;
@@ -669,7 +696,23 @@ class ProductController extends Controller
                         $img->image = url('/images/product/' . $img->image);
                     }
                 }
-                $relatedProduct = $relatedProduct->makeHidden(['productReview', 'subcategory', 'category', 'category_id', 'sub_category_id', 'sku', 'slug', 'isActive', 'is_featured', 'description', 'long_description'])->toArray();
+                $relatedProduct = $relatedProduct->makeHidden(['productReview', 'subcategory', 'category', 'category_id', 'sub_category_id', 'sku', 'isActive', 'is_featured', 'description', 'long_description']);
+                if ($user) {
+                    foreach ($relatedProduct as $ele) {
+                        $wishlistProduct = Wishlists::where('user_id', $user->id)
+                            ->where('product_id', $ele->id)
+                            ->first();
+                        if ($wishlistProduct) {
+                            $ele->isWishlist = 1;
+                        } else {
+                            $ele->isWishlist = 0;
+                        }
+                    }
+                } else {
+                    foreach ($relatedProduct as $ele) {
+                        $ele->isWishlist = 0;
+                    }
+                }
                 return response()->json(
                     [
                         'success' => true,

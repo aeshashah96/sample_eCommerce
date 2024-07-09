@@ -21,8 +21,6 @@ class WishlistsController extends Controller
                     ->where('user_id', $user->id)
                     ->first();
                 if (!$flag) {
-                    $productId->isWishlist = 1;
-                    $productId->save();
                     $wishlist = Wishlists::create([
                         'user_id' => $user->id,
                         'product_id' => $id,
@@ -52,8 +50,6 @@ class WishlistsController extends Controller
                         ->get()
                         ->first();
                     if (!is_null($wishlist)) {
-                        $productId->isWishlist = 0;
-                        $productId->save();
                         $wishlist->delete();
                         return response()->json(
                             [
