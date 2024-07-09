@@ -188,20 +188,21 @@ class CartsController extends Controller
             ->get()
             ->first();
         if ($cart) {
-            if ($cart->quantity == 0) {
-                return response()->json([
-                    'success' => true,
-                    'status' => 200,
-                    'message' => 'Product Limit Reached(0)',
-                ]);
-            }
             $productPrice = Product::where('id', $cart->product_id)
-                ->pluck('price')
-                ->first();
+            ->pluck('price')
+            ->first();
             $totalPrice = $cart->total;
             $cart->quantity = $cart->quantity - 1;
             $cart->Total = $totalPrice - $productPrice;
             $cart->save();
+            if ($cart->quantity == 0) {
+                $cart->delete();
+                return response()->json([
+                    'success' => true,
+                    'status' => 200,
+                    'message' => 'Product Removed SuccessFully.',
+                ]);
+            }
             return response()->json([
                 'success' => true,
                 'status' => 200,
@@ -211,7 +212,7 @@ class CartsController extends Controller
             return response()->json([
                 'success' => false,
                 'status' => 404,
-                'message' => 'Not Found',
+                'message' => 'No Product Found. Please Add Product.',
             ]);
         }
     }
