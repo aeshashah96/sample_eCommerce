@@ -94,10 +94,6 @@ Route::middleware(['auth:adminApi'])->group(function () {
     Route::apiResource('newsletter', NewsLetterController::class);
     // <------------------------------end of newsletter module ------------------------------------------------->
 
-// <------------------------------ newsletter module ------------------------------------------------->
-    Route::apiResource('newsletter',NewsLetterController::class);
-// <------------------------------end of newsletter module ------------------------------------------------->
-    
     // <------------------------------ setting module ------------------------------------------------->
     Route::get('get-setting', [SettingController::class, 'getSettingData']);
     Route::post('update-setting', [SettingController::class, 'updateSettingData']);
