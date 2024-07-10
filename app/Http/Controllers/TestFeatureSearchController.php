@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categories;
+use App\Models\ImageProduct;
 use App\Models\Product;
 use App\Models\ProductColor;
+use App\Models\ProductReview;
 use App\Models\ProductSize;
 use App\Models\SubCategories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-use function PHPUnit\Framework\isEmpty;
 
 class TestFeatureSearchController extends Controller
 {   
@@ -135,7 +136,14 @@ class TestFeatureSearchController extends Controller
         get search result products ids and getting data using model
         */    
         $final = array_unique(array_column($data, 'id'));   
-        $product = Product::whereIn('id',$final)->with('productImages')->paginate(10);
+        
+        $product = Product::whereIn('id',$final)->paginate(10);
+        foreach($product as $item){
+            $item->avg_rating = ProductReview::where('product_id',$item->id)->pluck('rating')->avg();
+            $item->total_review = ProductReview::where('product_id',$item->id)->pluck('rating')->count();
+            $item->product_image = url("/images/product/".ImageProduct::where('product_id',$item->id)->pluck('image')->first());
+        }
+        
         return response()->json([
             'success'=>true,
             'status'=>200,
@@ -171,7 +179,12 @@ class TestFeatureSearchController extends Controller
         /*
         get search result products ids and getting data using model
         */    
-        $product = Product::whereIn('id',$final)->with('productImages')->paginate(10);
+        $product = Product::whereIn('id',$final)->paginate(10);
+        foreach($product as $item){
+            $item->avg_rating = ProductReview::where('product_id',$item->id)->pluck('rating')->avg();
+            $item->total_review = ProductReview::where('product_id',$item->id)->pluck('rating')->count();
+            $item->product_image = url("/images/product/".ImageProduct::where('product_id',$item->id)->pluck('image')->first());
+        }
         return response()->json([
             'success'=>true,
             'status'=>200,
