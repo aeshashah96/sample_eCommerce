@@ -154,7 +154,7 @@ Route::middleware(['auth:adminApi'])->group(function () {
 
     Route::apiResource('order', OrdersController::class);
     Route::get('/contact-us', [ContactsController::class, 'getAllContactUs']);
-    Route::get('/contact-us/{id}', [ContactsController::class, 'showDetailsOfCountectUs']);
+    Route::get('/contact-us/{id}', [ContactsController::class, 'showDetailsOfContactUs']);
 
     Route::get('/product-status/{id}', [ProductController::class, 'changeActiveStatus']);
     Route::get('/banner-status/{id}', [BannersController::class, 'changeStatus']);

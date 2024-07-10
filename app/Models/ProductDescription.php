@@ -11,5 +11,5 @@ class ProductDescription extends Model
 
     protected $fillable=['product_id','description','additional_information'];
 
-    protected $hidden=['created_at','updated_at','description'];
+    protected $hidden=['created_at','updated_at'];
 }

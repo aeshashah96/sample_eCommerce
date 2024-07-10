@@ -97,7 +97,7 @@ class WishlistsController extends Controller
                         $query->select('id', 'name', 'price','slug');
                     },
                 ])
-                ->paginate(5);
+                ->paginate(2);
 
             foreach ($wishlist as $ele) {
                 $productId = $ele->products->id;

@@ -23,13 +23,13 @@ class ContactsController extends Controller
                 return response()->json([
                     'success' => true,
                     'status' => 201,
-                    'message' => 'Contacts Add Successfully',
+                    'message' => 'Message Send Successfully',
                 ], 201);
             } else {
                 return response()->json([
                     'success' => false,
                     'status' => 404,
-                    'message' => 'Contacts is Not Added'
+                    'message' => 'Message Not Send'
                 ]);
             }
         } catch (Exception $e) {
@@ -51,7 +51,7 @@ class ContactsController extends Controller
         }
     }
 
-    public function showDetailsOfCountectUs($id){
+    public function showDetailsOfContactUs($id){
         $contactus = Contacts::find($id);
         if($contactus){
             return response()->json(['success'=>true,'status'=>200,'message'=>'ContactUs Data Get Successfully','data'=>$contactus]);
