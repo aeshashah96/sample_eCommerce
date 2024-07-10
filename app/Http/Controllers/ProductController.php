@@ -73,7 +73,6 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->additional_information);
         try {
             // $varient = [[1, null, 20], [5, null, 30], [3, null, 50]];
             // $varient = [[4, 2, 100], [5, 3, 500], [3, 2, 5]];
@@ -123,7 +122,7 @@ class ProductController extends Controller
                             'product_id' => $product->id,
                             'product_color_id' => $col['color'],
                             'product_size_id' => $col['size'],
-                            'variant_name' => $varient_name,
+                            'variant_name' => ($varient_name),
                             'stock' => $col['stock'],
                         ]);
                         $varient_name = '';
@@ -153,13 +152,13 @@ class ProductController extends Controller
                 if ($productImage != null && $productDescription != null && $productVarient != null) {
                     return response()->json(['success' => true, 'status' => 201, 'message' => 'Product Add Successfully']);
                 } else {
-                    return response()->json(['success' => true, 'status' => 422, 'message' => 'Some Error Found']);
+                    return response()->json(['success' => false, 'status' => 422, 'message' => 'Some Error Found']);
                 }
             } else {
                 return response()->json(['success' => false, 'status' => 201, 'message' => 'Error']);
             }
         } catch (Exception $e) {
-            return response()->json(['status' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['success' => false,'status' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }
 
@@ -183,13 +182,11 @@ class ProductController extends Controller
                 $img = $product->productImages->pluck('image');
                 $product->avrageRating = $product->productReview->pluck('rating')->avg();
                 $colors = $product->colors->pluck('color');
-                $product->color = $colors;
+                $product->color =($colors);
                 $product->size = $product->sizes->pluck('size');
                 $product->categoryName = $product->category->name;
                 $product->subcategoryName = $product->subcategory->name;
-                foreach ($img as $key => $imgs) {
-                    $img[$key] = url('images/product/' . $imgs);
-                }
+               
                 $product->images = $img;
                 $stock = ProductVarient::where('product_id', $product->id)
                     ->whereIn('stock', ['unlimited'])
@@ -213,7 +210,7 @@ class ProductController extends Controller
                 return response()->json(['success' => false, 'status' => 404, 'message' => 'Product Not Found']);
             }
         } catch (Exception $e) {
-            return response()->json(['success' => true, 'status' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['success' => false, 'status' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }
 
@@ -307,7 +304,7 @@ class ProductController extends Controller
                                 'product_color_id' => $varient['color'],
                                 
                                 'product_size_id' => $varient['size'],
-                                'variant_name' => $varient_name,
+                                'variant_name' => ($varient_name),
                                 'stock' => $varient['stock'],
                             ]);
                       
@@ -322,7 +319,7 @@ class ProductController extends Controller
                 return response()->json(['success' => false, 'status' => 201, 'message' => 'Error']);
             }
         } catch (Exception $e) {
-            return response()->json(['status' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['success' => false,'status' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }
 

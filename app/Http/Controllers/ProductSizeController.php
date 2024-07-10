@@ -31,7 +31,7 @@ class ProductSizeController extends Controller
         //add a new size in database
         try{
             $validatedData = $request->validate([
-                'size' => 'required|string|max:15|unique:product_sizes,size',
+                'size' => 'required|string|max:30|unique:product_sizes,size',
             ]);
            $size = ProductSize::create([
                 'size'=>$request->size,
@@ -71,7 +71,7 @@ class ProductSizeController extends Controller
         //update a specific size
         try{
             $validatedData = $request->validate([
-                'size' => 'required|string|max:15|unique:product_sizes,size',
+                'size' => 'required|string|max:30|unique:product_sizes,size',
             ]);
            $size = ProductSize::find($id);
         
