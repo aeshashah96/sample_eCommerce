@@ -150,9 +150,8 @@ class OrdersController extends Controller
         if ($order) {
             foreach ($cart as $item) {
                 $cartQuantity = $item->quantity;
-                $productVariantDetails = ProductVarient::where('id', $item->product_varient_id)->first();
-                // dd($productVariantDetails);
-                $productVariantDetails->stock = $productVariantDetails->stock - $cartQuantity;
+                $productVariantDetails = ProductVarient::where('id',$item->product_varient_id)->first();
+                $productVariantDetails->stock = $productVariantDetails->stock -$cartQuantity;
                 $productVariantDetails->save();
                 if ($productVariantDetails->stock_status == "out_of_stock") {
                     return response()->json([
