@@ -273,17 +273,20 @@ class BannersController extends Controller
         try{
             $slugUrl = '/'.$category.'/'.$subcategory;
             // dd($slugUrl);
-            $banner = Banners::where('banner_url',$slugUrl)->first();
-            // dd($banner->category_id);
-            $product = Product::where('category_id',$banner->category_id)->where('sub_category_id',$banner->sub_category_id)->get();
+            // dd($slugUrl);
+            // 
+            $catName  = Categories::where('category_slug',$category)->first();
+            // dd($catName);
+            $subcatName = SubCategories::where('subcategory_slug',$subcategory)->first();
+            $product = Product::where('category_id',$catName->id)->where('sub_category_id',$subcatName->id)->get();
             // dd($product);
     
             foreach($product as $item){
-                // dd($item);
+            
                 $item->product_image= url("/images/product/".ImageProduct::where('product_id',$item->id)->pluck('image')->first());
-                // dd($productImage);
+                
                 $item->avg_rating = ProductReview::where('product_id',$item->id)->pluck('rating')->avg();
-                // dd($productRating);
+               
                 $item->total_review= ProductReview::where('product_id',$item->id)->pluck('rating')->count();
             }
             if($product){

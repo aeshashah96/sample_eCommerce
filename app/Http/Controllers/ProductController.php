@@ -14,6 +14,7 @@ use App\Models\Wishlists;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+
 class ProductController extends Controller
 {
     /**
@@ -72,7 +73,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-     dd($request->additional_information);
+        dd($request->additional_information);
         try {
             // $varient = [[1, null, 20], [5, null, 30], [3, null, 50]];
             // $varient = [[4, 2, 100], [5, 3, 500], [3, 2, 5]];
@@ -91,7 +92,7 @@ class ProductController extends Controller
 
             $randomString = fake()->regexify('[A-Z0-9]{10}');
             //add Product in Product
-    
+
             $product = Product::create([
                 'name' => $request->name,
                 'description' => $request->description,
@@ -172,10 +173,10 @@ class ProductController extends Controller
         try {
             $product = Product::find($id);
             if ($product) {
-                
-                $product->makeHidden(['productImages', 'productReview', 'sku','productInformation']);
-                $longdes=($product->productInformation->additional_information);
-                $product->additional_information=$longdes;
+
+                $product->makeHidden(['productImages', 'productReview', 'sku', 'productInformation']);
+                $longdes = ($product->productInformation->additional_information);
+                $product->additional_information = $longdes;
                 $img = $product->productImages->pluck('image');
                 $product->avrageRating = $product->productReview->pluck('rating')->avg();
                 $colors = $product->colors->pluck('color');
@@ -235,24 +236,23 @@ class ProductController extends Controller
             $varientid = ProductVarient::where('product_id', $id)->get();
 
             // validation for new varienrt data
-            
+
             foreach ($request->varient as $key => $varient) {
-               
-             
+
+
 
                 if ($key < count($varientid)) {
-                    
                 } else {
                     $check = ProductVarient::where('product_color_id', $varient['color'])
-                    ->where('product_size_id', $varient['size'])
-                    ->first();
+                        ->where('product_size_id', $varient['size'])
+                        ->first();
                     if ($check) {
                         return response()->json(['success' => true, 'status' => 422, 'message' => 'Do not Enter Same Data']);
                     }
                 }
             }
 
-           
+
 
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
@@ -389,59 +389,81 @@ class ProductController extends Controller
         }
     }
 
+    // Make A Function to Show Featured Product List 
     public function list_featured_product(Request $request)
     {
         try {
             $user = auth()->guard('api')->user();
             $limit = $request->input('limit');
-            $productlist = Product::select('id', 'name', 'price')->with('productReview', 'productImages:id,product_id,image')->where('is_featured', 1)->get();
+            // $productlist = Product::select('id', 'name', 'price')->with('productReview', 'productImages:id,product_id,image')->where('is_featured', 1)->get();
+            $productlist = Product::where('is_featured', 1)->get();
             $productlist = Product::limit($limit)
-                ->get()
-                ->makeHidden(['productReview', 'created_at', 'updated_at', 'sku', 'is_featured', 'long_description', 'description', 'isActive', 'category_id', 'sub_category_id']);
-
-            if ($productlist) {
-                foreach ($productlist as $image) {
-                    // $image->productImages[0]->image = url("/images/product/".$image->productImages[0]->image);
-                    foreach ($image->productImages as $img) {
-                        $img->image = url('/images/product/' . $img->image);
-                    }
+            ->get()
+            ->makeHidden([ 'sku', 'is_featured', 'long_description', 'description', 'isActive', 'category_id', 'sub_category_id']);
+            // dd($productlist);
+            $ratingAverage = 0;
+            $totalReview = 0;
+            $productImage = '';
+            foreach ($productlist as $product) {
+                $productImage = url("/images/product/" . ImageProduct::where('product_id', $product->id)->pluck('image')->first());
+                $ratingAverage = ProductReview::where('product_id', $product->id)->pluck('rating')->avg();
+                if (is_null($ratingAverage)) {
+                    $ratingAverage = 0;
                 }
+                $totalReview = ProductReview::where('product_id', $product->id)->pluck('rating')->count();
+                $product->product_image = $productImage;
+                $product->avg_rating = number_format((float)$ratingAverage, 2, '.', '');
+                $product->total_review = $totalReview;
+                $ratingAverage = 0;
+                $totalReview = 0;
+                $productImage = '';
+            }
+          
+            // dd($productlist);
+            // if ($productlist) {
+            //     foreach ($productlist as $image) {
+            //         foreach ($image->productImages as $img) {
+            //             $img->image = url('/images/product/' . $img->image);
+            //         }
+            //     }
 
-                $rating = 0;
-                $productreview = 0;
-                foreach ($productlist as $review) {
-                    foreach ($review->productReview as $ele) {
-                        $rating = $ele
-                            ->where('product_id', $review->id)
-                            ->pluck('rating')
-                            ->avg();
-                        $productreview = $ele
-                            ->where('product_id', $review->id)
-                            ->pluck('rating')
-                            ->count();
-                    }
-                    $review->avg_rating = $rating;
-                    $review->total_review = $productreview;
-                    $rating = 0;
-                    $productreview = 0;
-                }
+            //     $rating = 0;
+            //     $productreview = 0;
+            //     foreach ($productlist as $review) {
+            //         foreach ($review->productReview as $ele) {
+            //             $rating = $ele
+            //                 ->where('product_id', $review->id)
+            //                 ->pluck('rating')
+            //                 ->avg();
+            //             $productreview = $ele
+            //                 ->where('product_id', $review->id)
+            //                 ->pluck('rating')
+            //                 ->count();
+            //         }
+            //         $review->avg_rating = $rating;
+            //         $review->total_review = $productreview;
+            //         $rating = 0;
+            //         $productreview = 0;
+            //     }
 
-                if ($user) {
-                    foreach ($productlist as $ele) {
-                        $wishlistProduct = Wishlists::where('user_id', $user->id)
-                            ->where('product_id', $ele->id)
-                            ->first();
-                        if ($wishlistProduct) {
-                            $ele->isWishlist = 1;
-                        } else {
-                            $ele->isWishlist = 0;
-                        }
-                    }
-                } else {
-                    foreach ($productlist as $ele) {
+
+            if ($user) {
+                foreach ($productlist as $ele) {
+                    $wishlistProduct = Wishlists::where('user_id', $user->id)
+                        ->where('product_id', $ele->id)
+                        ->first();
+                    if ($wishlistProduct) {
+                        $ele->isWishlist = 1;
+                    } else {
                         $ele->isWishlist = 0;
                     }
                 }
+            } else {
+                foreach ($productlist as $ele) {
+                    $ele->isWishlist = 0;
+                }
+            }
+            if ($productlist) {
                 return response()->json(
                     [
                         'success' => true,
@@ -466,7 +488,7 @@ class ProductController extends Controller
             ]);
         }
     }
-
+    // Make A Function Product Details Find By Product Slug Name 
     public function getProduct($slug)
     {
         try {
@@ -489,9 +511,9 @@ class ProductController extends Controller
             }
             $rat = [];
             $total_review = [];
-            // dd($productlist);
+
             foreach ($productlist->productReview as $review) {
-                // dd($review);
+
                 $rating = $review
                     ->where('product_id', $productlist->id)
                     ->pluck('rating')
@@ -501,7 +523,6 @@ class ProductController extends Controller
                     ->where('product_id', $productlist->id)
                     ->pluck('rating')
                     ->count();
-                // $productlist->total_review = $total_review;
                 $total_review[] = $final_review;
             }
             if (!empty($rat) && !empty($total_review)) {
@@ -537,7 +558,7 @@ class ProductController extends Controller
             ]);
         }
     }
-
+    // Make a Function get Product Additional Information By Product ID 
     public function productAdditionalInformation(Request $request)
     {
         try {
@@ -570,6 +591,7 @@ class ProductController extends Controller
         }
     }
 
+    // Make a Function All Product Review Add By User Details By Product ID 
     public function productReview(Request $request)
     {
         try {
@@ -577,7 +599,7 @@ class ProductController extends Controller
                 'id' => 'required|integer',
             ]);
             $id = $request->query('id');
-            $productData = Product::select('id', 'name')->orderBy('created_at','DESC')->with('productReview:id,product_id,user_id,comment,rating,created_at')->findOrFail($id);
+            $productData = Product::select('id', 'name')->orderBy('created_at', 'DESC')->with('productReview:id,product_id,user_id,comment,rating,created_at')->findOrFail($id);
             foreach ($productData->productReview as $product) {
                 $img = $product->user->user_logo;
                 $product->user->image = url('/images/users/' . $img);
@@ -609,6 +631,7 @@ class ProductController extends Controller
         }
     }
 
+    // Make a Function to User Add Product Review 
     public function addProductReview(addProductReviewRequest $request, $id)
     {
         try {
@@ -663,14 +686,13 @@ class ProductController extends Controller
             ]);
         }
     }
-
+    // Make a Function to Relateg Product get By Subcategory 
     public function getRelatedProduct($slug)
     {
         try {
             $user = auth()->guard('api')->user();
             $relatedProduct = Product::with('category', 'subcategory', 'productReview', 'productImages:id,product_id,image')->where('slug', $slug)->get();
             $products = [];
-            // $avg_rating = 0;
 
             foreach ($relatedProduct as $product) {
                 // dd($product);
@@ -701,8 +723,6 @@ class ProductController extends Controller
             if ($relatedProduct) {
                 foreach ($relatedProduct as $product) {
                     foreach ($product->productImages as $img) {
-                        // $img = $image->image;
-                        // dd(url("/images/product/".$img->image));
                         $img->image = url('/images/product/' . $img->image);
                     }
                 }
