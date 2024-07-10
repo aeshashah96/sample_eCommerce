@@ -42,10 +42,10 @@ class ContactsController extends Controller
     }
 
     public function getAllContactUs(){
-        $contact=Contacts::paginate(10,['name','email']);
+        $contact=Contacts::paginate(10,['name','email','message','subject','id']);
 
         if($contact){
-            return response()->json(['success'=>true,'status'=>200,'message'=>'ContactUs Data Get Successfully','data'=>$contact]);
+            return response()->json(['success'=>true,'status'=>200,'message'=>'Data Get Successfully','data'=>$contact]);
         }else{
             return response()->json(['success'=>false,'status'=>404,'message'=>'Data Not Found']);
         }
@@ -54,7 +54,16 @@ class ContactsController extends Controller
     public function showDetailsOfContactUs($id){
         $contactus = Contacts::find($id);
         if($contactus){
-            return response()->json(['success'=>true,'status'=>200,'message'=>'ContactUs Data Get Successfully','data'=>$contactus]);
+            return response()->json(['success'=>true,'status'=>200,'message'=>'Data Get Successfully','data'=>$contactus]);
+        }else{
+            return response()->json(['success'=>false,'status'=>404,'message'=>'Data Not Found']);
+        }
+    }
+    public function deleteContactUs($id){
+        $contactus = Contacts::find($id);
+        if($contactus){
+            $contactus->delete();
+            return response()->json(['success'=>true,'status'=>200,'message'=>'Contact Delete Successfully']);
         }else{
             return response()->json(['success'=>false,'status'=>404,'message'=>'Data Not Found']);
         }

@@ -197,14 +197,12 @@ class OrdersController extends Controller
         ]);
     }
 
-    public function show($id)
-    {
-        $order = Orders::with(['item_order.product', 'user'])
-            ->find($id)
-            ->makeHidden(['user']);
-        $order->user_name = $order->user->first_name . ' ' . $order->user->last_name;
-        foreach ($order->item_order as $items) {
-            $items->product_name = Product::find($items->product_id)->name;
+    public function show($id){
+        $order=Orders::with(['order_items.product','user'])->find($id)->makeHidden(['user','product']);
+        $order->user_name=$order->user->first_name.' '.$order->user->last_name;
+        foreach($order->order_items as $items){
+            $items->product_name=Product::withTrashed()->find($items->product_id)->name;
+            
         }
         if ($order) {
             return response()->json(['success' => true, 'status' => 200, 'message' => 'Order Get Successfully', 'data' => $order]);
