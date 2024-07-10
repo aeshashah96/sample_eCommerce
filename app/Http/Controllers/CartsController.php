@@ -104,7 +104,7 @@ class CartsController extends Controller
                 'message' => 'No Product Found',
             ]);
         }
-    }
+    }   
 
     // Show Cart Products
     public function showCartProduct(Request $request)
