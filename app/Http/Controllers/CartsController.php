@@ -14,7 +14,7 @@ class CartsController extends Controller
     public function addProductCart(Request $request, $id)
     {
         $user = $request->user();
-        $productId = Product::where('id',$id)->first();
+        $productId = Product::where('id', $id)->first();
         if ($productId) {
             $productPrice = $productId->price;
             $colorId = ProductColor::where('color', $request->color)
@@ -25,15 +25,24 @@ class CartsController extends Controller
                 ->first();
             $variant = ProductVarient::where('product_id', $id)->where('product_size_id', $sizeId)->where('product_color_id', $colorId)->get();
             $variantId = $variant->pluck('id')->first();
+            $stock = $variant->pluck('stock')->first();
+
             if ($variantId) {
+                if ($stock == 0) {
+                    return response()->json([
+                        'success' => false,
+                        'status' => 200,
+                        'message' => 'Product Out Of Stock',
+                    ]);
+                }
                 $stock = $variant->pluck('stock')->first();
                 $cartFlag = Carts::where('user_id', $user->id)
-                ->where('product_id', $id)
-                ->where('product_varient_id', $variantId)
-                ->first();
-                
+                    ->where('product_id', $id)
+                    ->where('product_varient_id', $variantId)
+                    ->first();
+
                 if (is_null($cartFlag)) {
-                    if($request->quantity  < $stock){
+                    if ($request->quantity < $stock) {
                         $cart = Carts::create([
                             'user_id' => $user->id,
                             'product_id' => $id,
@@ -56,17 +65,15 @@ class CartsController extends Controller
                                 'message' => 'Internal Server Error',
                             ]);
                         }
-                    }
-                    else{
+                    } else {
                         return response()->json([
-                            'success' => true,
+                            'success' => false,
                             'status' => 200,
-                            'message' => "Product Limit Reached",
+                            'message' => 'Product Limit Reached',
                         ]);
                     }
-                    
                 } else {
-                    if(($cartFlag->quantity + $request->quantity) <= $stock){
+                    if ($cartFlag->quantity + $request->quantity <= $stock) {
                         $cartFlag->quantity = $cartFlag->quantity + $request->quantity;
                         $cartFlag->total = $productPrice * $cartFlag->quantity;
                         $cartFlag->save();
@@ -75,10 +82,9 @@ class CartsController extends Controller
                             'status' => 200,
                             'message' => 'Product Updated SuccessFully',
                         ]);
-                    }
-                    else{
+                    } else {
                         return response()->json([
-                            'success' => true,
+                            'success' => false,
                             'status' => 200,
                             'message' => 'Product Limit Reached',
                         ]);
@@ -111,7 +117,7 @@ class CartsController extends Controller
                 $varaintFlag = $element->product_varient_id;
                 $productVariant = ProductVarient::where('id', $varaintFlag)->get();
                 $productId = $element->product_id;
-                $product = Product::where('id',$productId)->first();
+                $product = Product::where('id', $productId)->first();
                 $productImg = Product::find($productId)->productImages->pluck('image')->first();
                 $element->product_name = $product->name;
                 $element->product_prize = $product->price;
@@ -151,7 +157,7 @@ class CartsController extends Controller
             $varaintFlag = $cart->product_varient_id;
             $productVariant = ProductVarient::where('id', $varaintFlag)->get();
             $stock = $productVariant->pluck('stock')->first();
-            if($cart->quantity < $stock){
+            if ($cart->quantity < $stock) {
                 $totalPrice = $cart->total;
                 $cart->quantity = $cart->quantity + 1;
                 $cart->Total = $totalPrice + $productPrice;
@@ -161,15 +167,13 @@ class CartsController extends Controller
                     'status' => 200,
                     'message' => 'Product Updated SuccessFully',
                 ]);
-            }
-            else{
+            } else {
                 return response()->json([
                     'success' => true,
                     'status' => 200,
                     'message' => 'Product Limit Reached',
                 ]);
             }
-
         } else {
             return response()->json([
                 'success' => false,
@@ -189,8 +193,8 @@ class CartsController extends Controller
             ->first();
         if ($cart) {
             $productPrice = Product::where('id', $cart->product_id)
-            ->pluck('price')
-            ->first();
+                ->pluck('price')
+                ->first();
             $totalPrice = $cart->total;
             $cart->quantity = $cart->quantity - 1;
             $cart->Total = $totalPrice - $productPrice;

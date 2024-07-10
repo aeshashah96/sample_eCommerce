@@ -16,14 +16,17 @@ class OrderInvoice extends Mailable
     /**
      * Create a new message instance.
      */
-    public $order,$totalItem,$user,$productPrice,$productName;
-    public function __construct($order,$totalItem,$user,$productPrice,$productName)
+    public $order,$totalItem,$user,$productPrice,$productName,$productVariantName,$address;
+    public function __construct($order,$totalItem,$user,$productPrice,$productName,$productVariantName,$address)
     {
         $this->order = $order;
         $this->totalItem = $totalItem;
         $this->user = $user;
         $this->productPrice = $productPrice;
         $this->productName = $productName;
+        $this->productVariantName = $productVariantName;
+        $this->address = $address;
+
     }
 
     /**

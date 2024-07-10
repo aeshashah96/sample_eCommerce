@@ -14,17 +14,20 @@ use Illuminate\Support\Facades\Mail;
 class SendEmailOrderInvoice implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    protected $order,$totalItem,$user,$productName,$productPrice;
+    protected $order,$totalItem,$user,$productName,$productPrice,$productVariantName,$address;
     /**
      * Create a new job instance.
      */
-    public function __construct($order,$totalItem,$user,$productName,$productPrice)
+    public function __construct($order,$totalItem,$user,$productName,$productPrice,$productVariantName,$address)
     {
         $this->order = $order;
         $this->totalItem = $totalItem;
         $this->user = $user;
         $this->productName = $productName;
         $this->productPrice = $productPrice;
+        $this->productVariantName = $productVariantName;
+        $this->address = $address;
+
     }
 
     /**
@@ -32,11 +35,8 @@ class SendEmailOrderInvoice implements ShouldQueue
      */
     public function handle(): void
     {
-    
-        $email = new OrderInvoice($this->order,$this->totalItem,$this->user,$this->productName,$this->productPrice);
-        // ($this->user->email);
-        \Log::info($this->user->email);
+        $email = new OrderInvoice( $this->order,$this->totalItem,$this->user,$this->productName,$this->productPrice,$this->productVariantName,$this->address);
+        Log::info($this->user->email);
         Mail::to($this->user->email)->send($email);
-        // Log::info("Order Invoice mail Send Successfully");
     }
 }
