@@ -27,6 +27,7 @@ class OrdersController extends Controller
         }
     }
 
+    // Make a Function When User Proceed to Checkout Then User Cart Details SHow 
     public function checkoutOrder(Request $request)
     {
         try {
@@ -48,7 +49,7 @@ class OrdersController extends Controller
                     'message' => 'Please add items to your cart before placing an order.',
                 ]);
             } else {
-                $cart = $cart->makeHidden(['products', 'color', 'size', 'user_id', 'product_id', 'product_id', 'product_varient_id', 'quantity']);
+                $cart = $cart->makeHidden(['products', 'color', 'size', 'user_id', 'product_id', 'product_id', 'product_varient_id']);
                 return response()->json([
                     'success' => true,
                     'status' => 200,
@@ -65,6 +66,7 @@ class OrdersController extends Controller
         }
     }
 
+    // Make a Function To Place Order By User 
     public function orderDetails(Request $request)
     {
         $user = $request->user();
@@ -121,7 +123,25 @@ class OrdersController extends Controller
                 'shipping_address' => $shipping_address,
             ]);
         }
-        if ($order) {
+        if($order) {
+            foreach($cart as $item){
+                $cartQuantity = $item->quantity;
+                $productVariantDetails = ProductVarient::where('id',$item->product_varient_id)->first();
+                // dd($productVariantDetails);
+                $productVariantDetails->stock = $productVariantDetails->stock -$cartQuantity;
+                $productVariantDetails->save();
+                if($productVariantDetails->stock_status == "out_of_stock"){
+                    return response()->json([
+                        'success'=>false,
+                        'status'=>404,
+                        'message'=>'Order Item Out of Stock'
+                    ]);
+                }
+                if($productVariantDetails->stock == 0){
+                    $productVariantDetails->stock_status = "out_of_stock";
+                    $productVariantDetails->save();
+                }
+            }
             foreach ($cart as $item) {
                 $cartQuantity = $item->quantity;
                 $productVariantDetails = ProductVarient::where('id', $item->product_varient_id)->first();
