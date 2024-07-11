@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\addProductReviewRequest;
+use App\Models\Carts;
 use App\Models\ImageProduct;
 use App\Models\Product;
 use App\Models\ProductColor;
@@ -92,6 +93,20 @@ class ProductController extends Controller
             $randomString = fake()->regexify('[A-Z0-9]{10}');
             //add Product in Product
 
+            if($request->varient){
+                $arr=[];
+               foreach($request->varient as $varient){
+                   $colorSize = $varient['color'].$varient['size'];
+
+                   if(in_array($colorSize,$arr)){
+                    return response()->json(['success'=>false,'status'=>422,'message'=>'Do Not Enter Duplicate Variant Data']);
+                    
+                   }else{
+                    array_push($arr,$colorSize);
+                   }
+               }
+
+            }
             $product = Product::create([
                 'name' => $request->name,
                 'description' => $request->description,
@@ -224,32 +239,20 @@ class ProductController extends Controller
             {
                 $color = ProductColor::find($col)->color;
                 if ($si != null) {
-                    $si = ProductSize::find($si);
-                    if (is_null($si)) {
-                        $varient_name = $color . ' ' . $name;
-                        return $varient_name;
-                    }
-
+                    $si = ProductSize::find($si)->size;
+                    
                     $varient_name = $color . ' ' . $si . ' ' . $name;
                     return $varient_name;
+                    
                 } else {
                     $varient_name = $color . ' ' . $name;
                     return $varient_name;
                 }
+                // dd($varient_name);
             }
 
-            // validation for new varienrt data
-
-            if ($request->varient) {
-                foreach ($request->varient as $key => $varient) {
-                    $check = ProductVarient::where('product_color_id', $varient['color'])
-                        ->where('product_size_id', $varient['size'])->where('product_id', $id)
-                        ->first();
-                    if ($check) {
-                        return response()->json(['success' => false, 'status' => 422, 'message' => 'Do not Enter Same Data']);
-                    }
-                }
-            }
+        
+    
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
                 'category_id' => 'required|exists:categories,id',
@@ -271,7 +274,14 @@ class ProductController extends Controller
                 'is_featured' => $request->is_featured,
                 'long_description' => $request->long_description,
             ]);
-
+    // validation for new varienrt data
+    $productVarinet=ProductVarient::where('product_id',$id)->get();
+    foreach($productVarinet as $product){
+        $product->update([
+            'variant_name'=>generateVarientName($product->product_color_id,$product->product_size_id,$request->name),
+            'slug' => Str::slug($request->name, '-'),
+        ]);
+    }
             if ($product) {
                 //update Product in Product Description
                 $productDescription = ProductDescription::where('product_id', $id)
@@ -298,14 +308,21 @@ class ProductController extends Controller
                 if ($request->varient) {
                     foreach ($request->varient as $varient) {
                         $varient_name = generateVarientName($varient['color'], $varient['size'], $request->name);
-                        $productVarient = ProductVarient::create([
-                            'product_id' => $id,
-                            'product_color_id' => $varient['color'],
+                       $oldData= ProductVarient::where('variant_name', $varient_name)->first();
+                        if ($oldData) {
+                            $oldData->update([ 'stock' => $varient['stock']]);
+                        
+                        }else{
 
-                            'product_size_id' => $varient['size'],
-                            'variant_name' => ($varient_name),
-                            'stock' => $varient['stock'],
-                        ]);
+                            $productVarient = ProductVarient::create([
+                                'product_id' => $id,
+                                'product_color_id' => $varient['color'],
+    
+                                'product_size_id' => $varient['size'],
+                                'variant_name' => ($varient_name),
+                                'stock' => $varient['stock'],
+                            ]);
+                        }
                     }
                 }
                 if ($productDescription != null) {
@@ -332,11 +349,12 @@ class ProductController extends Controller
             $productImage = ImageProduct::where('product_id', $product->id)->delete();
             $productVarient = ProductVarient::where('product_id', $product->id)->delete();
             $productDescription = ProductDescription::where('product_id', $product->id)->delete();
+            Carts::where('product_id', $product->id)->delete();
             $product->delete();
             if ($productImage != null && $productDescription != null && $productVarient != null) {
                 return response()->json(['success' => true, 'status' => 200, 'message' => 'Product Delete Successfully']);
             } else {
-                return response()->json(['success' => true, 'status' => 422, 'message' => 'Some Error Found']);
+                return response()->json(['success' => false, 'status' => 422, 'message' => 'Some Error Found']);
             }
         } else {
             return response()->json(['success' => false, 'status' => 404, 'message' => 'Product Not Found']);

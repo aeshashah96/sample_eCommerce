@@ -58,13 +58,14 @@ class BannersController extends Controller
                 $image_name = time() . "." . $extention;
                 $file->move('images/banners/', $image_name);
             }
+            $id=SubCategories::find($request->sub_category_id)->category_id;
+            
             Banners::create([
                 'image' => $image_name,
                 'description' => $request->description,
                 'banner_title' => $request->banner_title,
                 'sub_category_id' => $request->sub_category_id,
-                'category_id' => $request-> category_id,
-                'banner_url' => '/' . Categories::find($request->category_id)->category_slug. '/' . SubCategories::find( $request->sub_category_id)->subcategory_slug
+                'banner_url' => '/' . Categories::find($id)->category_slug. '/' . SubCategories::find( $request->sub_category_id)->subcategory_slug
             ]);
             return response()->json([
                 'success'=>true,
@@ -75,7 +76,7 @@ class BannersController extends Controller
             return response()->json([
                 'success'=>false,
                 'status'=>404,
-                'error'=>$e
+                'error'=>$e->getMessage(),
             ]);
         }
     }

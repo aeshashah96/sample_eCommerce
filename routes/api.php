@@ -18,6 +18,7 @@ use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\WishlistsController;
 use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NewsLetterController;
 use App\Http\Controllers\ProductSizeController;
 use App\Http\Controllers\TestFeatureSearchController;
@@ -80,7 +81,7 @@ Route::post('/admin-login', [AdminAuthController::class, 'admin_login']);
 // harshvardhan 28 jun logout route
 Route::middleware(['auth:adminApi'])->group(function () {
     // <------------------------------ Admin profile module ------------------------------------------------->
-    Route::get('/admin-logout', [AdminAuthController::class, 'admin_logout']);
+    Route::post('/admin-logout', [AdminAuthController::class, 'admin_logout']);
     Route::get('/admin-profile', [AdminAuthController::class, 'admin_profile']);
     Route::post('/edit-admin-profile', [AdminAuthController::class, 'edit_admin_profile']);
     Route::post('/change-admin-password', [AdminAuthController::class, 'change_admin_password']);
@@ -165,6 +166,8 @@ Route::middleware(['auth:adminApi'])->group(function () {
     Route::get('/city-status/{id}', [CityController::class, 'changeActiveStatus']);
     Route::get('/state-status/{id}', [StateController::class, 'changeActiveStatus']);
     Route::get('/country-status/{id}', [CountryController::class, 'changeActiveStatus']);
+
+    Route::get('/dashboard',[DashboardController::class,'getDashboardDetails']);
 });
 // AdminLogin  && AdminLogout
 
