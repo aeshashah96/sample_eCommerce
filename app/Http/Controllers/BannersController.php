@@ -194,24 +194,7 @@ class BannersController extends Controller
             ]);
         }
     }
-    // function for get banner frontend side 
 
-    // public function createBanner(Request $request,$id){
-    //     if ($request->has('image')) {
-    //         $file = $request->file('image');
-    //         $extention = $file->getClientOriginalExtension();
-    //         $image_name = time() . "." . $extention;
-    //         $file->move('upload/banners/', $image_name);
-    //     }
-    //     // $ = Banners::find($id);
-
-    //     Banners::create([
-    //         'image'=>$image_name,
-    //         'description'=>$request->description,
-    //         'banner_title'=>$request->banner_title,
-    //         // 'sub_category_id'=>
-    //     ]);
-    // }
     public function homeBanner()
     {
         try {
@@ -268,23 +251,16 @@ class BannersController extends Controller
     }
     public function getProduct($category,$subcategory){
         try{
-            $slugUrl = '/'.$category.'/'.$subcategory;
-            // dd($slugUrl);
-            // dd($slugUrl);
-            // 
             $catName  = Categories::where('category_slug',$category)->first();
-            // dd($catName);
             $subcatName = SubCategories::where('subcategory_slug',$subcategory)->first();
             $product = Product::where('category_id',$catName->id)->where('sub_category_id',$subcatName->id)->get();
-            // dd($product);
     
             foreach($product as $item){
             
                 $item->product_image= url("/images/product/".ImageProduct::where('product_id',$item->id)->pluck('image')->first());
-                
-                $item->avg_rating = ProductReview::where('product_id',$item->id)->pluck('rating')->avg();
-               
+                $rating = ProductReview::where('product_id',$item->id)->pluck('rating')->avg();
                 $item->total_review= ProductReview::where('product_id',$item->id)->pluck('rating')->count();
+                $item->avg_rating = number_format((float) $rating , 2, '.', '');
             }
             if($product){
                 $product = $product->makeHidden(['description','category_id','sub_category_id','sku','isActive','is_featured','long_description'])->toArray();

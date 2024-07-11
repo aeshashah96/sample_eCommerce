@@ -158,7 +158,7 @@ class ProductController extends Controller
                 return response()->json(['success' => false, 'status' => 201, 'message' => 'Error']);
             }
         } catch (Exception $e) {
-            return response()->json(['success' => false,'status' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['success' => false, 'status' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }
 
@@ -172,21 +172,21 @@ class ProductController extends Controller
         try {
             $product = Product::find($id);
             if ($product) {
-                
-                $product->makeHidden(['productReview', 'sku','productInformation']);
-                $longdes=($product->productInformation->additional_information);
-                $product->additional_information=$longdes;
+
+                $product->makeHidden(['productReview', 'sku', 'productInformation']);
+                $longdes = ($product->productInformation->additional_information);
+                $product->additional_information = $longdes;
                 foreach ($product->productImages as $img) {
                     $img->image = url('/images/product/' . $img->image);
                 }
                 $img = $product->productImages->pluck('image');
                 $product->avrageRating = $product->productReview->pluck('rating')->avg();
                 $colors = $product->colors->pluck('color');
-                $product->color =($colors);
+                $product->color = ($colors);
                 $product->size = $product->sizes->pluck('size');
                 $product->categoryName = $product->category->name;
                 $product->subcategoryName = $product->subcategory->name;
-               
+
                 $product->images = $img;
                 $stock = ProductVarient::where('product_id', $product->id)
                     ->whereIn('stock', ['unlimited'])
@@ -225,11 +225,11 @@ class ProductController extends Controller
                 $color = ProductColor::find($col)->color;
                 if ($si != null) {
                     $si = ProductSize::find($si);
-             if(is_null($si)){
-                $varient_name = $color . ' ' . $name;
-                return $varient_name;
-                    }       
-                    
+                    if (is_null($si)) {
+                        $varient_name = $color . ' ' . $name;
+                        return $varient_name;
+                    }
+
                     $varient_name = $color . ' ' . $si . ' ' . $name;
                     return $varient_name;
                 } else {
@@ -239,15 +239,15 @@ class ProductController extends Controller
             }
 
             // validation for new varienrt data
-         
-            if($request->varient){
+
+            if ($request->varient) {
                 foreach ($request->varient as $key => $varient) {
-                        $check = ProductVarient::where('product_color_id', $varient['color'])
-                        ->where('product_size_id', $varient['size'])->where('product_id',$id)
+                    $check = ProductVarient::where('product_color_id', $varient['color'])
+                        ->where('product_size_id', $varient['size'])->where('product_id', $id)
                         ->first();
-                        if ($check) {
-                            return response()->json(['success' => false, 'status' => 422, 'message' => 'Do not Enter Same Data']);
-                        }
+                    if ($check) {
+                        return response()->json(['success' => false, 'status' => 422, 'message' => 'Do not Enter Same Data']);
+                    }
                 }
             }
             $validatedData = $request->validate([
@@ -274,11 +274,10 @@ class ProductController extends Controller
 
             if ($product) {
                 //update Product in Product Description
-                // if($request->)
                 $productDescription = ProductDescription::where('product_id', $id)
                     ->first()
                     ->update(['additional_information' => $request->additional_information, 'description' => $request->description]);
-                    
+
                 //add data for new images enter in product update
                 if ($request->hasFile('image')) {
                     $files = $request->file('image');
@@ -296,18 +295,17 @@ class ProductController extends Controller
                         return response()->json(['success' => false, 'status' => 422, 'message' => 'Some Error Found']);
                     }
                 }
-                if($request->varient ){
+                if ($request->varient) {
                     foreach ($request->varient as $varient) {
                         $varient_name = generateVarientName($varient['color'], $varient['size'], $request->name);
-                            $productVarient = ProductVarient::create([
-                                'product_id' => $id,
-                                'product_color_id' => $varient['color'],
-                                
-                                'product_size_id' => $varient['size'],
-                                'variant_name' => ($varient_name),
-                                'stock' => $varient['stock'],
-                            ]);
-                      
+                        $productVarient = ProductVarient::create([
+                            'product_id' => $id,
+                            'product_color_id' => $varient['color'],
+
+                            'product_size_id' => $varient['size'],
+                            'variant_name' => ($varient_name),
+                            'stock' => $varient['stock'],
+                        ]);
                     }
                 }
                 if ($productDescription != null) {
@@ -319,7 +317,7 @@ class ProductController extends Controller
                 return response()->json(['success' => false, 'status' => 201, 'message' => 'Error']);
             }
         } catch (Exception $e) {
-            return response()->json(['success' => false,'status' => $e->getCode(), 'message' => $e->getMessage()]);
+            return response()->json(['success' => false, 'status' => $e->getCode(), 'message' => $e->getMessage()]);
         }
     }
 
@@ -381,15 +379,11 @@ class ProductController extends Controller
         try {
             $user = auth()->guard('api')->user();
             $limit = $request->input('limit');
-            // $productlist = Product::select('id', 'name', 'price')->with('productReview', 'productImages:id,product_id,image')->where('is_featured', 1)->get();
+
             $productlist = Product::where('is_featured', 1)->get();
             $productlist = Product::limit($limit)
-            ->get()
-            ->makeHidden([ 'sku', 'is_featured', 'long_description', 'description', 'isActive', 'category_id', 'sub_category_id']);
-            // dd($productlist);
-            $ratingAverage = 0;
-            $totalReview = 0;
-            $productImage = '';
+                ->get()
+                ->makeHidden(['sku', 'is_featured', 'long_description', 'description', 'isActive', 'category_id', 'sub_category_id']);
             foreach ($productlist as $product) {
                 $productImage = url("/images/product/" . ImageProduct::where('product_id', $product->id)->pluck('image')->first());
                 $ratingAverage = ProductReview::where('product_id', $product->id)->pluck('rating')->avg();
@@ -400,39 +394,7 @@ class ProductController extends Controller
                 $product->product_image = $productImage;
                 $product->avg_rating = number_format((float)$ratingAverage, 2, '.', '');
                 $product->total_review = $totalReview;
-                $ratingAverage = 0;
-                $totalReview = 0;
-                $productImage = '';
             }
-          
-            // dd($productlist);
-            // if ($productlist) {
-            //     foreach ($productlist as $image) {
-            //         foreach ($image->productImages as $img) {
-            //             $img->image = url('/images/product/' . $img->image);
-            //         }
-            //     }
-
-            //     $rating = 0;
-            //     $productreview = 0;
-            //     foreach ($productlist as $review) {
-            //         foreach ($review->productReview as $ele) {
-            //             $rating = $ele
-            //                 ->where('product_id', $review->id)
-            //                 ->pluck('rating')
-            //                 ->avg();
-            //             $productreview = $ele
-            //                 ->where('product_id', $review->id)
-            //                 ->pluck('rating')
-            //                 ->count();
-            //         }
-            //         $review->avg_rating = $rating;
-            //         $review->total_review = $productreview;
-            //         $rating = 0;
-            //         $productreview = 0;
-            //     }
-
-
             if ($user) {
                 foreach ($productlist as $ele) {
                     $wishlistProduct = Wishlists::where('user_id', $user->id)
@@ -486,15 +448,10 @@ class ProductController extends Controller
                 $list->image = url('/images/product/' . $list->image);
             }
             $arrSize = [];
-            $arrId = [];
             foreach ($productlist->sizes as $size) {
-                array_push($arrId, $size->id);
                 array_push($arrSize, $size->size);
             }
-            $arrayMerge = array_combine($arrId, $arrSize);
-            if (!empty($arrayMerge)) {
-                $productlist->size = $arrayMerge;
-            }
+            $productlist->size = array_unique($arrSize);
             $rat = [];
             $total_review = [];
 
@@ -520,6 +477,7 @@ class ProductController extends Controller
             }
 
             if ($productlist) {
+                $productlist = $productlist->makeHidden('sizes');
                 return response()->json(
                     [
                         'success' => true,
@@ -639,14 +597,12 @@ class ProductController extends Controller
                         200,
                     );
                 }
-
                 $productReview = ProductReview::create([
                     'user_id' => $user->id,
                     'product_id' => $id,
                     'comment' => $request->comment,
                     'rating' => $request->rating,
                 ]);
-
                 if ($productReview) {
                     return response()->json(
                         [
@@ -662,7 +618,7 @@ class ProductController extends Controller
                         'status' => 500,
                         'message' => 'Product Review Not Added',
                     ]);
-                }
+                }   
             }
         } catch (Exception $e) {
             return response()->json([
@@ -677,14 +633,14 @@ class ProductController extends Controller
     {
         try {
             $user = auth()->guard('api')->user();
-            $relatedProduct = Product::with('category', 'subcategory', 'productReview', 'productImages:id,product_id,image')->where('slug', $slug)->get();
+            $relatedProduct = Product::with('category', 'subcategory', 'productReview')->where('slug', $slug)->get();
             $products = [];
 
             foreach ($relatedProduct as $product) {
                 // dd($product);
                 $products = $product
-                    ->where('sub_category_id', $product->subcategory->id)
-                    ->with('category', 'subcategory', 'productReview', 'productImages')
+                    ->where('category_id', $product->category->id)
+                    // ->with('category', 'subcategory', 'productReview', 'productImages')
                     ->get();
                 $relatedProduct = $products;
             }
@@ -701,16 +657,14 @@ class ProductController extends Controller
                         ->pluck('rating')
                         ->count();
                 }
-                $ele->avg_rating = $rating;
+                $ele->avg_rating = number_format((float)$rating, 2, '.', '');
                 $ele->total_review = $total;
                 $rating = 0;
                 $total = 0;
             }
             if ($relatedProduct) {
                 foreach ($relatedProduct as $product) {
-                    foreach ($product->productImages as $img) {
-                        $img->image = url('/images/product/' . $img->image);
-                    }
+                    $product->product_image = url("/images/product/" . ImageProduct::where('product_id', $product->id)->pluck('image')->first());
                 }
                 $relatedProduct = $relatedProduct->makeHidden(['productReview', 'subcategory', 'category', 'category_id', 'sub_category_id', 'sku', 'isActive', 'is_featured', 'description', 'long_description']);
                 if ($user) {

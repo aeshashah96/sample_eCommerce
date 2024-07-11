@@ -95,8 +95,16 @@ class CityController extends Controller
         
     }
     //search city api
-    public function search_city($id){
+    public function search_city($id = null){
         try{
+            if(!$id){
+                return response()->json([
+                    "success"=>true,
+                    'status'=>200,
+                    'message'=>'cities fetch successfully',
+                    'data'=>[]
+                ]);
+            }
             $data = City::where('city_name','like',"%$id%")->get(['id','city_name']);
             return response()->json([
                 'success'=>true,
@@ -111,7 +119,7 @@ class CityController extends Controller
                 'message' => $e->getMessage(),
             ]);
         }
-    }
+    }     
 
     //select city
     public function select_city($id){

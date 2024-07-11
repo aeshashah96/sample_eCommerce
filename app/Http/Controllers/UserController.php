@@ -38,7 +38,7 @@ class UserController extends Controller
 
             if ($user) {
                 // $user->sendEmailVerificationNotification();
-                SendEmailUser::dispatch($user);
+                // SendEmailUser::dispatch($user);
                 return response()->json([
                     'success' => true,
                     'status' => 201,

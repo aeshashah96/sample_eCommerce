@@ -223,7 +223,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('add-user-address', [UserAddressesController::class, 'add_user_address']);
     Route::post('edit-user-address/{id}', [UserAddressesController::class, 'edit_user_address']);
     Route::get('get-city', [CityController::class, 'get_cities']);
-    Route::get('search-city/{id}', [CityController::class, 'search_city']);
+    Route::get('search-city/{id?}', [CityController::class, 'search_city']);
     Route::get('select-city/{id}', [CityController::class, 'select_city']);
     // <------------------------------------------------------------------------------------------------>
 
@@ -247,7 +247,11 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/add-product-review/{id}',[ProductController::class,'addProductReview']);
     Route::get('/checkout',[OrdersController::class,'checkoutOrder']);
     Route::post('/add-order',[OrdersController::class,'orderDetails']);
+    Route::get('/orders',[OrdersController::class,'orders']);
 });
+
+// <-----------------------------------Nikunj OrderItems API-------------------------------------------->
+Route::get('/order-details/{id}',[OrdersController::class,'orderHistory']); 
 // <------------------------------------------------------------------------------------------------>
 
 // ------------------------------Product Details APi : Nikunj -------------------------------
@@ -273,3 +277,4 @@ Route::group(['middleware' => 'guest:api'], function () {
 Route::get('search',[TestFeatureSearchController::class,'search_filter']);
 Route::post('filter-feature',[TestFeatureSearchController::class,'filter_feature']);
 
+Route::get('/product-banner/{category}/{subcategory}',[BannersController::class,'getProduct']);

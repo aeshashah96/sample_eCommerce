@@ -13,6 +13,13 @@ class CartsController extends Controller
 {
     public function addProductCart(Request $request, $id)
     {
+        if($request->quantity < 1){
+            return response()->json([
+                'success'=>false,
+                'status'=>404,
+                'message'=>'Please Add Quantity'
+            ]);
+        }
         $user = $request->user();
         $productId = Product::where('id', $id)->first();
         if ($productId) {
@@ -52,6 +59,7 @@ class CartsController extends Controller
                             'color' => $request->color,
                             'size' => $request->size,
                         ]);
+
                         if ($cart) {
                             return response()->json([
                                 'success' => true,
@@ -169,7 +177,7 @@ class CartsController extends Controller
                 ]);
             } else {
                 return response()->json([
-                    'success' => true,
+                    'success' => false,
                     'status' => 200,
                     'message' => 'Product Limit Reached',
                 ]);
@@ -202,7 +210,7 @@ class CartsController extends Controller
             if ($cart->quantity == 0) {
                 $cart->delete();
                 return response()->json([
-                    'success' => true,
+                    'success' => false,
                     'status' => 200,
                     'message' => 'Product Removed SuccessFully.',
                 ]);
