@@ -105,7 +105,6 @@ class TestFeatureSearchController extends Controller
         */
         if($value['flag']){
             return $value['data'];
-            
         }
         /*
         if record not found for whole string then devide string by space and find for each word 
@@ -123,35 +122,17 @@ class TestFeatureSearchController extends Controller
         return to search or filter function 
          */
         return $value['data'];
-        
     }
 
-    public function search_filter(Request $request){
-        /*
-        sending searching string from param to test_search function
-        */
-        $value = TestFeatureSearchController::test_search($request->search);
-        $data = $value->get('products.id')->toArray();      
-        /*
-        get search result products ids and getting data using model
-        */    
-        $final = array_unique(array_column($data, 'id'));   
-        
-        $product = Product::whereIn('id',$final)->paginate(10);
-        foreach($product as $item){
-            $item->avg_rating = ProductReview::where('product_id',$item->id)->pluck('rating')->avg();
-            $item->total_review = ProductReview::where('product_id',$item->id)->pluck('rating')->count();
-            $item->product_image = url("/images/product/".ImageProduct::where('product_id',$item->id)->pluck('image')->first());
-        }
-        
-        return response()->json([
-            'success'=>true,
-            'status'=>200,
-            'message'=>'products fetch successfully',
-            'data'=>$product
-        ]);
-    }
     public function filter_feature(Request $request){
+        if(!$request->search){
+            return response()->json([
+                'success'=>true,
+                'status'=>200,
+                'message'=>'products fetch successfully',
+                'data'=>[]
+            ]);
+        }
         /*
         sending searching string from param to test_search function
         */
@@ -160,7 +141,8 @@ class TestFeatureSearchController extends Controller
         filter search results by price 
         */
         if($request->price){
-            $value->where('products.price','<',$request->price);
+            $value->where('products.price','>',$request->minPrice);
+            $value->where('products.price','<',$request->maxPrice);
         }
         /*
         filter search results by color 
@@ -178,13 +160,28 @@ class TestFeatureSearchController extends Controller
         $final = array_unique(array_column($data, 'id'));
         /*
         get search result products ids and getting data using model
-        */    
-        $product = Product::whereIn('id',$final)->paginate(10);
+        */   
+        $product = Product::whereIn('id',$final);
+       
+        
+        if($request->latest){
+            $product = $product->orderBy('products.created_at', 'DESC')->paginate(10);
+        }
+        else if($request->popularity){
+            $product = $product->orderBy('products.is_featured', 'DESC')->paginate(10);
+        }
+        else if($request->rating){
+            $product = $product->orderBy('rating', 'DESC')->paginate(10);
+        }else{
+            $product = $product->paginate(10);
+        }
         foreach($product as $item){
-            $item->avg_rating = ProductReview::where('product_id',$item->id)->pluck('rating')->avg();
+            $ratingAverage = ProductReview::where('product_id',$item->id)->pluck('rating')->avg();
+            number_format((float)$ratingAverage, 2, '.', '');
+            $item->avg_rating = $ratingAverage;
             $item->total_review = ProductReview::where('product_id',$item->id)->pluck('rating')->count();
             $item->product_image = url("/images/product/".ImageProduct::where('product_id',$item->id)->pluck('image')->first());
-        }
+        } 
         return response()->json([
             'success'=>true,
             'status'=>200,

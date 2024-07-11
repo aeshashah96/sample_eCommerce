@@ -218,32 +218,18 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     // <------------------------------------------------------------------------------------------------>
 
-    // <-------------------------- User Address Module : Harshvardhan Zala : 4/7/2024 ------------------------------>
-    Route::get('get-user-address/{id}', [UserAddressesController::class, 'get_user_address']);
-    Route::post('add-user-address', [UserAddressesController::class, 'add_user_address']);
-    Route::post('edit-user-address/{id}', [UserAddressesController::class, 'edit_user_address']);
-    Route::get('get-city', [CityController::class, 'get_cities']);
-    Route::get('search-city/{id?}', [CityController::class, 'search_city']);
-    Route::get('select-city/{id}', [CityController::class, 'select_city']);
-    // <------------------------------------------------------------------------------------------------>
-
-    // <-------------------------- search Module : Harshvardhan Zala : 4/7/2024 ------------------------------>
-    Route::get('search-filter/{id}', [FeaturesController::class, 'search_filter']);
-    // <------------------------------------------------------------------------------------------------>
 
 // <-------------------------- User Address Module : Harshvardhan Zala : 4/7/2024 ------------------------------> 
         Route::get('get-user-address/{id}',[UserAddressesController::class,'get_user_address']);
         Route::post('add-user-address',[UserAddressesController::class,'add_user_address']);
         Route::post('edit-user-address/{id}',[UserAddressesController::class,'edit_user_address']);
         Route::get('get-city',[CityController::class,'get_cities']);
-        Route::get('search-city/{id}',[CityController::class,'search_city']);
+        Route::get('search-city/{id?}',[CityController::class,'search_city']);
         Route::get('select-city/{id}',[CityController::class,'select_city']);
 // <------------------------------------------------------------------------------------------------>
 
-// <-------------------------- search Module : Harshvardhan Zala : 4/7/2024 ------------------------------> 
-        Route::get('search-filter/{id}',[FeaturesController::class,'search_filter']);
-// <------------------------------------------------------------------------------------------------>
-    // <=====================================Nikunj Product And Order==========================================> 
+
+// <=====================================Nikunj Product And Order==========================================> 
     Route::post('/add-product-review/{id}',[ProductController::class,'addProductReview']);
     Route::get('/checkout',[OrdersController::class,'checkoutOrder']);
     Route::post('/add-order',[OrdersController::class,'orderDetails']);
@@ -257,10 +243,8 @@ Route::get('/order-details/{id}',[OrdersController::class,'orderHistory']);
 // ------------------------------Product Details APi : Nikunj -------------------------------
 
 // <-------------------------- search Module : Harshvardhan Zala : 4/7/2024 ------------------------------>
-Route::post('/fitler', [FeaturesController::class, 'filter_product']);
 
-Route::get('search/{id}', [FeaturesController::class, 'search_by_vatiant']);
-Route::post('/varient-fitler', [FeaturesController::class, 'filter_by_vatiant']);
+Route::get('search-filters',[TestFeatureSearchController::class,'filter_feature']);
 
 // <------------------------------------------------------------------------------------------------>
 
@@ -274,7 +258,7 @@ Route::group(['middleware' => 'guest:api'], function () {
     Route::get('category/product/{id}', [CategoriesController::class, 'getProductBasedCategory']);
 });
 
-Route::get('search',[TestFeatureSearchController::class,'search_filter']);
-Route::post('filter-feature',[TestFeatureSearchController::class,'filter_feature']);
+
+
 
 Route::get('/product-banner/{category}/{subcategory}',[BannersController::class,'getProduct']);
