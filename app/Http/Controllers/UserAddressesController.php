@@ -26,11 +26,10 @@ class UserAddressesController extends Controller
         }else{
             return response()->json([
                 'success'=>false,
-                'code'=>404,
+                'status'=>404,
                 'message'=>'record not found'
             ]);
-        }
-        
+        }  
     }
 
     public function add_user_address(UserAddressValidation $request){

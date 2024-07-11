@@ -91,7 +91,7 @@ class NewsLetterController extends Controller
         try {
             $newsletter = NewsLetter::create($request->input());
             if ($newsletter) {
-                SendEmailNewsPaper::dispatch($newsletter);
+                // SendEmailNewsPaper::dispatch($newsletter);
                 return response()->json([
                     'success' => true,
                     'status' => 201,

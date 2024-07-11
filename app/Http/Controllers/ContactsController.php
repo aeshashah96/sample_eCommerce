@@ -19,7 +19,7 @@ class ContactsController extends Controller
                 'message' => $request->message,
             ]);
             if ($contact) {
-                SendEmailContactUsUser::dispatch($contact);
+                // SendEmailContactUsUser::dispatch($contact);
                 return response()->json([
                     'success' => true,
                     'status' => 201,
