@@ -39,6 +39,7 @@ class TestFeatureSearchController extends Controller
             //searching string in  category name
             $category = Categories::where('name','like',"%$id%");
             if($category->count()){
+                // dd($id,'cat');
                 //redirect to category_search
                 $data = TestFeatureSearchController::category_search($data,$id);
                 $flag = true;
@@ -58,6 +59,8 @@ class TestFeatureSearchController extends Controller
             //searching string in productColor table
             $color = ProductColor::where('color','like',"%$id%");
             if($color->count()){
+                // dd($id,'col');
+
                 //redirect to color_search
                 $data = TestFeatureSearchController::color_search($data,$id);
                 $flag = true;
@@ -67,6 +70,8 @@ class TestFeatureSearchController extends Controller
             //searching string in productSize table
             $size = ProductSize::where('size','like',"%$id%");
             if($size->count()){
+                // dd($id,'size');
+
                 //redirect to size_search
                 $data = TestFeatureSearchController::size_search($data,$id);
                 $flag = true;
@@ -76,6 +81,8 @@ class TestFeatureSearchController extends Controller
             //searching string in products table
             $product = Product::where('name','like',"%$id%");
             if($product->count()){
+                // dd($id,'pro');
+
                 //redirect to product_search
                 $data = TestFeatureSearchController::product_search($data,$id);
                 $flag = true;
@@ -99,7 +106,6 @@ class TestFeatureSearchController extends Controller
         sending $data collecting and searched string to redirect_search function 
         */
         $value =  TestFeatureSearchController::redirect_search($data,$id,$flag=false);
-        
         /*
         if records are found for whole string then $value['flag'] returns true and return data to serach or filter function
         */
@@ -162,8 +168,6 @@ class TestFeatureSearchController extends Controller
         get search result products ids and getting data using model
         */   
         $product = Product::whereIn('id',$final);
-       
-        
         if($request->latest){
             $product = $product->orderBy('products.created_at', 'DESC')->paginate(10);
         }

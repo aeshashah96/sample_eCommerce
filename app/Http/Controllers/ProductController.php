@@ -398,8 +398,7 @@ class ProductController extends Controller
             $user = auth()->guard('api')->user();
             $limit = $request->input('limit');
 
-            $productlist = Product::where('is_featured', 1)->get();
-            $productlist = Product::limit($limit)
+            $productlist = Product::where('is_featured',1)->where('isActive',1)->limit($limit)
                 ->get()
                 ->makeHidden(['sku', 'is_featured', 'long_description', 'description', 'isActive', 'category_id', 'sub_category_id']);
             foreach ($productlist as $product) {
@@ -467,9 +466,11 @@ class ProductController extends Controller
             }
             $arrSize = [];
             foreach ($productlist->sizes as $size) {
-                array_push($arrSize, $size->size);
+                if(!in_array($size->size,$arrSize)){
+                    array_push($arrSize, $size->size);
+                }
             }
-            $productlist->size = array_unique($arrSize);
+            $productlist->size = ($arrSize);
             $rat = [];
             $total_review = [];
 

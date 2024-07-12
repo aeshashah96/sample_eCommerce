@@ -56,8 +56,9 @@ class UserController extends Controller
             }
         } catch (Exception $e) {
             return response()->json([
-                'status' => 'warning',
-                'message' => $e,
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
             ]);
         }
     }
@@ -88,7 +89,7 @@ class UserController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'status' => 'warning',
+                'status' => $e->getCode(),
                 'message' => $e->getMessage(),
             ]);
         }
@@ -109,11 +110,11 @@ class UserController extends Controller
                 ],
                 200,
             );
-        } catch (\Throwable $th) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'status' => 'warning',
-                'message' => $th,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
             ]);
         }
     }
@@ -143,8 +144,8 @@ class UserController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'status' => 'warning',
-                'message' => $e,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
             ]);
         }
     }
@@ -181,7 +182,7 @@ class UserController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'status' => 'warning',
+                'status' => $e->getCode(),
                 'message' => $e->getMessage(),
             ]);
         }
@@ -232,11 +233,11 @@ class UserController extends Controller
                     'message' => 'Invalid Password',
                 ]);
             }
-        } catch (\Throwable $th) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'status' => 'warning',
-                'message' => $th,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
             ]);
         }
     }

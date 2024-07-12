@@ -18,7 +18,7 @@ class CustomerController extends Controller
     public function index()
     {   
         try{
-            $datas = User::orderBy('created_at','desc')->paginate();
+            $datas = User::orderBy('created_at','desc')->paginate(10);
            foreach($datas as $data){
             // dump($data);
             $data->user_logo=url('images/users/'.$data->user_logo);
@@ -126,11 +126,11 @@ class CustomerController extends Controller
                 return response()->json([
                     'success'=>false,
                     'status'=>404,
-                    'error'=>'record not found'
+                    'message'=>'Record not found'
                 ]);    
             }
             if($request->has('user_logo')){
-                if($item->user_logo && $item->user_logo != 'userLogo.png'){
+                if($item->user_logo && ($item->user_logo != 'userLogo.png')){
                     $name = $item->user_logo;
                      $image_path = "images/users/$name";
                      unlink($image_path);
@@ -146,7 +146,7 @@ class CustomerController extends Controller
             return response()->json([
                 'success'=>true,
                 'status'=>200,
-                'messasge'=>'user record updated'
+                'message'=>'User Record Updated'
             ],200);
         }catch (Exception $e) {
             return response()->json([
@@ -169,10 +169,10 @@ class CustomerController extends Controller
                 return response()->json([
                     'success'=>false,
                     'status'=>404,
-                    'error'=>'record not found'
+                    'message'=>'record not found'
                 ]);    
             }
-            if($item->user_logo){
+            if($item->user_logo != 'userLogo.png'){
                 $name = $item->user_logo;
                  $image_path = "images/users/$name";
                  unlink($image_path);

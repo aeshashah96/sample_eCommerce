@@ -22,7 +22,11 @@ class BannersController extends Controller
         try{
             $data = Banners::with(['subcategory'=> function ($query) {
                 $query->select('id', 'name');
-            },])->orderBy('created_at','desc')->paginate(10);   
+            },])->orderBy('created_at','desc')->paginate(10);
+            foreach($data as $banner){
+                // dd($banner);
+                $banner->image = url("images/banners",$banner->image);
+            }   
             return response()->json([
                 'success'=>true,
                 'status' => 200,
@@ -31,9 +35,9 @@ class BannersController extends Controller
             ]);
         } catch(Exception $e){
             return response()->json([
-                'success'=>false,
-                'status'=>404,
-                'error'=>$e
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
             ]);
         }
     }
@@ -74,9 +78,9 @@ class BannersController extends Controller
             ], 200);
         } catch(Exception $e){
             return response()->json([
-                'success'=>false,
-                'status'=>404,
-                'error'=>$e->getMessage(),
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
             ]);
         }
     }
@@ -130,6 +134,7 @@ class BannersController extends Controller
     {
         try {
             $item = Banners::find($id);
+            $id=SubCategories::find($request->sub_category_id)->category_id;
             if (!$item) {
                 return response()->json([
                     'success'=>false,
@@ -149,7 +154,10 @@ class BannersController extends Controller
                 $banner_name = time() . "." . $extention;
                 $file->move('images/banners/', $banner_name);
                 $item->image = $banner_name;
-                $item->banner_url = url("/images/banners/$banner_name");
+                $item->banner_url = '/' . Categories::find($id)->category_slug. '/' . SubCategories::find( $request->sub_category_id)->subcategory_slug;
+                $item->update([
+                    'image' => $banner_name,
+                ]);
             }
             $item->update($request->input());
             return response()->json([
@@ -159,9 +167,9 @@ class BannersController extends Controller
             ], 200);
         } catch(Exception $e){
             return response()->json([
-                'success'=>false,
-                'status'=>404,
-                'error'=>$e
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
             ]);
         }
     }
@@ -189,9 +197,9 @@ class BannersController extends Controller
             ], 200);
         } catch(Exception $e){
             return response()->json([
-                'success'=>false,
-                'status'=>404,
-                'error'=>$e
+                'success' => false,
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
             ]);
         }
     }
