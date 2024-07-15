@@ -14,7 +14,7 @@ class ProductSizeController extends Controller
     public function index()
     {
         //get all sizes
-        $size=ProductSize::orderBy('created_at','DESC')->paginate(30);
+        $size=ProductSize::orderBy('created_at','DESC')->paginate(10);
         if($size){
 
             return response()->json(['success'=>true,'status'=>200,'message'=>'Product Size Get Successfully','data'=>$size]);
