@@ -177,7 +177,7 @@ class CartsController extends Controller
                 ]);
             } else {
                 return response()->json([
-                    'success' => false,
+                    'success' => false, 
                     'status' => 200,
                     'message' => 'Product Limit Reached',
                 ]);
